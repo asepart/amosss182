@@ -6,3 +6,15 @@ The app has the following main features:
 * Java-based server backend
 * Secure chat betweeen clients
 * Problem reports via app
+
+## Building
+
+### Web Service Backend
+
+Currently, there is a demo REST service which can be build and executed using:
+
+`$ cd webservice`
+`$ mvn clean compile`
+`$ mvn exec:java -Dexec.mainClass="HelloWorldService"`
+
+On port 12345, the service will respond with "Hello World" to any GET request.
