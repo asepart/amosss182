@@ -1,0 +1,8 @@
+language: node_js
+
+node_js:
+  - "iojs"
+  - "7"
+  
+notifications:
+    slack: amosss182:uKt02yuzx0zG1x1IDbhFUcOG
