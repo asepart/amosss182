@@ -37,3 +37,14 @@ You can now view admin-web-app in the browser on http://localhost:3000/
 
 To run the Webapp you need to install `iojs`
 `$ npm install iojs`
+
+## Testing
+
+### Web Service Backend
+
+JUnit is used as testing framework. To run the tests, execute:
+
+`$ cd webservice`
+
+`$ mvn test`
+
