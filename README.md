@@ -42,7 +42,7 @@ To run the Webapp you need to install `iojs`
 
 ### Web Service Backend
 
-JUnit is used as testing framework. To run the tests, execute:
+JUnit is used as our testing framework. To run the tests, execute:
 
 `$ cd webservice`
 
