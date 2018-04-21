@@ -39,10 +39,14 @@ To run the Webapp you need to install `iojs`
 `$ npm install iojs`
 
 ### User App
-#### Android
-To build the app one have to change the directory to `user-app/android` and run
 
-`./gradlew assembleRelease`
+#### Android
+
+To build the app one have to change the directory to `user-app` and run
+
+`npm install`
+
+`npm run android`
 
 ## Testing
 
