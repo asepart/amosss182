@@ -38,6 +38,12 @@ You can now view admin-web-app in the browser on http://localhost:3000/
 To run the Webapp you need to install `iojs`
 `$ npm install iojs`
 
+### User App
+#### Android
+To build the app one have to change the directory to `user-app/android` and run
+
+`./gradlew assembleRelease`
+
 ## Testing
 
 ### Web Service Backend
