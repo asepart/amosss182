@@ -25,26 +25,32 @@ On port 12345, the service will respond with "Hello World" to any GET request.
 
 The demo Web Application can be build and executed by:
 
-`installing iojs`
-
 `$ cd admin-web-app`
+
+`$ npm install`
 
 `$ npm start`
 
 You can now view admin-web-app in the browser on http://localhost:3000/
 
-#### Dependencies
-
-To run the Webapp you need to install `iojs`
-`$ npm install iojs`
-
 ## Testing
 
 ### Web Service Backend
 
-JUnit is used as testing framework. To run the tests, execute:
+JUnit is used as our testing framework. To run the tests, execute:
 
 `$ cd webservice`
 
 `$ mvn test`
+
+### Admin Web App
+
+The web application uses Jest to run unit and rendering tests. To run from command line, execute:
+
+`$ cd admin-web-app`
+
+`$ npm install`
+
+`$ npm test`
+
 
