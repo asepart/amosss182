@@ -63,4 +63,12 @@ The web application uses Jest to run unit and rendering tests. To run from comma
 
 `$ npm test`
 
+### User App
 
+Like the web application, the mobile user app also uses Jest.
+
+`$ cd user-app`
+
+`$ npm install`
+
+`$ npm test`
