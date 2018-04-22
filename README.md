@@ -33,6 +33,16 @@ The demo Web Application can be build and executed by:
 
 You can now view admin-web-app in the browser on http://localhost:3000/
 
+### User App
+
+#### Android
+
+To build the app one have to change the directory to `user-app` and run
+
+`npm install`
+
+`npm run android`
+
 ## Testing
 
 ### Web Service Backend
