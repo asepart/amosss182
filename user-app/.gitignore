@@ -15,10 +15,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# android build files
-
-android/.gradle/
-android/app/build/
-android/build/
-
