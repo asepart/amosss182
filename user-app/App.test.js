@@ -7,7 +7,3 @@ it('renders without crashing', () => {
   const rendered = renderer.create(<App />).toJSON();
   expect(rendered).toBeTruthy();
 });
-
-it('example test', () => {
-  expect(1 + 1).toEqual(2);
-});
