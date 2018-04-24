@@ -6,9 +6,6 @@ matrix:
         - cd webservice && mvn clean verify
         
     - language: node_js
-      node_js:
-        - iojs
-        - node
       before_script:
         - npm i react-native-scripts
       script:
