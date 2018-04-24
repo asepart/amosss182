@@ -10,7 +10,7 @@ matrix:
         - iojs
         - 7
       script:
-        - cd user-app && npm run eject && npm install
+        - cd user-app && npm install
         - cd ../admin-web-app && npm install
 
 notifications:
