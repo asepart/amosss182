@@ -1,3 +1,17 @@
-sudo: false
-language: java
-script: "cd webservice && mvn clean verify"
+matrix:
+  include:
+    - language: java
+      sudo: false
+      script:
+        - cd webservice && mvn clean verify
+        
+    - language: node_js
+      node_js: 
+        - iojs
+        - 7
+      script:
+        - cd user-app && npm run eject && npm install
+        - cd admin-web-app && npm install
+
+notifications:
+    slack: amosss182:TgxsHpbje9iTEqXYwuPyC32C
