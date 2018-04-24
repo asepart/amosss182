@@ -10,7 +10,7 @@ matrix:
         - iojs
         - 8
       before_install:
-        - npm install react-native-scripts
+        - npm i react-native-scripts
       script:
         - cd user-app && npm run eject && npm install
         - cd ../admin-web-app && npm install
