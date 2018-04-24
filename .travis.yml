@@ -8,7 +8,7 @@ matrix:
     - language: node_js
       sudo: false
       script:
-        - npm install -g create-react-native-app
+        - npm i react-native-scripts
         - cd user-app && npm run eject && npm install
         - cd ../admin-web-app && npm install
 
