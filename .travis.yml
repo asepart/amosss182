@@ -8,10 +8,8 @@ matrix:
     - language: node_js
       node_js:
         - 8
-      before_script:
-        - npm i react-native-scripts
       script:
-        - cd user-app && npm run eject && npm install
+        - cd user-app && npm install
         - cd ../admin-web-app && npm install
 
 notifications:
