@@ -10,8 +10,8 @@ matrix:
         - iojs
         - 7
       script:
-        - cd admin-web-app && npm install
-        - cd ../user-app && npm install
+        - cd user-app && npm run eject && npm install
+        - cd ../admin-web-app && npm install
 
 notifications:
     slack: amosss182:Jy3u9zaYLt3M9abd8PnYID3D
