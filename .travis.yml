@@ -8,8 +8,7 @@ matrix:
     - language: node_js
       sudo: false
       script:
-        - npm i react-native-scripts
-        - cd user-app && npm run eject && npm install
+        - cd user-app && npm i react-native-scripts && npm run eject && npm install
         - cd ../admin-web-app && npm install
 
 notifications:
