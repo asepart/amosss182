@@ -11,7 +11,7 @@ matrix:
         - 7
       script:
         - cd admin-web-app && npm install
-        - cd ../user-app && npm run eject && npm install
+        - cd ../user-app && npm install
 
 notifications:
-    slack: amosss182:TgxsHpbje9iTEqXYwuPyC32C
+    slack: amosss182:Jy3u9zaYLt3M9abd8PnYID3D
