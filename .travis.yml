@@ -8,6 +8,7 @@ matrix:
     - language: node_js
       node_js:
         - iojs
+        - 8
       sudo: false
       before_install:
         - npm install react-native-scripts
