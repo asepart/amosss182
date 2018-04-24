@@ -9,6 +9,8 @@ matrix:
       node_js:
         - iojs
         - node
+      before_script:
+        - npm i react-native-scripts
       script:
         - cd user-app && npm run eject && npm install
         - cd ../admin-web-app && npm install
