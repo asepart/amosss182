@@ -11,6 +11,7 @@ matrix:
         - 8
       sudo: false
       before_install:
+        - nvm use 8
         - npm install react-native-scripts
       script:
         - cd user-app && npm run eject && npm install
