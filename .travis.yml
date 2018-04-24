@@ -14,4 +14,4 @@ matrix:
         - cd ../admin-web-app && npm install
 
 notifications:
-    slack: amosss182:Jy3u9zaYLt3M9abd8PnYID3D
+    slack: amosss182:Jy3u9zaYLt3M9abd8PnYID3D 
