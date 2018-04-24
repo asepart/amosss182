@@ -6,11 +6,9 @@ matrix:
         - cd webservice && mvn clean verify
         
     - language: node_js
-      node_js: 
-        - iojs
-        - 7
+      sudo: false
       script:
-        - cd user-app && npm install
+        - cd user-app && npm run eject && npm install
         - cd ../admin-web-app && npm install
 
 notifications:
