@@ -6,6 +6,8 @@ matrix:
         - cd webservice && mvn clean verify
         
     - language: node_js
+      node_js:
+        - iojs
       sudo: false
       before_install:
         - npm install react-native-scripts
