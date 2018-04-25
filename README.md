@@ -17,9 +17,9 @@ Currently, there is a demo REST service which can be build and executed using:
 
 `$ mvn clean compile`
 
-`$ mvn exec:java -Dexec.mainClass="HelloWorldService"`
+`$ mvn exec:java -Dexec.mainClass="de.fau.cs.osr.amos.asepart.WebService"`
 
-On port 12345, the service will respond with "Hello World" to any GET request.
+On port 12345, the service will respond with "Hello World" to any GET request and show the number of requests made in total.
 
 ### Admin Web App
 

@@ -1,3 +1,5 @@
+package de.fau.cs.osr.amos.asepart;
+
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -10,13 +12,35 @@ import javax.ws.rs.core.UriBuilder;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import org.hibernate.Session;
+
 @Path("/")
-public class HelloWorldService
+public class WebService
 {
     @GET
     public Response get()
     {
-        return Response.ok("Hello, World!").build();
+        Session session = DatabaseController.newSession();
+        session.beginTransaction();
+
+        KeyValueEntry demo = session.get(KeyValueEntry.class, "demo");
+
+        if (demo == null)
+        {
+            demo = new KeyValueEntry();
+            demo.setKey("demo");
+            demo.setValue(0);
+        }
+
+        int count = demo.getValue();
+        count++;
+        demo.setValue(count);
+
+        session.save(demo);
+        session.getTransaction().commit();
+        session.close();
+
+        return Response.ok("Hello, World! Counter: " + count).build();
     }
 
     public static void main(String[] args)
@@ -27,7 +51,7 @@ public class HelloWorldService
             final String address = "http://" + ip + "/";
 
             final URI uri = UriBuilder.fromUri(address).port(12345).build();
-            ResourceConfig config = new ResourceConfig(HelloWorldService.class);
+            ResourceConfig config = new ResourceConfig(WebService.class);
             JdkHttpServerFactory.createHttpServer(uri, config);
         }
 
