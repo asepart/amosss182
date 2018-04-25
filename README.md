@@ -39,9 +39,9 @@ You can now view admin-web-app in the browser on http://localhost:3000/
 
 To build the app one have to change the directory to `user-app` and run
 
-`npm run eject`
-
 `npm install`
+
+`npm run eject`
 
 `npm run android`
 
