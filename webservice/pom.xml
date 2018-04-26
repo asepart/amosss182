@@ -78,7 +78,7 @@
                     <images>
                         <image>
                             <alias>webservice</alias>
-                            <name>davidhaller/asepart-webservice:${project.version}</name>
+                            <name>asepart-webservice:${project.version}</name>
 
                             <build>
                                 <from>openjdk:8</from>
