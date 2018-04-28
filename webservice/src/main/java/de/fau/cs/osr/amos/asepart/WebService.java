@@ -14,6 +14,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import org.hibernate.Session;
 
+import de.fau.cs.osr.amos.asepart.entities.KeyValueEntry;
+
 @Path("/")
 public class WebService
 {

@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

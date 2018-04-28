@@ -1,5 +1,7 @@
 package de.fau.cs.osr.amos.asepart;
 
+import de.fau.cs.osr.amos.asepart.entities.KeyValueEntry;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;

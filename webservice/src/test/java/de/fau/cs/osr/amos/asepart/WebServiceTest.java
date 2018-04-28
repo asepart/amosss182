@@ -1,5 +1,6 @@
 package de.fau.cs.osr.amos.asepart;
 
+import de.fau.cs.osr.amos.asepart.entities.KeyValueEntry;
 import org.hibernate.Session;
 
 import org.junit.jupiter.api.Test;
