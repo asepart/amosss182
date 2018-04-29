@@ -55,7 +55,6 @@ public class AuthenticationFilter implements ContainerRequestFilter
         if (authorization == null || authorization.isEmpty())
         {
             requestContext.abortWith(ACCESS_DENIED);
-            return;
         }
 
         // Get encoded username and password

@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -20,7 +21,7 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 @Path("/")
 public class WebService
 {
-    @GET
+    @GET @RolesAllowed({"User"})
     public Response get()
     {
         Session session = DatabaseController.newSession();
