@@ -13,10 +13,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import org.hibernate.Session;
-
 import de.fau.cs.osr.amos.asepart.authentication.AuthenticationFilter;
-import de.fau.cs.osr.amos.asepart.entities.*;
 
 @Path("/")
 public class WebService
@@ -24,7 +21,7 @@ public class WebService
     @GET @RolesAllowed({"User"})
     public Response get()
     {
-        Session session = DatabaseController.newSession();
+        /*Session session = DatabaseController.newSession();
         session.beginTransaction();
 
         KeyValueEntry demo = session.get(KeyValueEntry.class, "demo");
@@ -42,9 +39,9 @@ public class WebService
 
         session.save(demo);
         session.getTransaction().commit();
-        session.close();
+        session.close();*/
 
-        return Response.ok("Hello, World! Counter: " + count).build();
+        return Response.ok("Hello, World!").build();
     }
 
     public static void main(String[] args)
@@ -53,10 +50,11 @@ public class WebService
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
             final String address = "http://" + ip + "/";
-
             final URI uri = UriBuilder.fromUri(address).port(12345).build();
+
             ResourceConfig config = new ResourceConfig(WebService.class);
             config.register(AuthenticationFilter.class);
+
             JdkHttpServerFactory.createHttpServer(uri, config);
         }
 

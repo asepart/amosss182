@@ -17,13 +17,10 @@ public class DatabaseController
         try
         {
             Configuration configuration = new Configuration().configure();
-            configuration.addAnnotatedClass(KeyValueEntry.class);
-
             configuration.addAnnotatedClass(Account.class);
             configuration.addAnnotatedClass(Admin.class);
             configuration.addAnnotatedClass(User.class);
-
-            //configuration.addAnnotatedClass(Project.class);
+            configuration.addAnnotatedClass(Project.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());
