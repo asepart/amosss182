@@ -6,40 +6,53 @@ import java.util.HashSet;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "admin")
-public class Admin
+@Table(name = "user")
+public class User
 {
-    @Id @Column(name = "admin_id")
+    @Id @Column(name = "user_id")
     @GeneratedValue
-    private int adminID;
+    private int userID;
 
-    @Id @Column(name = "admin_name")
-    private String adminName;
+    @Id @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "phone", nullable = false)
+    private String phone;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @ManyToMany(mappedBy = "admins")
+    @ManyToMany(mappedBy = "users")
     private Set<Project> projects = new HashSet<>();
 
-    public int getAdminID()
+    public int getUserID()
     {
-        return adminID;
+        return userID;
     }
 
-    public void setAdminID(int adminID)
+    public void setUserID(int userID)
     {
-        this.adminID = adminID;
+        this.userID = userID;
     }
 
-    public String getAdminName()
+    public String getUserName()
     {
-        return adminName;
+        return userName;
     }
 
-    public void setAdminName(String adminName)
+    public void setUserName(String userName)
     {
-        this.adminName = adminName;
+        this.userName = userName;
+    }
+
+    public String getPhone()
+    {
+        return phone;
+    }
+
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
     }
 
     public String getPasswordHash()
