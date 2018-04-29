@@ -6,10 +6,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
 
-import de.fau.cs.osr.amos.asepart.entities.Admin;
-import de.fau.cs.osr.amos.asepart.entities.User;
-import de.fau.cs.osr.amos.asepart.entities.Project;
-import de.fau.cs.osr.amos.asepart.entities.KeyValueEntry;
+import de.fau.cs.osr.amos.asepart.entities.*;
 
 public class DatabaseController
 {
@@ -22,9 +19,11 @@ public class DatabaseController
             Configuration configuration = new Configuration().configure();
             configuration.addAnnotatedClass(KeyValueEntry.class);
 
-            configuration.addAnnotatedClass(Project.class);
+            configuration.addAnnotatedClass(Account.class);
             configuration.addAnnotatedClass(Admin.class);
             configuration.addAnnotatedClass(User.class);
+
+            //configuration.addAnnotatedClass(Project.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());

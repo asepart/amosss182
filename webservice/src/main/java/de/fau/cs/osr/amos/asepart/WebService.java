@@ -14,7 +14,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import org.hibernate.Session;
 
-import de.fau.cs.osr.amos.asepart.entities.KeyValueEntry;
+import de.fau.cs.osr.amos.asepart.authentication.AuthenticationFilter;
+import de.fau.cs.osr.amos.asepart.entities.*;
 
 @Path("/")
 public class WebService
@@ -54,6 +55,7 @@ public class WebService
 
             final URI uri = UriBuilder.fromUri(address).port(12345).build();
             ResourceConfig config = new ResourceConfig(WebService.class);
+            config.register(AuthenticationFilter.class);
             JdkHttpServerFactory.createHttpServer(uri, config);
         }
 

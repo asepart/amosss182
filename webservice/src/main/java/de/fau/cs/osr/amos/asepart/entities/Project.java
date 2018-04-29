@@ -1,33 +1,19 @@
 package de.fau.cs.osr.amos.asepart.entities;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "project")
 public class Project
 {
-    @Id @Column(name = "project_id")
-    @GeneratedValue
-    private int projectID;
-
     @Id @Column(name = "project_name")
     private String projectName;
 
     @Column(name = "entry_key", nullable = false)
     private String entryKey;
-
-    public int getProjectID()
-    {
-        return projectID;
-    }
-
-    public void setProjectID(int projectID)
-    {
-        this.projectID = projectID;
-    }
 
     public String getProjectName()
     {
@@ -49,6 +35,7 @@ public class Project
         this.entryKey = entryKey;
     }
 
+    /*
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable
             (
@@ -90,4 +77,5 @@ public class Project
         admins.remove(admin);
         admin.getProjects().remove(this);
     }
+    */
 }
