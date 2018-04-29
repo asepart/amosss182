@@ -28,6 +28,10 @@ public class WebServiceTest
             a.setPasswordHash(BCrypt.hashpw("password123", BCrypt.gensalt()));
 
             session.save(a);
+
+            Account b = session.get(Account.class, "testuser");
+            assertEquals("Test", b.getFirstName());
+
             session.getTransaction().commit();
         }
     }
