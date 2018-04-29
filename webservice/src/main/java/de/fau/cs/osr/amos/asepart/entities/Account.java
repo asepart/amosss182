@@ -71,4 +71,24 @@ public class Account
     {
         this.lastName = lastName;
     }
+
+    public Admin getAdmin()
+    {
+        return admin;
+    }
+
+    public void setAdmin(Admin admin)
+    {
+        this.admin = admin;
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    public void setUser(User user)
+    {
+        this.user = user;
+    }
 }

@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,33 +15,14 @@ import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import de.fau.cs.osr.amos.asepart.authentication.AuthenticationFilter;
+import de.fau.cs.osr.amos.asepart.entities.*;
 
 @Path("/")
 public class WebService
 {
-    @GET @RolesAllowed({"User"})
+    @GET @PermitAll
     public Response get()
     {
-        /*Session session = DatabaseController.newSession();
-        session.beginTransaction();
-
-        KeyValueEntry demo = session.get(KeyValueEntry.class, "demo");
-
-        if (demo == null)
-        {
-            demo = new KeyValueEntry();
-            demo.setKey("demo");
-            demo.setValue(0);
-        }
-
-        int count = demo.getValue();
-        count++;
-        demo.setValue(count);
-
-        session.save(demo);
-        session.getTransaction().commit();
-        session.close();*/
-
         return Response.ok("Hello, World!").build();
     }
 

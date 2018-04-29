@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -14,6 +15,9 @@ import javax.persistence.Table;
 public class User implements Serializable
 {
     @Id
+    @GeneratedValue
+    private Integer userId;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "login_name")
     private Account accountName;
@@ -25,6 +29,11 @@ public class User implements Serializable
     @ManyToMany(mappedBy = "users")
     private Set<Project> projects = new HashSet<>();
     */
+
+    public Integer getUserId()
+    {
+        return userId;
+    }
 
     public Account getAccountName()
     {
