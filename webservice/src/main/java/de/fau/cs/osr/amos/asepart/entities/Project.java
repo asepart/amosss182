@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "project")
+@Table(name = "asepart_projects")
 public class Project
 {
     @Id @Column(name = "project_name")

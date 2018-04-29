@@ -9,7 +9,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "accounts")
+@Table(name = "asepart_accounts")
 public class Account
 {
     @Id @Column(name = "login_name")

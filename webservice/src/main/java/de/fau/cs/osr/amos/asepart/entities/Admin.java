@@ -1,6 +1,7 @@
 package de.fau.cs.osr.amos.asepart.entities;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,11 +11,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "admins")
+@Table(name = "asepart_admins")
 public class Admin implements Serializable
 {
     @Id
     @GeneratedValue
+    @Column(name = "admin_id")
     private Integer adminId;
 
     @OneToOne(fetch = FetchType.LAZY)

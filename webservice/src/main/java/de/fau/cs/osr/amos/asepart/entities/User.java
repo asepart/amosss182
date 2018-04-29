@@ -11,11 +11,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "users")
+@Table(name = "asepart_users")
 public class User implements Serializable
 {
     @Id
     @GeneratedValue
+    @Column(name = "user_id")
     private Integer userId;
 
     @OneToOne(fetch = FetchType.LAZY)
