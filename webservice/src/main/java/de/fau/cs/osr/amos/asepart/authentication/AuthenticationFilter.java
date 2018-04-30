@@ -38,8 +38,11 @@ public class AuthenticationFilter implements ContainerRequestFilter
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Basic";
 
-    private static final Response ACCESS_DENIED = Response.status(Response.Status.UNAUTHORIZED)
-            .entity("You cannot access this resource.").build();
+    private static final Response ACCESS_UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED)
+            .entity("Your identification is invalid.").build();
+
+    private static final Response ACCESS_FORBIDDEN = Response.status(Response.Status.FORBIDDEN)
+            .entity("Your account has no rights to access this ressource.").build();
 
     @Override
     public void filter(ContainerRequestContext requestContext)
@@ -58,7 +61,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // If no authorization information present; block access
         if (authorization == null || authorization.isEmpty())
         {
-            requestContext.abortWith(ACCESS_DENIED);
+            requestContext.abortWith(ACCESS_UNAUTHORIZED);
         }
 
         // Get encoded username and password
@@ -77,27 +80,29 @@ public class AuthenticationFilter implements ContainerRequestFilter
             RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
             Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
 
-            // Is user valid?
-            if (!isAuthorized(accountName, password, rolesSet))
-                requestContext.abortWith(ACCESS_DENIED);
+            // Are credentials correct and authorized for ressource?
+            final Response error = checkAuthorized(accountName, password, rolesSet);
+            if (error != null)
+                requestContext.abortWith(error);
         }
+
+        // TODO pass account name to REST endpoint
     }
 
-    private boolean isAuthorized(final String loginName, final String password, final Set<String> rolesSet)
+    private Response checkAuthorized(final String loginName, final String password, final Set<String> rolesSet)
     {
-        boolean authorized = false;
+        Session session = DatabaseController.newSession();
+        session.beginTransaction();
 
-        try (Session session = DatabaseController.newSession())
+        try
         {
-            session.beginTransaction();
-
             Account account = session.get(Account.class, loginName);
             if (account == null) // account with loginName does not exist
-                return false;
+                return ACCESS_UNAUTHORIZED;
 
             final String savedHash = account.getPasswordHash();
             if (!BCrypt.checkpw(password, savedHash)) // password does not match
-                return false;
+                return ACCESS_UNAUTHORIZED;
 
             for (String role : rolesSet) // check if account is in any allowed role
             {
@@ -106,7 +111,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
                     final Admin admin = session.get(Admin.class, account.getLoginName());
 
                     if (admin != null)
-                        return true;
+                        return null;
                 }
 
                 else if (role.equals("User"))
@@ -114,13 +119,17 @@ public class AuthenticationFilter implements ContainerRequestFilter
                     final User user = session.get(User.class, account.getLoginName());
 
                     if (user != null)
-                        return true;
+                        return null;
                 }
             }
-
-            session.getTransaction().commit();
         }
 
-        return false;
+        finally
+        {
+            session.getTransaction().commit();
+            session.close();
+        }
+
+        return ACCESS_FORBIDDEN;
     }
 }
