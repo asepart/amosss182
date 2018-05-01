@@ -17,6 +17,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.hibernate.Session;
 
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
@@ -92,12 +93,21 @@ public class WebService
 
     @Path("/projects/{name}/users")
     @GET
-    //@Produces(MediaType.APPLICATION_JSON) TODO: should be json array
+    @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
-    public Response getUsersOfProject(@PathParam("name") String name)
+    public Response getUsersOfProject(@PathParam("name") String name) //not working because project table not working TODO: add other status code responses
     {
-        String result = "Peter, 01601234567" + "\n" + "Hans, 01707654321" + "\n";
-        return Response.ok(result).build();
+    		try (Session session = DatabaseController.newSession())
+        {
+            session.beginTransaction();
+
+//            Project p = session.get(Project.class, name);	// add this when projects table works
+//            User[] users = new User[p.getUsers().size()];	// add this when projects table works
+//            	users = (User[]) p.getUsers().toArray();		// add this when projects table works
+
+            session.getTransaction().commit();
+			return Response.ok(/*users*/).build();	// add this when projects table works
+        }
     }
 
     // TODO create User and create Admin
