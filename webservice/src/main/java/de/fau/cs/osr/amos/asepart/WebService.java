@@ -28,7 +28,22 @@ public class WebService
         TODO: Replace PermitAll with RolesAllowed
         TODO: Actually talk with database instead of using dummies
         TODO: get user name from @Context SecurityContext sc parameter for each request
+
+        TODO: (maybe) login limit to avoid brute force attacks
     */
+
+    @Path("/login")
+    @GET
+    @RolesAllowed({"Admin", "User"})
+    public Response login()
+    {
+        /* If credentials are invalid, the method call will automatically fail.
+         * This is done by the AuthenticationFilter, so if the return statement
+         * below is reached the credentials have been validated already.
+         */
+
+        return Response.ok("Your identification is invalid").build();
+    }
 
     @GET
     @PermitAll
