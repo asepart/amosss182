@@ -6,7 +6,9 @@ import java.net.UnknownHostException;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -30,7 +32,19 @@ public class WebService
     @PermitAll
     public Response get()
     {
-        return Response.ok("Hello, World!").build();
+    		return Response.ok("Hello, World!").build();
+    }
+	
+	  @Path("/projects/{name}/users")
+    @GET @PermitAll
+    public Response getUsersOfProject(@PathParam("name") String name)
+    {
+		//TODO
+		//get projectusers from database
+		
+		//hello world behavior
+        String result = "Peter, 01601234567" + "\n" + "Hans, 01707654321" + "\n";  	
+    		return Response.ok(result).build();
     }
 
     @Path("/projects/{name}")
@@ -70,7 +84,6 @@ public class WebService
         return Response.ok(String.format("Added account %s to project %s.", accountname, name)).build();
     }
 
-    // TODO put Marks code here
     // TODO create User and create Admin
 
     public static void main(String[] args)
