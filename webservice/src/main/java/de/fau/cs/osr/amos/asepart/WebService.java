@@ -23,6 +23,7 @@ public class WebService
     /*
         TODO: Replace PermitAll with RolesAllowed
         TODO: Actually talk with database instead of using dummies
+        TODO: get user name from @Context SecurityContext sc parameter for each request
     */
 
     @GET

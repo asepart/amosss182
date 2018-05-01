@@ -86,11 +86,16 @@ public class AuthenticationFilter implements ContainerRequestFilter
                 requestContext.abortWith(error);
         }
 
-        // TODO pass account name to REST endpoint
+        // TODO pass account name to security context
     }
 
     private Response checkAuthorized(final String loginName, final String password, final Set<String> rolesSet)
     {
+        return null;
+
+        // TODO enable authenfication
+
+        /*
         Session session = DatabaseController.newSession();
         session.beginTransaction();
 
@@ -131,5 +136,6 @@ public class AuthenticationFilter implements ContainerRequestFilter
         }
 
         return ACCESS_FORBIDDEN;
+        */
     }
 }
