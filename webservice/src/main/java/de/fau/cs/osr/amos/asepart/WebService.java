@@ -8,6 +8,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -20,10 +21,22 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 @Path("/")
 public class WebService
 {
-    @GET @PermitAll
+	@GET @PermitAll
     public Response get()
     {
-        return Response.ok("Hello, World!").build();
+    		return Response.ok("Hello, World!").build();
+    }
+	
+	@Path("projects/{name}/users")
+    @GET @PermitAll
+    public Response getUsersOfProject(@PathParam("name") String name)
+    {
+		//TODO
+		//get data from database
+		
+		//hello world behavior
+        String result = "Peter, 0160123456" + "\n" + "Hans, 0170654321" + "\n";  	
+    		return Response.ok(result).build();
     }
 
     public static void main(String[] args)
