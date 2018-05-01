@@ -34,19 +34,7 @@ public class WebService
     @PermitAll
     public Response get()
     {
-    		return Response.ok("Hello, World!").build();
-    }
-	
-	  @Path("/projects/{name}/users")
-    @GET @PermitAll
-    public Response getUsersOfProject(@PathParam("name") String name)
-    {
-		//TODO
-		//get projectusers from database
-		
-		//hello world behavior
-        String result = "Peter, 01601234567" + "\n" + "Hans, 01707654321" + "\n";  	
-    		return Response.ok(result).build();
+        return Response.ok("Hello, World!").build();
     }
 
     @Path("/projects/{name}")
@@ -84,6 +72,16 @@ public class WebService
     public Response addUserToProject(@PathParam("name") String name, @PathParam("accountname") String accountname)
     {
         return Response.ok(String.format("Added account %s to project %s.", accountname, name)).build();
+    }
+
+    @Path("/projects/{name}/users")
+    @GET
+    //@Produces(MediaType.APPLICATION_JSON) TODO: should be json array
+    @PermitAll
+    public Response getUsersOfProject(@PathParam("name") String name)
+    {
+        String result = "Peter, 01601234567" + "\n" + "Hans, 01707654321" + "\n";
+        return Response.ok(result).build();
     }
 
     // TODO create User and create Admin
