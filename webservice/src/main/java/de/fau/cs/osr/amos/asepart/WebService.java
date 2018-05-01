@@ -32,10 +32,10 @@ public class WebService
     public Response getUsersOfProject(@PathParam("name") String name)
     {
 		//TODO
-		//get data from database
+		//get projectusers from database
 		
 		//hello world behavior
-        String result = "Peter, 0160123456" + "\n" + "Hans, 0170654321" + "\n";  	
+        String result = "Peter, 01601234567" + "\n" + "Hans, 01707654321" + "\n";  	
     		return Response.ok(result).build();
     }
 
