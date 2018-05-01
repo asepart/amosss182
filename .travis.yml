@@ -4,13 +4,13 @@ matrix:
       jdk: openjdk8
       sudo: false
       script:
-        - cd webservice && mvn clean verify
+        - cd webservice && mvn clean verify && mvn test
         
     - language: node_js
       node_js: 8
       script:
-        - cd user-app && npm install
-        - cd ../admin-web-app && npm install
+        - cd user-app && npm install && npm test
+        - cd ../admin-web-app && npm install && npm test
         
 before_deploy: 
   - echo 'ready P1?'
