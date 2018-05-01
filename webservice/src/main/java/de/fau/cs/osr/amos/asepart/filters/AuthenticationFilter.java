@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart.authentication;
+package de.fau.cs.osr.amos.asepart.filters;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -20,13 +20,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
-import org.hibernate.Session;
-import org.mindrot.jbcrypt.BCrypt;
-
-import de.fau.cs.osr.amos.asepart.DatabaseController;
-import de.fau.cs.osr.amos.asepart.entities.Account;
-import de.fau.cs.osr.amos.asepart.entities.Admin;
-import de.fau.cs.osr.amos.asepart.entities.User;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
