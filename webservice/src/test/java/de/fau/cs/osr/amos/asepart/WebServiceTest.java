@@ -14,16 +14,15 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 
 public class WebServiceTest
 {
-    /*
+
     @BeforeAll
     public static void setUp()
     {
-
         try (Session session = DatabaseController.newSession())
         {
             session.beginTransaction();
 
-            Account a = new Account();
+            Admin a = new Admin();
             a.setLoginName("testuser");
             a.setFirstName("Test");
             a.setLastName("User");
@@ -31,13 +30,12 @@ public class WebServiceTest
 
             session.save(a);
 
-            Account b = session.get(Account.class, "testuser");
+            Admin b = session.get(Admin.class, "testuser");
             assertEquals("Test", b.getFirstName());
 
             session.getTransaction().commit();
         }
     }
-    */
 
     @Test
     public void emptyTest()

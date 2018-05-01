@@ -1,16 +1,11 @@
 package de.fau.cs.osr.amos.asepart.entities;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.Column;
 
-@Entity
-@Table(name = "asepart_accounts")
-public class Account
+@MappedSuperclass
+public abstract class Account
 {
     @Id @Column(name = "login_name")
     private String loginName;
@@ -18,19 +13,11 @@ public class Account
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
-
-    @OneToOne(mappedBy = "accountName", cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY, optional = true)
-    private Admin admin;
-
-    @OneToOne(mappedBy = "accountName", cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY, optional = true)
-    private User user;
 
     public String getLoginName()
     {
@@ -70,25 +57,5 @@ public class Account
     public void setLastName(String lastName)
     {
         this.lastName = lastName;
-    }
-
-    public Admin getAdmin()
-    {
-        return admin;
-    }
-
-    public void setAdmin(Admin admin)
-    {
-        this.admin = admin;
-    }
-
-    public User getUser()
-    {
-        return user;
-    }
-
-    public void setUser(User user)
-    {
-        this.user = user;
     }
 }
