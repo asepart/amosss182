@@ -1,19 +1,38 @@
 package de.fau.cs.osr.amos.asepart.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.*;
 
 @Entity
-@Table(name = "asepart_projects")
+@Table(name = "projects")
 public class Project
 {
-    @Id @Column(name = "project_name")
+    @Id
+    @Column(name = "project_name")
     private String projectName;
 
     @Column(name = "entry_key", nullable = false)
     private String entryKey;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable
+    (
+            name = "projects_users",
+            joinColumns = {@JoinColumn(name = "project_name", referencedColumnName = "project_name")},
+            inverseJoinColumns = {@JoinColumn(name = "user_name", referencedColumnName = "login_name")}
+    )
+    private Set<User> users = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable
+    (
+            name = "projects_admins",
+            joinColumns = {@JoinColumn(name = "project_name", referencedColumnName = "project_name")},
+            inverseJoinColumns = {@JoinColumn(name = "admin_name", referencedColumnName = "login_name")}
+    )
+    private Set<Admin> admins = new HashSet<>();
 
     public String getProjectName()
     {
@@ -35,47 +54,23 @@ public class Project
         this.entryKey = entryKey;
     }
 
-    /*
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinTable
-            (
-                    name = "project_user",
-                    joinColumns = { @JoinColumn(name = "project_id") },
-                    inverseJoinColumns = { @JoinColumn(name = "user_id") }
-            )
-    private Set<User> users = new HashSet<>();
-
-    public void addUser(User user)
+    public Set<User> getUsers()
     {
-        users.add(user);
-        user.getProjects().add(this);
+        return users;
     }
 
-    public void removeUser(User user)
+    public void setUsers(Set<User> users)
     {
-        users.remove(user);
-        user.getProjects().remove(this);
+        this.users = users;
     }
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinTable
-            (
-                    name = "project_admin",
-                    joinColumns = { @JoinColumn(name = "project_id") },
-                    inverseJoinColumns = { @JoinColumn(name = "admin_id") }
-            )
-    private Set<Admin> admins = new HashSet<>();
-
-    public void addAdmin(Admin admin)
+    public Set<Admin> getAdmins()
     {
-        admins.add(admin);
-        admin.getProjects().add(this);
+        return admins;
     }
 
-    public void removeAdmin(Admin admin)
+    public void setAdmins(Set<Admin> admins)
     {
-        admins.remove(admin);
-        admin.getProjects().remove(this);
+        this.admins = admins;
     }
-    */
 }

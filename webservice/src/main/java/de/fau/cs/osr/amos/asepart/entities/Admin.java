@@ -4,12 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "asepart_admins")
+@Table(name = "admins")
 public class Admin extends Account
 {
-    /*
-    @ManyToMany(mappedBy = "admins")
-    private Set<Project> projects = new HashSet<>();
-    */
-
 }
