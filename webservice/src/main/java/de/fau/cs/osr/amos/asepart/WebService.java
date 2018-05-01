@@ -6,8 +6,8 @@ import java.net.UnknownHostException;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -20,11 +20,57 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 @Path("/")
 public class WebService
 {
-    @GET @PermitAll
+    /*
+        TODO: Replace PermitAll with RolesAllowed
+        TODO: Actually talk with database instead of using dummies
+    */
+
+    @GET
+    @PermitAll
     public Response get()
     {
         return Response.ok("Hello, World!").build();
     }
+
+    @Path("/projects/{name}")
+    @PUT
+    @PermitAll
+    public Response createProject(@PathParam("name") String name, String entryKey)
+    {
+        return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
+    }
+
+    @Path("/projects")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    public Response listProjects()
+    {
+        Project p1 = new Project();
+        p1.setProjectName("Project1");
+        p1.setEntryKey("foo");
+
+        Project p2 = new Project();
+        p2.setProjectName("Project2");
+        p2.setEntryKey("bar");
+
+        Project[] proj = new Project[2];
+        proj[0] = p1;
+        proj[1] = p2;
+
+        return Response.ok(proj).build();
+    }
+
+    @Path("/projects/{name}/users/{accountname}")
+    @PUT
+    @PermitAll
+    public Response addUserToProject(@PathParam("name") String name, @PathParam("accountname") String accountname)
+    {
+        return Response.ok(String.format("Added account %s to project %s.", accountname, name)).build();
+    }
+
+    // TODO put Marks code here
+    // TODO create User and create Admin
 
     public static void main(String[] args)
     {
