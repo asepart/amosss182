@@ -25,8 +25,16 @@ public class HelloWorldService
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
             final String address = "http://" + ip + "/";
-
-            final URI uri = UriBuilder.fromUri(address).port(12345).build();
+            int port = 12345;
+			
+			try {
+        		port = Integer.parseInt(System.getenv("PORT"));
+    		}
+    		catch (NumberFormatException e) {
+			}
+            
+            final URI uri = UriBuilder.fromUri(address).port(port).build();
+            
             ResourceConfig config = new ResourceConfig(HelloWorldService.class);
             JdkHttpServerFactory.createHttpServer(uri, config);
         }
