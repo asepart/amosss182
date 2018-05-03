@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import {ActivityIndicator, View} from 'react-native';
+import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
+import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
 
@@ -32,14 +33,21 @@ export default class ProjectList extends Component {
 		});
 	}
 
+	showAddProject () {
+		setState({
+			isAuth: true,
+			show: 'addProject',
+			param: ''
+		});
+	}
+
 	render() {
 		if (this.state.isLoading) {
-			return (<View style={{
-					flex: 1,
-					padding: 20
-				}}>
-				<ActivityIndicator/>
-			</View>)
+			return (
+				<View style={{flex: 1,padding: 20}}>
+					<ActivityIndicator/>
+				</View>
+			)
 		}
 
 		const columns = [
@@ -53,8 +61,15 @@ export default class ProjectList extends Component {
 			}
 		]
 
-		return (<View>
-			<ReactTable data={this.state.dataSource} columns={columns}/>
-		</View>);
+		return (
+			<View>
+				<Button
+					onPress = { this.showAddProject }
+					title = "Add Project"
+					color = "#841584"
+				/>
+				<ReactTable data={this.state.dataSource} columns={columns}/>
+			</View>
+		);
 	}
 }
