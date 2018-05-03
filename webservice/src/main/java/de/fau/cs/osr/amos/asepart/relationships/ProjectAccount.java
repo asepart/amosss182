@@ -5,9 +5,17 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import static java.util.Objects.requireNonNull;
+
 @Embeddable
 public class ProjectAccount implements Serializable
 {
+    public ProjectAccount(String projectName, String loginName)
+    {
+        this.projectName = requireNonNull(projectName);
+        this.loginName = requireNonNull(loginName);
+    }
+
     @Column(name = "project_name")
     private String projectName;
 

@@ -1,5 +1,7 @@
 package de.fau.cs.osr.amos.asepart;
 
+import de.fau.cs.osr.amos.asepart.relationships.ProjectAccount;
+import de.fau.cs.osr.amos.asepart.relationships.ProjectUser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.hibernate.Session;
@@ -47,7 +50,7 @@ public class WebServiceTest
     {
         assertTrue(true);
     }
-/*
+
     @Test
     public void testGetUsersOfProject() //TODO: add more testcases as soon as project table is working
     {
@@ -58,36 +61,59 @@ public class WebServiceTest
             User aa = new User();
             aa.setLastName("TestLastNameP1");
             aa.setFirstName("TestFirstNameP1");
+            aa.setLoginName("testaa");
             aa.setPhone("01601111111");
 
             User ab = new User();
             ab.setLastName("TestLastNameP2");
             ab.setFirstName("TestFirstNameP2");
+            ab.setLoginName("testab");
             ab.setPhone("01702222222");
-
-            Set<User> users = new HashSet<>();
-
-            users.add(aa);
-            users.add(ab);
 
             Project p1 = new Project();
             p1.setProjectName("Test1");
-            p1.setUsers(users);
+            p1.setEntryKey("foo");
 
             Project p2 = new Project();
             p2.setProjectName("Test2");
-            p1.setUsers(users);
+            p2.setEntryKey("bar");
 
-//    			session.save(p1);	// add this when projects table works
-//    			session.save(p2);	// add this when projects table works
+            session.save(p1);
+            session.save(p2);
+
+            ProjectUser pu = new ProjectUser();
+
+            pu = new ProjectUser();
+            pu.setRelId(new ProjectAccount(p1.getProjectName(), aa.getLoginName()));
+            session.save(pu);
+
+            pu = new ProjectUser();
+            pu.setRelId(new ProjectAccount(p1.getProjectName(), ab.getLoginName()));
+            session.save(pu);
+
+            pu = new ProjectUser();
+            pu.setRelId(new ProjectAccount(p2.getProjectName(), aa.getLoginName()));
+            session.save(pu);
+
+            pu = new ProjectUser();
+            pu.setRelId(new ProjectAccount(p2.getProjectName(), ab.getLoginName()));
+            session.save(pu);
 
             WebService w = new WebService();
             Response r = w.getUsersOfProject("Test2");
 
-//    			assertEquals(r, Response.ok(users).build());	// add this when projects table works
-            assert (true);        // remove this when projects table works
             session.getTransaction().commit();
+
+            /*
+            GenericType<User[]> type = new GenericType<User[]>() {};
+            User[] array = r.readEntity(type);
+
+            assertEquals(array, new User[] {aa, ab});
+            */
+
+            // TODO: extract db logic from WebService class for better testing
+
+            assertTrue(true);
         }
     }
-    */
 }

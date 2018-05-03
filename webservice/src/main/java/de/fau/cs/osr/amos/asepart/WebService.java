@@ -3,6 +3,7 @@ package de.fau.cs.osr.amos.asepart;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -11,13 +12,16 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
@@ -26,25 +30,17 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 @Path("/")
 public class WebService
 {
-    /*
-        TODO: Replace PermitAll with RolesAllowed
-        TODO: Actually talk with database instead of using dummies
-        TODO: get user name from @Context SecurityContext sc parameter for each request
-
-        TODO: (maybe) login limit to avoid brute force attacks
-    */
-
     @Path("/login")
     @GET
     @RolesAllowed({"Admin", "User"})
-    public Response login()
+    public Response login(@Context SecurityContext sc)
     {
         /* If credentials are invalid, the method call will automatically fail.
          * This is done by the AuthenticationFilter, so if the return statement
          * below is reached the credentials have been validated already.
          */
 
-        return Response.ok("Your identification is invalid").build();
+        return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
     @GET
@@ -56,7 +52,7 @@ public class WebService
 
     @Path("/projects/{name}")
     @PUT
-    @PermitAll
+    @RolesAllowed({"Admin"})
     public Response createProject(@PathParam("name") String name, String entryKey)
     {
         return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
@@ -65,7 +61,7 @@ public class WebService
     @Path("/projects")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @PermitAll
+    @RolesAllowed({"Admin"})
     public Response listProjects()
     {
         Project p1 = new Project();
@@ -85,7 +81,7 @@ public class WebService
 
     @Path("/projects/{name}/users/{accountname}")
     @PUT
-    @PermitAll
+    @RolesAllowed({"Admin"})
     public Response addUserToProject(@PathParam("name") String name, @PathParam("accountname") String accountname)
     {
         return Response.ok(String.format("Added account %s to project %s.", accountname, name)).build();
@@ -94,23 +90,32 @@ public class WebService
     @Path("/projects/{name}/users")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @PermitAll
-    public Response getUsersOfProject(@PathParam("name") String name) //not working because project table not working TODO: add other status code responses
+    @RolesAllowed({"Admin"})
+    public Response getUsersOfProject(@PathParam("name") String name)
     {
-    		try (Session session = DatabaseController.newSession())
+        try (Session session = DatabaseController.newSession())
         {
             session.beginTransaction();
 
-//            Project p = session.get(Project.class, name);	// add this when projects table works
-//            User[] users = new User[p.getUsers().size()];	// add this when projects table works
-//            	users = (User[]) p.getUsers().toArray();		// add this when projects table works
+            Query userQuery = session.createQuery("select pu.relId.loginName from ProjectUser pu where pu.relId.projectName = :param");
+            userQuery.setParameter("param", name);
+
+            List resultList = userQuery.list();
+            User[] users = new User[resultList.size()];
+            int index = 0;
+
+            for (Object row: resultList)
+            {
+                users[index] = session.get(User.class, row.toString());
+                ++index;
+            }
 
             session.getTransaction().commit();
-			return Response.ok(/*users*/).build();	// add this when projects table works
+            return Response.ok(users).build();
         }
     }
 
-    // TODO create User and create Admin
+    // TODO create User and create Admin REST call?
 
     public static void main(String[] args)
     {

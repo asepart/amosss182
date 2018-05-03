@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "project_admins")
+@Table(name = "projects_admins")
 public class ProjectAdmin
 {
     @EmbeddedId ProjectAccount relId;

@@ -2,6 +2,20 @@
 # WEBSERVICE API #
 ##################
 
+Please notice: All API calls require an HTTP Authorization header. The header is expected to look like this:
+
+  Authorization: Basic <string>
+
+where <string> is a base64-econded string in the format <username>:<password>.
+
+Additionaly, to distinguish between different account roles, the client must provide a special header like this:
+
+  X-ASEPART-Role: <role>
+
+where <role> can be either Admin or User.
+
+The following REST operations are available:
+
 - Check if your username and password are correct.
 
   HTTP operation: GET
