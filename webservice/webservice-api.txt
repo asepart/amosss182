@@ -1,0 +1,66 @@
+##################
+# WEBSERVICE API #
+##################
+
+- Check if your username and password are correct.
+
+  HTTP operation: GET
+  Path:           /login
+  Status code:    [200 OK]           if credentials are valid.
+                  [401 Unauthorized] if credentials are not valid.
+
+- Create new project with an entry key
+
+  HTTP operation: PUT
+  Path:           /projects/{name}
+  Request-Body:   Entry key as ASCII string
+  Status code:    [200 OK]           in case of success.
+                  [400 Bad Request]  if project already exists.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the specified user is not an admin.
+
+- List existing projects the admin is able to view
+
+  HTTP operation: GET
+  Path:           /projects
+  Returns:        List<Project>
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+
+- Add user to project
+
+  HTTP operation: PUT
+  Path:           /projects/{name}/users/{accountname}
+  Status code:    [200 OK]           in case of success.
+                  [400 Bad Request]  if user is already member of project or accountname is not a username.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not an admin for the project.
+
+- List users of project
+
+  HTTP operation: GET
+  Path:           /projects/{name}/users
+  Returns:        List<User>
+  Status code:    [200 OK]           in case of success
+                  [401 Unauthorized] if the provided username or password is invalid
+                  [403 Forbidden]    if the authorized user is not an admin for the project.
+
+- Create user
+
+  HTTP operation: PUT
+  Path:           /users/{accountname}
+  Request-Body:   User information
+  Status code:    [200 OK]           in case of success.
+                  [400 Bad Request]  if user already exists or accountname is unknown or user information is invalid.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not an admin.
+
+- Create admin
+
+  HTTP operation: PUT
+  Path:           /admins/{accountname}
+  Request-Body:   Admin information
+  Status code:    [200 OK]           in case of success.
+                  [400 Bad Request]  if admin already exists or accountname is unknown or admin information is invalid.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not an admin.
