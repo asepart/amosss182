@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import {Button, ActivityIndicator, View} from 'react-native';
+import {ActivityIndicator, View} from 'react-native';
 import ReactTable from 'react-table';
-import {getAuth} from './shared/auth';
-import {URL} from './shared/const';
+import {getAuth} from '../shared/auth';
+import {URL} from '../shared/const';
+import ProjectButton from './ProjectButton';
 import 'react-table/react-table.css';
-import '../index.css';
+import '../../index.css';
 
 export default class ProjectList extends Component {
 	constructor(props) {
@@ -44,7 +45,8 @@ export default class ProjectList extends Component {
 		const columns = [
 			{
 				Header: 'Project Name',
-				accessor: 'projectName' // String-based value accessors!
+				accessor: 'projectName',
+				Cell: props => <ProjectButton proj={props.value}/>
 			}, {
 				Header: 'Entrycode',
 				accessor: 'entryKey' // String-based value accessors!
