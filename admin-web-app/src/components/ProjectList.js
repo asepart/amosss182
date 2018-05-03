@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import {Button, ActivityIndicator, View} from 'react-native';
 import ReactTable from 'react-table';
-import {getAuth} from './auth';
-import {URL} from './const';
+import {getAuth} from './shared/auth';
+import {URL} from './shared/const';
 import 'react-table/react-table.css';
-import './index.css';
+import '../index.css';
 
-export class ProjectList extends Component {
+export default class ProjectList extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -15,8 +15,11 @@ export class ProjectList extends Component {
 	}
 
 	componentDidMount() {
-		let headers = getAuth();
-		return fetch(URL + '/projects', {method:'GET', headers: headers})
+		this.setState({
+			isLoading: false,
+			dataSource: [{"entryKey":"foo","projectName":"Project1"},{"entryKey":"bar","projectName":"Project2"}]
+		});
+		return fetch(URL + '/projects', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -24,7 +27,6 @@ export class ProjectList extends Component {
 				dataSource: responseJson
 			}, function() {});
 		}).catch((error) => {
-			alert("sad");
 			console.error(error);
 		});
 	}
@@ -50,7 +52,6 @@ export class ProjectList extends Component {
 		]
 
 		return (<View>
-			<Button onPress="" title="Add Project" color="#841584"/>
 			<ReactTable data={this.state.dataSource} columns={columns}/>
 		</View>);
 	}

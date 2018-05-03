@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Text} from 'react-native';
 import './index.css';
 import Login from './components/Login/login';
+import ProjectList from './components/ProjectList';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 
@@ -25,7 +25,7 @@ class Page extends Component{
 		if(!this.state.isAuth){
 			return(<Login />);
 		}
-		return (<Text>login succsessfull!</Text>);
+		return (<ProjectList/>);
 	}
 }
 
