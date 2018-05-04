@@ -3,6 +3,8 @@ package de.fau.cs.osr.amos.asepart;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.ws.rs.WebApplicationException;
 
 import org.hibernate.cfg.Configuration;
@@ -87,6 +89,11 @@ public class Database
         return project != null;
     }
 
+    public static Project getProject(Session session, String projectName)
+    {
+        return session.get(Project.class, projectName);
+    }
+
     public static Project[] listProjects(Session session)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -103,37 +110,45 @@ public class Database
     public static void addUsersToProject(Session session, String user, String project)
     {
         if (!isUser(session, user))
-        { throw new WebApplicationException("User does not exist."); }
+            throw new WebApplicationException("User does not exist.");
+
         if (!isProject(session, project))
-        { throw new WebApplicationException("Project does not exist."); }
+            throw new WebApplicationException("Project does not exist.");
+
         if (isUserMemberOfProject(session, user, project))
-        { throw new WebApplicationException("User already member of project."); }
+            throw new WebApplicationException("User already member of project.");
 
         ProjectUser pu = new ProjectUser();
-        pu.setRel(new ProjectAccount(project, user));
+        pu.setLoginName(user);
+        pu.setProjectName(project);
 
         session.save(pu);
     }
 
     public static boolean isUserMemberOfProject(Session session, String user, String project)
     {
-        Query query = session.createQuery("select pu.rel.loginName from ProjectUser pu where pu.rel.projectName = :projectParam and pu.rel.loginName = :userParam");
-        query.setParameter("projectParam", project);
-        query.setParameter("userParam", user);
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
 
-        List result = query.list();
+        Root<ProjectUser> table = criteria.from(ProjectUser.class);
+        criteria.where(builder.equal(table.get("projectName"), project))
+                .where(builder.equal(table.get("loginName"), user));
 
-        if (result.size() == 0)
-        { return false; }
-        else { return true; }
+        List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+            return false;
+        else return true;
     }
 
     public static User[] getUsersOfProject(Session session, String projectName)
     {
-        Query userQuery = session.createQuery("select pu.rel.loginName from ProjectUser pu where pu.rel.projectName = :param");
-        userQuery.setParameter("param", projectName);
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
 
-        List resultList = userQuery.list();
+        Root<ProjectUser> table = criteria.from(ProjectUser.class);
+        criteria.where(builder.equal(table.get("projectName"), projectName));
+        List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
         User[] users = new User[resultList.size()];
         int index = 0;
 
@@ -144,12 +159,6 @@ public class Database
         }
 
         return users;
-    }
-
-    public static User getUser(Session session, String loginName)
-    {
-        User user = session.get(User.class, loginName);
-        return user;
     }
 
     public static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
@@ -169,18 +178,16 @@ public class Database
         session.save(user);
     }
 
+    public static User getUser(Session session, String loginName)
+    {
+        return session.get(User.class, loginName);
+    }
+
     public static boolean isUser(Session session, String loginName)
     {
         User user = session.get(User.class, loginName);
         return user != null;
     }
-
-    public static Admin getAdmin(Session session, String loginName)
-    {
-        Admin admin = session.get(Admin.class, loginName);
-        return admin;
-    }
-
 
     public static void putAdmin(Session session, String loginName, String password, String firstName, String lastName)
     {
@@ -198,6 +205,10 @@ public class Database
         session.save(admin);
     }
 
+    public static Admin getAdmin(Session session, String loginName)
+    {
+        return session.get(Admin.class, loginName);
+    }
 
     public static boolean isAdmin(Session session, String loginName)
     {

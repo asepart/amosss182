@@ -1,26 +1,32 @@
 package de.fau.cs.osr.amos.asepart.relationships;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.MappedSuperclass;
 
-import static java.util.Objects.requireNonNull;
-
-@Embeddable
-public class ProjectAccount implements Serializable
+@MappedSuperclass
+public abstract class ProjectAccount
 {
-    public ProjectAccount(String projectName, String loginName)
-    {
-        this.projectName = requireNonNull(projectName);
-        this.loginName = requireNonNull(loginName);
-    }
+    @Id
+    @GeneratedValue
+    private Integer relId;
 
     @Column(name = "project_name")
     private String projectName;
 
     @Column(name = "login_name")
     private String loginName;
+
+    public Integer getRelId()
+    {
+        return relId;
+    }
+
+    public void setRelId(Integer relId)
+    {
+        this.relId = relId;
+    }
 
     public String getProjectName()
     {
