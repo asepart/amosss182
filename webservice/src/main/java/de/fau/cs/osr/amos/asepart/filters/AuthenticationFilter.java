@@ -21,16 +21,13 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
-import org.hibernate.Session;
-import org.mindrot.jbcrypt.BCrypt;
 
 import de.fau.cs.osr.amos.asepart.WebServiceSecurityContext;
-import de.fau.cs.osr.amos.asepart.DatabaseController;
-import de.fau.cs.osr.amos.asepart.entities.Account;
+import de.fau.cs.osr.amos.asepart.DatabaseClient;
 import de.fau.cs.osr.amos.asepart.entities.Admin;
 import de.fau.cs.osr.amos.asepart.entities.User;
 
-// TODO: (maybe) login limit to avoid brute force attacks
+// TODO: (maybe) introduce login limit to avoid brute force attacks
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -113,43 +110,23 @@ public class AuthenticationFilter implements ContainerRequestFilter
 
     private Response checkPassword(final String loginName, final String password, final String role)
     {
-        Session session = DatabaseController.newSession();
-        session.beginTransaction();
-
-        try
+        try (DatabaseClient client = new DatabaseClient())
         {
-            Account account = null;
-            Class<?> accountType;
-
             switch (role)
             {
                 case "Admin":
-                    accountType = Admin.class;
-                    break;
+                    if (client.authenticate(loginName, password, Admin.class))
+                        return null;
+                    else break;
                 case "User":
-                    accountType = User.class;
-                    break;
+                    if (client.authenticate(loginName, password, User.class))
+                        return null;
+                    else break;
                 default:
                     return ACCESS_FORBIDDEN;
             }
-
-
-            account = (Account) session.get(accountType, loginName);
-            if (account == null) // account with loginName does not exist
-                return ACCESS_UNAUTHORIZED;
-
-            final String savedHash = account.getPasswordHash();
-
-            if (!BCrypt.checkpw(password, savedHash)) // password does not match
-                return ACCESS_UNAUTHORIZED;
         }
 
-        finally
-        {
-            session.getTransaction().commit();
-            session.close();
-        }
-
-        return null;
+        return ACCESS_UNAUTHORIZED;
     }
 }

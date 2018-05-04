@@ -3,7 +3,6 @@ package de.fau.cs.osr.amos.asepart;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -16,8 +15,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
@@ -82,12 +79,17 @@ public class WebService
         return Response.ok(proj).build();
     }
 
-    @Path("/projects/{name}/users/{accountname}")
+    @Path("/projects/{name}/users/{username}")
     @PUT
     @RolesAllowed({"Admin"})
-    public Response addUserToProject(@PathParam("name") String name, @PathParam("accountname") String accountname)
+    public Response addUserToProject(@PathParam("name") String name, @PathParam("username") String username)
     {
-        return Response.ok(String.format("Added account %s to project %s.", accountname, name)).build();
+        try (DatabaseClient client = new DatabaseClient())
+        {
+            client.addUsersToProject(username, name);
+        }
+
+        return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
     }
 
     @Path("/projects/{name}/users")
@@ -96,29 +98,48 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getUsersOfProject(@PathParam("name") String name)
     {
-        try (Session session = DatabaseController.newSession())
+        try (DatabaseClient client = new DatabaseClient())
         {
-            session.beginTransaction();
-
-            Query userQuery = session.createQuery("select pu.relId.loginName from ProjectUser pu where pu.relId.projectName = :param");
-            userQuery.setParameter("param", name);
-
-            List resultList = userQuery.list();
-            User[] users = new User[resultList.size()];
-            int index = 0;
-
-            for (Object row: resultList)
-            {
-                users[index] = session.get(User.class, row.toString());
-                ++index;
-            }
-
-            session.getTransaction().commit();
+            User[] users = client.getUsersOfProject(name);
             return Response.ok(users).build();
         }
     }
 
-    // TODO create User and create Admin REST call?
+    @Path("/users")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response addUser(User newUser)
+    {
+        try (DatabaseClient client = new DatabaseClient())
+        {
+            String loginName = newUser.getLoginName();
+
+            if (client.isUser(loginName))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            client.putUser(newUser);
+            return Response.ok(String.format("Added new user %s.", newUser.getLoginName())).build();
+        }
+    }
+
+    @Path("/admins")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response addAdmin(Admin newAdmin)
+    {
+        try (DatabaseClient client = new DatabaseClient())
+        {
+            String loginName = newAdmin.getLoginName();
+
+            if (client.isAdmin(loginName))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            client.putAdmin(newAdmin);
+            return Response.ok(String.format("Added new admin %s.", newAdmin.getLoginName())).build();
+        }
+    }
 
     public static void main(String[] args)
     {

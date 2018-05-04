@@ -9,15 +9,15 @@ import javax.persistence.Table;
 public class ProjectUser
 {
     @EmbeddedId
-    ProjectAccount relId;
+    ProjectAccount rel;
 
-    public ProjectAccount getRelId()
+    public ProjectAccount getRel()
     {
-        return relId;
+        return rel;
     }
 
-    public void setRelId(ProjectAccount relId)
+    public void setRel(ProjectAccount rel)
     {
-        this.relId = relId;
+        this.rel = rel;
     }
 }

@@ -8,15 +8,15 @@ import javax.persistence.Table;
 @Table(name = "projects_admins")
 public class ProjectAdmin
 {
-    @EmbeddedId ProjectAccount relId;
+    @EmbeddedId ProjectAccount rel;
 
-    public ProjectAccount getRelId()
+    public ProjectAccount getRel()
     {
-        return relId;
+        return rel;
     }
 
-    public void setRelId(ProjectAccount relId)
+    public void setRel(ProjectAccount rel)
     {
-        this.relId = relId;
+        this.rel = rel;
     }
 }
