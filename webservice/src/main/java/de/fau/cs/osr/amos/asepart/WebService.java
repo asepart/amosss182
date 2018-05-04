@@ -12,6 +12,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
+import javax.xml.crypto.Data;
+
+import org.hibernate.Session;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -43,18 +46,16 @@ public class WebService
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
-    @GET
-    @PermitAll
-    public Response get()
-    {
-        return Response.ok("Hello, World!").build();
-    }
-
     @Path("/projects/{name}")
     @PUT
     @RolesAllowed({"Admin"})
     public Response createProject(@PathParam("name") String name, String entryKey)
     {
+        try (Session session = Database.openSession())
+        {
+            Database.putProject(session, name, entryKey);
+        }
+
         return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
     }
 
@@ -64,19 +65,10 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listProjects()
     {
-        Project p1 = new Project();
-        p1.setProjectName("Project1");
-        p1.setEntryKey("foo");
-
-        Project p2 = new Project();
-        p2.setProjectName("Project2");
-        p2.setEntryKey("bar");
-
-        Project[] proj = new Project[2];
-        proj[0] = p1;
-        proj[1] = p2;
-
-        return Response.ok(proj).build();
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listProjects(session)).build();
+        }
     }
 
     @Path("/projects/{name}/users/{username}")
@@ -84,9 +76,9 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response addUserToProject(@PathParam("name") String name, @PathParam("username") String username)
     {
-        try (DatabaseClient client = new DatabaseClient())
+        try (Session session = Database.openSession())
         {
-            client.addUsersToProject(username, name);
+            Database.addUsersToProject(session, username, name);
         }
 
         return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
@@ -98,9 +90,9 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getUsersOfProject(@PathParam("name") String name)
     {
-        try (DatabaseClient client = new DatabaseClient())
+        try (Session session = Database.openSession())
         {
-            User[] users = client.getUsersOfProject(name);
+            User[] users = Database.getUsersOfProject(session, name);
             return Response.ok(users).build();
         }
     }
@@ -111,14 +103,14 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response addUser(User newUser)
     {
-        try (DatabaseClient client = new DatabaseClient())
+        try (Session session = Database.openSession())
         {
             String loginName = newUser.getLoginName();
 
-            if (client.isUser(loginName))
+            if (Database.isUser(session, loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
-            client.putUser(newUser);
+            Database.putUser(session, newUser);
             return Response.ok(String.format("Added new user %s.", newUser.getLoginName())).build();
         }
     }
@@ -129,14 +121,14 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response addAdmin(Admin newAdmin)
     {
-        try (DatabaseClient client = new DatabaseClient())
+        try (Session session = Database.openSession())
         {
             String loginName = newAdmin.getLoginName();
 
-            if (client.isAdmin(loginName))
+            if (Database.isAdmin(session, loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
-            client.putAdmin(newAdmin);
+            Database.putAdmin(session, newAdmin);
             return Response.ok(String.format("Added new admin %s.", newAdmin.getLoginName())).build();
         }
     }

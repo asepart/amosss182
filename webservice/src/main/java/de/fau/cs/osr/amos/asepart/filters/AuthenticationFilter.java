@@ -23,9 +23,10 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.internal.util.Base64;
 
 import de.fau.cs.osr.amos.asepart.WebServiceSecurityContext;
-import de.fau.cs.osr.amos.asepart.DatabaseClient;
+import de.fau.cs.osr.amos.asepart.Database;
 import de.fau.cs.osr.amos.asepart.entities.Admin;
 import de.fau.cs.osr.amos.asepart.entities.User;
+import org.hibernate.Session;
 
 // TODO: (maybe) introduce login limit to avoid brute force attacks
 
@@ -110,16 +111,16 @@ public class AuthenticationFilter implements ContainerRequestFilter
 
     private Response checkPassword(final String loginName, final String password, final String role)
     {
-        try (DatabaseClient client = new DatabaseClient())
+        try (Session session = Database.openSession())
         {
             switch (role)
             {
                 case "Admin":
-                    if (client.authenticate(loginName, password, Admin.class))
+                    if (Database.authenticate(session, loginName, password, Admin.class))
                         return null;
                     else break;
                 case "User":
-                    if (client.authenticate(loginName, password, User.class))
+                    if (Database.authenticate(session, loginName, password, User.class))
                         return null;
                     else break;
                 default:

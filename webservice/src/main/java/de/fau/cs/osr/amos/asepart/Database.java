@@ -1,5 +1,10 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.ws.rs.WebApplicationException;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
@@ -9,21 +14,12 @@ import org.hibernate.Session;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import de.fau.cs.osr.amos.asepart.entities.Account;
-import de.fau.cs.osr.amos.asepart.entities.Admin;
-import de.fau.cs.osr.amos.asepart.entities.Project;
-import de.fau.cs.osr.amos.asepart.entities.User;
-import de.fau.cs.osr.amos.asepart.relationships.ProjectAccount;
-import de.fau.cs.osr.amos.asepart.relationships.ProjectAdmin;
-import de.fau.cs.osr.amos.asepart.relationships.ProjectUser;
+import de.fau.cs.osr.amos.asepart.entities.*;
+import de.fau.cs.osr.amos.asepart.relationships.*;
 
-import javax.ws.rs.WebApplicationException;
-import java.util.List;
-
-public class DatabaseClient implements AutoCloseable
+public class Database
 {
     private static final SessionFactory factory;
-    private Session session;
 
     static
     {
@@ -56,6 +52,11 @@ public class DatabaseClient implements AutoCloseable
         }
     }
 
+    public static Session openSession()
+    {
+        return factory.openSession();
+    }
+
     private static String hashPassword(String password)
     {
         return BCrypt.hashpw(password, BCrypt.gensalt());
@@ -66,62 +67,55 @@ public class DatabaseClient implements AutoCloseable
         return BCrypt.checkpw(password, hash);
     }
 
-    public DatabaseClient()
+    public static void putProject(Session session, String projectName, String entryKey)
     {
-        session = factory.openSession();
-    }
-
-    @Override
-    public void close()
-    {
-        session.close();
-    }
-
-    public void putProject(String projectName, String entryKey)
-    {
-        session.beginTransaction();
         Project project = new Project();
         project.setProjectName(projectName);
         project.setEntryKey(entryKey);
 
         session.save(project);
-        session.getTransaction().commit();
     }
 
-    public void putProject(Project project)
+    public static void putProject(Session session, Project project)
     {
-        session.beginTransaction();
         session.save(project);
-        session.getTransaction().commit();
     }
 
-    public boolean isProject(String projectName)
+    public static boolean isProject(Session session, String projectName)
     {
         Project project = session.get(Project.class, projectName);
         return project != null;
     }
 
-    public void addUsersToProject(String user, String project)
+    public static Project[] listProjects(Session session)
     {
-        session.beginTransaction();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
+        criteria.from(Project.class);
 
-        /*
-        if (!isUser(user))
-            throw new WebApplicationException("User does not exist.");
-        if (!isProject(project))
-            throw new WebApplicationException("Project does not exist.");
-        if (isUserMemberOfProject(user, project))
-            throw new WebApplicationException("User already member of project.");
-            */
+        List<Project> projectList = session.createQuery(criteria).getResultList();
+        Project[] projects = new Project[projectList.size()];
+        projects = projectList.toArray(projects);
+
+        return projects;
+    }
+
+    public static void addUsersToProject(Session session, String user, String project)
+    {
+        if (!isUser(session, user))
+        { throw new WebApplicationException("User does not exist."); }
+        if (!isProject(session, project))
+        { throw new WebApplicationException("Project does not exist."); }
+        if (isUserMemberOfProject(session, user, project))
+        { throw new WebApplicationException("User already member of project."); }
 
         ProjectUser pu = new ProjectUser();
         pu.setRel(new ProjectAccount(project, user));
 
         session.save(pu);
-        session.getTransaction().commit();
     }
 
-    public boolean isUserMemberOfProject(String user, String project)
+    public static boolean isUserMemberOfProject(Session session, String user, String project)
     {
         Query query = session.createQuery("select pu.rel.loginName from ProjectUser pu where pu.rel.projectName = :projectParam and pu.rel.loginName = :userParam");
         query.setParameter("projectParam", project);
@@ -130,11 +124,11 @@ public class DatabaseClient implements AutoCloseable
         List result = query.list();
 
         if (result.size() == 0)
-            return false;
-        else return true;
+        { return false; }
+        else { return true; }
     }
 
-    public User[] getUsersOfProject(String projectName)
+    public static User[] getUsersOfProject(Session session, String projectName)
     {
         Query userQuery = session.createQuery("select pu.rel.loginName from ProjectUser pu where pu.rel.projectName = :param");
         userQuery.setParameter("param", projectName);
@@ -143,7 +137,7 @@ public class DatabaseClient implements AutoCloseable
         User[] users = new User[resultList.size()];
         int index = 0;
 
-        for (Object row: resultList)
+        for (Object row : resultList)
         {
             users[index] = session.get(User.class, row.toString());
             ++index;
@@ -152,16 +146,14 @@ public class DatabaseClient implements AutoCloseable
         return users;
     }
 
-    public User getUser(String loginName)
+    public static User getUser(Session session, String loginName)
     {
         User user = session.get(User.class, loginName);
         return user;
     }
 
-    public void putUser(String loginName, String password, String firstName, String lastName, String phone)
+    public static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
     {
-        session.beginTransaction();
-
         User newUser = new User();
         newUser.setLoginName(loginName);
         newUser.setPasswordHash(hashPassword(password));
@@ -170,33 +162,28 @@ public class DatabaseClient implements AutoCloseable
         newUser.setPhone(phone);
 
         session.save(newUser);
-        session.getTransaction().commit();
     }
 
-    public void putUser(User user)
+    public static void putUser(Session session, User user)
     {
-        session.beginTransaction();
         session.save(user);
-        session.getTransaction().commit();
     }
 
-    public boolean isUser(String loginName)
+    public static boolean isUser(Session session, String loginName)
     {
         User user = session.get(User.class, loginName);
         return user != null;
     }
 
-    public Admin getAdmin(String loginName)
+    public static Admin getAdmin(Session session, String loginName)
     {
         Admin admin = session.get(Admin.class, loginName);
         return admin;
     }
 
 
-    public void putAdmin(String loginName, String password, String firstName, String lastName)
+    public static void putAdmin(Session session, String loginName, String password, String firstName, String lastName)
     {
-        session.beginTransaction();
-
         Admin newAdmin = new Admin();
         newAdmin.setLoginName(loginName);
         newAdmin.setPasswordHash(hashPassword(password));
@@ -204,43 +191,30 @@ public class DatabaseClient implements AutoCloseable
         newAdmin.setLastName(lastName);
 
         session.save(newAdmin);
-        session.getTransaction().commit();
     }
 
-    public void putAdmin(Admin admin)
+    public static void putAdmin(Session session, Admin admin)
     {
-        session.beginTransaction();
         session.save(admin);
-        session.getTransaction().commit();
     }
 
 
-    public boolean isAdmin(String loginName)
+    public static boolean isAdmin(Session session, String loginName)
     {
         Admin admin = session.get(Admin.class, loginName);
         return admin != null;
     }
 
-    public boolean authenticate(String loginName, String password, Class<?> type)
+    public static boolean authenticate(Session session, String loginName, String password, Class<?> type)
     {
-        try
+        Account account = (Account) session.get(type, loginName);
+
+        if (account != null)
         {
-            session.beginTransaction();
-
-            Account account = (Account) session.get(type, loginName);
-
-            if (account != null)
-            {
-                String hash = account.getPasswordHash();
-                return checkPassword(password, hash);
-            }
-
-            return false;
+            String hash = account.getPasswordHash();
+            return checkPassword(password, hash);
         }
 
-        finally
-        {
-            session.getTransaction().commit();
-        }
+        return false;
     }
 }
