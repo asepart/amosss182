@@ -53,7 +53,9 @@ public class WebService
     {
         try (Session session = Database.openSession())
         {
+            session.beginTransaction();
             Database.putProject(session, name, entryKey);
+            session.getTransaction().commit();
         }
 
         return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
@@ -78,7 +80,9 @@ public class WebService
     {
         try (Session session = Database.openSession())
         {
+            session.beginTransaction();
             Database.addUsersToProject(session, username, name);
+            session.getTransaction().commit();
         }
 
         return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
@@ -110,7 +114,10 @@ public class WebService
             if (Database.isUser(session, loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
+            session.beginTransaction();
             Database.putUser(session, newUser);
+            session.getTransaction().commit();
+
             return Response.ok(String.format("Added new user %s.", newUser.getLoginName())).build();
         }
     }
@@ -128,7 +135,10 @@ public class WebService
             if (Database.isAdmin(session, loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
+            session.beginTransaction();
             Database.putAdmin(session, newAdmin);
+            session.getTransaction().commit();
+
             return Response.ok(String.format("Added new admin %s.", newAdmin.getLoginName())).build();
         }
     }

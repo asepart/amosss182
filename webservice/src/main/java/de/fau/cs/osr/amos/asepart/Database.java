@@ -1,5 +1,6 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -130,14 +131,17 @@ public class Database
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
 
-        Root<ProjectUser> table = criteria.from(ProjectUser.class);
-        criteria.where(builder.equal(table.get("projectName"), project))
-                .where(builder.equal(table.get("loginName"), user));
+        Root<ProjectUser> columns = criteria.from(ProjectUser.class);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("projectName"), project));
+        predicates.add(builder.equal(columns.get("loginName"), user));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
 
         List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
 
         if (resultList.size() == 0)
             return false;
+
         else return true;
     }
 
@@ -146,15 +150,16 @@ public class Database
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
 
-        Root<ProjectUser> table = criteria.from(ProjectUser.class);
-        criteria.where(builder.equal(table.get("projectName"), projectName));
+        Root<ProjectUser> columns = criteria.from(ProjectUser.class);
+        criteria.where(builder.equal(columns.get("projectName"), projectName));
         List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
+
         User[] users = new User[resultList.size()];
         int index = 0;
 
-        for (Object row : resultList)
+        for (ProjectUser pu : resultList)
         {
-            users[index] = session.get(User.class, row.toString());
+            users[index] = session.get(User.class, pu.getLoginName());
             ++index;
         }
 
