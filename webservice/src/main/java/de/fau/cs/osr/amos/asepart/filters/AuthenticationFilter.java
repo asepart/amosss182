@@ -37,16 +37,13 @@ public class AuthenticationFilter implements ContainerRequestFilter
     @Context
     private ResourceInfo resourceInfo;
 
+    private static final String ROLE_PROPERTY = "X-ASEPART-Role";
+
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Basic";
 
-    private static final Response ACCESS_UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED)
-            .entity("Your identification is invalid.").build();
-
-    private static final Response ACCESS_FORBIDDEN = Response.status(Response.Status.FORBIDDEN)
-            .entity("Your account has no rights to access this ressource.").build();
-
-    private static final String ROLE_PROPERTY = "X-ASEPART-Role";
+    private static final String ACCESS_UNAUTHORIZED = "Your identification is invalid.";
+    private static final String ACCESS_FORBIDDEN = "Your account has no rights to access this resource.";
 
     @Override
     public void filter(ContainerRequestContext request)
@@ -65,7 +62,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // If no authorization information present; block access
         if (authorization == null || authorization.isEmpty())
         {
-            request.abortWith(ACCESS_UNAUTHORIZED);
+            request.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build());
             return;
         }
 
@@ -74,7 +71,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // If no role information present; block access
         if (role == null || role.isEmpty())
         {
-            request.abortWith(ACCESS_FORBIDDEN);
+            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
             return;
         }
 
@@ -99,7 +96,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
 
             if (!rolesSet.contains(roleName))
             {
-                request.abortWith(ACCESS_FORBIDDEN);
+                request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
                 return;
             }
 
@@ -130,10 +127,10 @@ public class AuthenticationFilter implements ContainerRequestFilter
                         return null;
                     else break;
                 default:
-                    return ACCESS_FORBIDDEN;
+                    return Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build();
             }
         }
 
-        return ACCESS_UNAUTHORIZED;
+        return Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build();
     }
 }
