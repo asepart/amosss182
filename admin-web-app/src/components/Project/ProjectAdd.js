@@ -14,6 +14,14 @@ export default class ProjectAdd extends Component {
 		};
 	}
 
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: ''
+		});
+	}
+
 	putProject() {
 		let auth = getAuth();
 		fetch(URL + '/projects/' + this.state.projectName, {
@@ -31,14 +39,7 @@ export default class ProjectAdd extends Component {
 			.catch((error) => {
 				console.error(error);
 			});
-	}
-
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: '',
-			param: ''
-		});
+		this.showProjectList ();
 	}
 
 	render() {
