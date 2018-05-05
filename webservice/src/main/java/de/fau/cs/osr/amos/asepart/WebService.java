@@ -31,9 +31,10 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 @Path("/")
 public class WebService
 {
+    @Path("/login")
     @OPTIONS
     @PermitAll
-    public Response options()
+    public Response login()
     {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -52,9 +53,17 @@ public class WebService
     }
 
     @Path("/projects/{name}")
+    @OPTIONS
+    @PermitAll
+    public Response createProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{name}")
     @PUT
     @RolesAllowed({"Admin"})
-    public Response createProject(@PathParam("name") String name, String entryKey)
+    public Response createProject(@Context SecurityContext sc, @PathParam("name") String name, String entryKey)
     {
         try (Session session = Database.openSession())
         {
@@ -67,10 +76,18 @@ public class WebService
     }
 
     @Path("/projects")
+    @OPTIONS
+    @PermitAll
+    public Response listProjects()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response listProjects()
+    public Response listProjects(@Context SecurityContext sc)
     {
         try (Session session = Database.openSession())
         {
@@ -79,9 +96,17 @@ public class WebService
     }
 
     @Path("/projects/{name}/users/{username}")
+    @OPTIONS
+    @PermitAll
+    public Response addUserToProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{name}/users/{username}")
     @PUT
     @RolesAllowed({"Admin"})
-    public Response addUserToProject(@PathParam("name") String name, @PathParam("username") String username)
+    public Response addUserToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("username") String username)
     {
         try (Session session = Database.openSession())
         {
@@ -94,10 +119,18 @@ public class WebService
     }
 
     @Path("/projects/{name}/users")
+    @OPTIONS
+    @PermitAll
+    public Response getUsersOfProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{name}/users")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response getUsersOfProject(@PathParam("name") String name)
+    public Response getUsersOfProject(@Context SecurityContext sc, @PathParam("name") String name)
     {
         try (Session session = Database.openSession())
         {
@@ -107,10 +140,18 @@ public class WebService
     }
 
     @Path("/users")
+    @OPTIONS
+    @PermitAll
+    public Response addUser()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/users")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response addUser(User newUser)
+    public Response addUser(@Context SecurityContext sc, User newUser)
     {
         try (Session session = Database.openSession())
         {
@@ -128,10 +169,18 @@ public class WebService
     }
 
     @Path("/admins")
+    @OPTIONS
+    @PermitAll
+    public Response addAdmin()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/admins")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response addAdmin(Admin newAdmin)
+    public Response addAdmin(@Context SecurityContext sc, Admin newAdmin)
     {
         try (Session session = Database.openSession())
         {
