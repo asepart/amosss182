@@ -62,6 +62,7 @@ public class WebService
 
     @Path("/projects/{name}")
     @PUT
+    @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin"})
     public Response createProject(@Context SecurityContext sc, @PathParam("name") String name, String entryKey)
     {
@@ -208,6 +209,7 @@ public class WebService
             ResourceConfig config = new ResourceConfig(WebService.class);
             config.register(CORSFilter.class);
             config.register(AuthenticationFilter.class);
+            // config.register(DebugExceptionMapper.class);
 
             JdkHttpServerFactory.createHttpServer(uri, config);
         }

@@ -66,6 +66,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         if (authorization == null || authorization.isEmpty())
         {
             request.abortWith(ACCESS_UNAUTHORIZED);
+            return;
         }
 
         final List<String> role = headers.get(ROLE_PROPERTY);
@@ -74,6 +75,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         if (role == null || role.isEmpty())
         {
             request.abortWith(ACCESS_FORBIDDEN);
+            return;
         }
 
         // Get encoded username and password
@@ -98,11 +100,15 @@ public class AuthenticationFilter implements ContainerRequestFilter
             if (!rolesSet.contains(roleName))
             {
                 request.abortWith(ACCESS_FORBIDDEN);
+                return;
             }
 
             final Response error = checkPassword(accountName, password, roleName);
             if (error != null)
+            {
                 request.abortWith(error);
+                return;
+            }
         }
 
         SecurityContext sc = new WebServiceSecurityContext(accountName, roleName, request.getUriInfo().getRequestUri().getScheme());
