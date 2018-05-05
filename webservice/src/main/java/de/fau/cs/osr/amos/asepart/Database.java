@@ -45,6 +45,14 @@ public class Database
             ServiceRegistry serviceRegistry = builder.build();
 
             factory = configuration.buildSessionFactory(serviceRegistry);
+
+            // Create default admin for testing
+            try (Session session = Database.openSession())
+            {
+                session.beginTransaction();
+                Database.putAdmin(session, "kingofthenorth", "winteriscoming", "Jon", "Snow");
+                session.getTransaction().commit();
+            }
         }
 
         catch (Throwable ex)
