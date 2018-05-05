@@ -26,6 +26,8 @@ export default class Login extends Component {
 
 		if(await isAuth()){
 			setState({isAuth: true});
+		} else {
+			this.setState({error: "Invalid credentials!"});
 		}
 	}
 
