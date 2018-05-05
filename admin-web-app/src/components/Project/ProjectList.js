@@ -17,10 +17,6 @@ export default class ProjectList extends Component {
 	}
 
 	componentDidMount() {
-		this.setState({
-			isLoading: false,
-			dataSource: [{"entryKey":"foo","projectName":"Project1"},{"entryKey":"bar","projectName":"Project2"}]
-		});
 		return fetch(URL + '/projects', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
