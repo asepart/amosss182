@@ -5,6 +5,7 @@ import './index.css';
 import Login from './components/Login/login';
 import ProjectList from './components/Project/ProjectList';
 import ProjectAdd from './components/Project/ProjectAdd';
+import UserList from './components/Project/UserList';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 
@@ -33,7 +34,7 @@ class Page extends Component{
 			case 'addProject':
 				return (<ProjectAdd/>);
 			case 'listUsers':
-				return (<Text>show Project</Text>); //(<listUsers project={this.state.param}/>);
+				return (<UserList project={this.state.param}/>);
 			case 'addUser':
 				return (<Text>add User</Text>); //(<addUser project={this.state.param}/>);
 			default:
