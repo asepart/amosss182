@@ -178,7 +178,7 @@ public class Database
     {
         User newUser = new User();
         newUser.setLoginName(loginName);
-        newUser.setPasswordHash(hashPassword(password));
+        newUser.setPassword(hashPassword(password));
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setPhone(phone);
@@ -188,6 +188,9 @@ public class Database
 
     public static void putUser(Session session, User user)
     {
+        String password = user.getPassword();
+        user.setPassword(hashPassword(password));
+
         session.save(user);
     }
 
@@ -206,7 +209,7 @@ public class Database
     {
         Admin newAdmin = new Admin();
         newAdmin.setLoginName(loginName);
-        newAdmin.setPasswordHash(hashPassword(password));
+        newAdmin.setPassword(hashPassword(password));
         newAdmin.setFirstName(firstName);
         newAdmin.setLastName(lastName);
 
@@ -215,6 +218,9 @@ public class Database
 
     public static void putAdmin(Session session, Admin admin)
     {
+        String password = admin.getPassword();
+        admin.setPassword(hashPassword(password));
+
         session.save(admin);
     }
 
@@ -235,7 +241,7 @@ public class Database
 
         if (account != null)
         {
-            String hash = account.getPasswordHash();
+            String hash = account.getPassword();
             return checkPassword(password, hash);
         }
 
