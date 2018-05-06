@@ -50,7 +50,8 @@ public class Database
             try (Session session = Database.openSession())
             {
                 session.beginTransaction();
-                Database.putAdmin(session, "kingofthenorth", "winteriscoming", "Jon", "Snow");
+                Database.putAdmin(session, "admin", "admin", "Default", "Admin");
+                Database.putUser(session, "user", "user", "Default", "User", "+4917123456");
                 session.getTransaction().commit();
             }
         }
