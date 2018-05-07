@@ -10,8 +10,8 @@ public abstract class Account
     @Id @Column(name = "login_name")
     private String loginName;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -29,14 +29,14 @@ public abstract class Account
         this.loginName = loginName;
     }
 
-    public String getPasswordHash()
+    public String getPassword()
     {
-        return passwordHash;
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash)
+    public void setPassword(String password)
     {
-        this.passwordHash = passwordHash;
+        this.password = password;
     }
 
     public String getFirstName()

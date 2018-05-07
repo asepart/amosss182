@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Table(name = "users")
 public class User extends Account
 {
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
     public String getPhone()

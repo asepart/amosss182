@@ -6,18 +6,23 @@ import java.net.UnknownHostException;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
+
+import org.hibernate.Session;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.hibernate.Session;
 
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
@@ -26,91 +31,172 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 @Path("/")
 public class WebService
 {
-    /*
-        TODO: Replace PermitAll with RolesAllowed
-        TODO: Actually talk with database instead of using dummies
-        TODO: get user name from @Context SecurityContext sc parameter for each request
-
-        TODO: (maybe) login limit to avoid brute force attacks
-    */
+    @Path("/login")
+    @OPTIONS
+    @PermitAll
+    public Response login()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 
     @Path("/login")
     @GET
     @RolesAllowed({"Admin", "User"})
-    public Response login()
+    public Response login(@Context SecurityContext sc)
     {
         /* If credentials are invalid, the method call will automatically fail.
          * This is done by the AuthenticationFilter, so if the return statement
          * below is reached the credentials have been validated already.
          */
 
-        return Response.ok("Your identification is invalid").build();
+        return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
-    @GET
+    @Path("/projects/{name}")
+    @OPTIONS
     @PermitAll
-    public Response get()
+    public Response createProject()
     {
-        return Response.ok("Hello, World!").build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @Path("/projects/{name}")
     @PUT
-    @PermitAll
-    public Response createProject(@PathParam("name") String name, String entryKey)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"Admin"})
+    public Response createProject(@Context SecurityContext sc, @PathParam("name") String name, String entryKey)
     {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.putProject(session, name, entryKey);
+            session.getTransaction().commit();
+        }
+
         return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
+    }
+
+    @Path("/projects")
+    @OPTIONS
+    @PermitAll
+    public Response listProjects()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @Path("/projects")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @PermitAll
-    public Response listProjects()
+    @RolesAllowed({"Admin"})
+    public Response listProjects(@Context SecurityContext sc)
     {
-        Project p1 = new Project();
-        p1.setProjectName("Project1");
-        p1.setEntryKey("foo");
-
-        Project p2 = new Project();
-        p2.setProjectName("Project2");
-        p2.setEntryKey("bar");
-
-        Project[] proj = new Project[2];
-        proj[0] = p1;
-        proj[1] = p2;
-
-        return Response.ok(proj).build();
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listProjects(session)).build();
+        }
     }
 
-    @Path("/projects/{name}/users/{accountname}")
-    @PUT
+    @Path("/projects/{name}/users/{username}")
+    @OPTIONS
     @PermitAll
-    public Response addUserToProject(@PathParam("name") String name, @PathParam("accountname") String accountname)
+    public Response addUserToProject()
     {
-        return Response.ok(String.format("Added account %s to project %s.", accountname, name)).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{name}/users/{username}")
+    @PUT
+    @RolesAllowed({"Admin"})
+    public Response addUserToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("username") String username)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.addUsersToProject(session, username, name);
+            session.getTransaction().commit();
+        }
+
+        return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
+    }
+
+    @Path("/projects/{name}/users")
+    @OPTIONS
+    @PermitAll
+    public Response getUsersOfProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @Path("/projects/{name}/users")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @PermitAll
-    public Response getUsersOfProject(@PathParam("name") String name) //not working because project table not working TODO: add other status code responses
+    @RolesAllowed({"Admin"})
+    public Response getUsersOfProject(@Context SecurityContext sc, @PathParam("name") String name)
     {
-    		try (Session session = DatabaseController.newSession())
+        try (Session session = Database.openSession())
         {
-            session.beginTransaction();
-
-//            Project p = session.get(Project.class, name);	// add this when projects table works
-//            User[] users = new User[p.getUsers().size()];	// add this when projects table works
-//            	users = (User[]) p.getUsers().toArray();		// add this when projects table works
-
-            session.getTransaction().commit();
-			return Response.ok(/*users*/).build();	// add this when projects table works
+            User[] users = Database.getUsersOfProject(session, name);
+            return Response.ok(users).build();
         }
     }
 
-    // TODO create User and create Admin
+    @Path("/users")
+    @OPTIONS
+    @PermitAll
+    public Response addUser()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/users")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response addUser(@Context SecurityContext sc, User newUser)
+    {
+        try (Session session = Database.openSession())
+        {
+            String loginName = newUser.getLoginName();
+
+            if (Database.isUser(session, loginName))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            session.beginTransaction();
+            Database.putUser(session, newUser);
+            session.getTransaction().commit();
+
+            return Response.ok(String.format("Added new user %s.", newUser.getLoginName())).build();
+        }
+    }
+
+    @Path("/admins")
+    @OPTIONS
+    @PermitAll
+    public Response addAdmin()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/admins")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response addAdmin(@Context SecurityContext sc, Admin newAdmin)
+    {
+        try (Session session = Database.openSession())
+        {
+            String loginName = newAdmin.getLoginName();
+
+            if (Database.isAdmin(session, loginName))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            session.beginTransaction();
+            Database.putAdmin(session, newAdmin);
+            session.getTransaction().commit();
+
+            return Response.ok(String.format("Added new admin %s.", newAdmin.getLoginName())).build();
+        }
+    }
 
     public static void main(String[] args)
     {
@@ -131,6 +217,7 @@ public class WebService
             ResourceConfig config = new ResourceConfig(WebService.class);
             config.register(CORSFilter.class);
             config.register(AuthenticationFilter.class);
+            // config.register(DebugExceptionMapper.class);
 
             JdkHttpServerFactory.createHttpServer(uri, config);
         }
