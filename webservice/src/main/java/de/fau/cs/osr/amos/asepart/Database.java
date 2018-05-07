@@ -34,6 +34,7 @@ public class Database
             configuration.addAnnotatedClass(Admin.class);
             configuration.addAnnotatedClass(User.class);
             configuration.addAnnotatedClass(Project.class);
+            configuration.addAnnotatedClass(Ticket.class);
 
             // Relationships
             configuration.addAnnotatedClass(ProjectAccount.class);
@@ -76,6 +77,36 @@ public class Database
     private static boolean checkPassword(String password, String hash)
     {
         return BCrypt.checkpw(password, hash);
+    }
+
+    public static boolean authenticate(Session session, String loginName, String password, Class<?> type)
+    {
+        Account account = (Account) session.get(type, loginName);
+
+        if (account != null)
+        {
+            String hash = account.getPassword();
+            return checkPassword(password, hash);
+        }
+
+        return false;
+    }
+
+    public static void putTicket(Session session, String ticketName, String ticketSummary,
+                                 String ticketDescription, TicketCategory ticketCategory)
+    {
+        Ticket ticket = new Ticket();
+        ticket.setTicketName(ticketName);
+        ticket.setTicketSummary(ticketSummary);
+        ticket.setTicketDescription(ticketDescription);
+        ticket.setTicketCategory(ticketCategory);
+
+        session.save(ticket);
+    }
+
+    public static void putTicket(Session session, Ticket ticket)
+    {
+        session.save(ticket);
     }
 
     public static void putProject(Session session, String projectName, String entryKey)
@@ -233,18 +264,5 @@ public class Database
     {
         Admin admin = session.get(Admin.class, loginName);
         return admin != null;
-    }
-
-    public static boolean authenticate(Session session, String loginName, String password, Class<?> type)
-    {
-        Account account = (Account) session.get(type, loginName);
-
-        if (account != null)
-        {
-            String hash = account.getPassword();
-            return checkPassword(password, hash);
-        }
-
-        return false;
     }
 }

@@ -52,6 +52,30 @@ public class WebService
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
+    @Path("/tickets")
+    @OPTIONS
+    @PermitAll
+    public Response createTicket()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/tickets")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response createTicket(@Context SecurityContext sc, Ticket ticket)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.putTicket(session, ticket);
+            session.getTransaction().commit();
+
+            return Response.ok(String.format("Added new ticket with name \"%s\".", ticket.getTicketName())).build();
+        }
+    }
+
     @Path("/projects/{name}")
     @OPTIONS
     @PermitAll
@@ -95,6 +119,8 @@ public class WebService
             return Response.ok(Database.listProjects(session)).build();
         }
     }
+
+    // TODO show only projects visible to admin
 
     @Path("/projects/{name}/users/{username}")
     @OPTIONS

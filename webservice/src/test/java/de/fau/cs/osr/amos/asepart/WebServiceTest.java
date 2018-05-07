@@ -31,6 +31,24 @@ public class WebServiceTest
     }
 
     @Test
+    public void testCreateTicket()
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.putTicket(session, "Demo Ticket",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.ONE_TIME_ERROR);
+
+            session.getTransaction().commit();
+        }
+
+        // TODO read ticket from database and check contents
+    }
+
+    @Test
     public void testGetUsersOfProject() // TODO: add more test cases
     {
         try (Session session = Database.openSession())
