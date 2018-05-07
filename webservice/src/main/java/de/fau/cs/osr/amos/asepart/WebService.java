@@ -159,7 +159,7 @@ public class WebService
             String loginName = newUser.getLoginName();
 
             if (Database.isUser(session, loginName))
-                return Response.status(Response.Status.BAD_REQUEST).build();
+            { return Response.status(Response.Status.BAD_REQUEST).build(); }
 
             session.beginTransaction();
             Database.putUser(session, newUser);
@@ -188,7 +188,7 @@ public class WebService
             String loginName = newAdmin.getLoginName();
 
             if (Database.isAdmin(session, loginName))
-                return Response.status(Response.Status.BAD_REQUEST).build();
+            { return Response.status(Response.Status.BAD_REQUEST).build(); }
 
             session.beginTransaction();
             Database.putAdmin(session, newAdmin);
@@ -205,13 +205,16 @@ public class WebService
             final String ip = InetAddress.getLocalHost().getHostAddress();
             final String address = "http://" + ip + "/";
             int port = 12345;
-			
-	    try {
-        	port = Integer.parseInt(System.getenv("PORT"));
-    	    }
-    	    catch (NumberFormatException e) {
-	    }
-			
+
+            try
+            {
+                port = Integer.parseInt(System.getenv("PORT"));
+            }
+
+            catch (NumberFormatException e)
+            {
+            }
+
             final URI uri = UriBuilder.fromUri(address).port(port).build();
 
             ResourceConfig config = new ResourceConfig(WebService.class);
