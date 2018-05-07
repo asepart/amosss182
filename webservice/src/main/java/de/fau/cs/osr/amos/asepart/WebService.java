@@ -13,6 +13,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -93,7 +94,7 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putProject(session, name, entryKey);
+            Database.putProject(session, sc.getUserPrincipal().getName(), name, entryKey);
             session.getTransaction().commit();
         }
 
@@ -116,11 +117,9 @@ public class WebService
     {
         try (Session session = Database.openSession())
         {
-            return Response.ok(Database.listProjects(session)).build();
+            return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
         }
     }
-
-    // TODO show only projects visible to admin
 
     @Path("/projects/{name}/users/{username}")
     @OPTIONS
@@ -138,7 +137,7 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.addUsersToProject(session, username, name);
+            Database.addUserToProject(session, sc.getUserPrincipal().getName(), username, name);
             session.getTransaction().commit();
         }
 
@@ -161,8 +160,13 @@ public class WebService
     {
         try (Session session = Database.openSession())
         {
-            User[] users = Database.getUsersOfProject(session, name);
+            User[] users = Database.getUsersOfProject(session, sc.getUserPrincipal().getName(), name);
             return Response.ok(users).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
     }
 

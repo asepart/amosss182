@@ -1,5 +1,6 @@
 package de.fau.cs.osr.amos.asepart;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,6 +10,20 @@ import de.fau.cs.osr.amos.asepart.entities.*;
 
 public class WebServiceTest
 {
+    @BeforeAll
+    public static void createAccounts()
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.putAdmin(session, "testadmin", "foobar", "Test", "Admin");
+            Database.putUser(session, "testuser", "foobar", "Test", "User", "+4991112345");
+
+            session.getTransaction().commit();
+        }
+    }
+
     @Test
     public void testWriteRead()
     {
@@ -20,8 +35,8 @@ public class WebServiceTest
                     "Jon", "Snow", "00000000000");
             User u = Database.getUser(session, "knowsnothing");
 
-            Database.putProject(session, "test", "1234");
-            Project p = Database.getProject(session, "test");
+            Database.putProject(session, "testadmin", "test", "1234");
+            Project p = Database.getProject(session, "testadmin", "test");
 
             session.getTransaction().commit();
 
@@ -60,17 +75,17 @@ public class WebServiceTest
             Database.putUser(session, "testbb", "supergeheim",
                     "TestFirstNameP2", "TestLastNameP2", "01702222222");
 
-            Database.putProject(session, "Test1", "foo");
-            Database.putProject(session, "Test2", "bar");
+            Database.putProject(session, "testadmin","Test1", "foo");
+            Database.putProject(session, "testadmin","Test2", "bar");
 
-            Database.addUsersToProject(session, "testaa", "Test1");
-            Database.addUsersToProject(session, "testbb", "Test1");
-            Database.addUsersToProject(session, "testaa", "Test2");
-            Database.addUsersToProject(session, "testbb", "Test2");
+            Database.addUserToProject(session, "testadmin","testaa", "Test1");
+            Database.addUserToProject(session, "testadmin","testbb", "Test1");
+            Database.addUserToProject(session, "testadmin","testaa", "Test2");
+            Database.addUserToProject(session, "testadmin","testbb", "Test2");
 
             User[] expected = new User[] { Database.getUser(session, "testaa"), Database.getUser(session, "testbb")};
-            User[] actual1 = Database.getUsersOfProject(session, "Test1");
-            User[] actual2 = Database.getUsersOfProject(session, "Test2");
+            User[] actual1 = Database.getUsersOfProject(session, "testadmin","Test1");
+            User[] actual2 = Database.getUsersOfProject(session, "testadmin","Test2");
 
             session.getTransaction().commit();
 

@@ -7,6 +7,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -47,7 +48,7 @@ public class Database
 
             factory = configuration.buildSessionFactory(serviceRegistry);
 
-            // Create default admin for testing
+            // Create default admin and user for testing
             try (Session session = Database.openSession())
             {
                 session.beginTransaction();
@@ -79,9 +80,9 @@ public class Database
         return BCrypt.checkpw(password, hash);
     }
 
-    public static boolean authenticate(Session session, String loginName, String password, Class<?> type)
+    public static boolean authenticate(Session session, String loginName, String password, Class<? extends Account> type)
     {
-        Account account = (Account) session.get(type, loginName);
+        Account account = session.get(type, loginName);
 
         if (account != null)
         {
@@ -101,7 +102,7 @@ public class Database
         ticket.setTicketDescription(ticketDescription);
         ticket.setTicketCategory(ticketCategory);
 
-        session.save(ticket);
+        putTicket(session, ticket);
     }
 
     public static void putTicket(Session session, Ticket ticket)
@@ -109,18 +110,19 @@ public class Database
         session.save(ticket);
     }
 
-    public static void putProject(Session session, String projectName, String entryKey)
+    public static void putProject(Session session, String adminName, String projectName, String entryKey)
     {
         Project project = new Project();
         project.setProjectName(projectName);
         project.setEntryKey(entryKey);
 
-        session.save(project);
+        putProject(session, adminName, project);
     }
 
-    public static void putProject(Session session, Project project)
+    public static void putProject(Session session, String adminName, Project project)
     {
         session.save(project);
+        addAdminToProject(session, adminName, project.getProjectName());
     }
 
     public static boolean isProject(Session session, String projectName)
@@ -129,34 +131,55 @@ public class Database
         return project != null;
     }
 
-    public static Project getProject(Session session, String projectName)
+    public static Project getProject(Session session, String adminName, String projectName)
     {
+        if (!isProject(session, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
+        }
+
+        if (!isAccountPartOfProject(session, ProjectAdmin.class, adminName, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to view that project.").build());
+        }
+
         return session.get(Project.class, projectName);
     }
 
-    public static Project[] listProjects(Session session)
+    public static Project[] listProjects(Session session, String adminName)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
         criteria.from(Project.class);
 
         List<Project> projectList = session.createQuery(criteria).getResultList();
-        Project[] projects = new Project[projectList.size()];
-        projects = projectList.toArray(projects);
+        ArrayList<Project> filteredProjectList = new ArrayList<>(projectList.size());
+
+        for (Project p : projectList)
+        {
+            if (isAccountPartOfProject(session, ProjectAdmin.class, adminName, p.getProjectName()))
+                filteredProjectList.add(p);
+        }
+
+        Project[] projects = new Project[filteredProjectList.size()];
+        projects = filteredProjectList.toArray(projects);
 
         return projects;
     }
 
-    public static void addUsersToProject(Session session, String user, String project)
+    public static void addUserToProject(Session session, String admin, String user, String project)
     {
         if (!isUser(session, user))
-            throw new WebApplicationException("User does not exist.");
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User does not exist.").build());
 
         if (!isProject(session, project))
-            throw new WebApplicationException("Project does not exist.");
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
 
-        if (isUserMemberOfProject(session, user, project))
-            throw new WebApplicationException("User already member of project.");
+        if (isAccountPartOfProject(session, ProjectUser.class, user, project))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User already member of project.").build());
+
+        if (!isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build());
 
         ProjectUser pu = new ProjectUser();
         pu.setLoginName(user);
@@ -165,27 +188,36 @@ public class Database
         session.save(pu);
     }
 
-    public static boolean isUserMemberOfProject(Session session, String user, String project)
+    public static void addAdminToProject(Session session, String admin, String project)
     {
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
+        if (!isAdmin(session, admin))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin does not exist.").build());
 
-        Root<ProjectUser> columns = criteria.from(ProjectUser.class);
-        List<Predicate> predicates = new ArrayList<>();
-        predicates.add(builder.equal(columns.get("projectName"), project));
-        predicates.add(builder.equal(columns.get("loginName"), user));
-        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+        if (!isProject(session, project))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
 
-        List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
+        if (isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin already member of project.").build());
 
-        if (resultList.size() == 0)
-            return false;
+        ProjectAdmin pa = new ProjectAdmin();
+        pa.setLoginName(admin);
+        pa.setProjectName(project);
 
-        else return true;
+        session.save(pa);
     }
 
-    public static User[] getUsersOfProject(Session session, String projectName)
+    public static User[] getUsersOfProject(Session session, String adminName, String projectName)
     {
+        if (!Database.isProject(session, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
+        }
+
+        if (!Database.isAccountPartOfProject(session, ProjectAdmin.class, adminName, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to view that project.").build());
+        }
+
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
 
@@ -205,16 +237,39 @@ public class Database
         return users;
     }
 
+    public static boolean isAccountPartOfProject(Session session, Class<? extends ProjectAccount> relationship, String loginName, String project)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+
+        @SuppressWarnings("unchecked")
+        CriteriaQuery<ProjectAccount> criteria = (CriteriaQuery<ProjectAccount>) builder.createQuery(relationship);
+
+        @SuppressWarnings("unchecked")
+        Root<ProjectAccount> columns = (Root<ProjectAccount>) criteria.from(relationship);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("projectName"), project));
+        predicates.add(builder.equal(columns.get("loginName"), loginName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<ProjectAccount> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+            return false;
+
+        else return true;
+    }
+
     public static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
     {
         User newUser = new User();
         newUser.setLoginName(loginName);
-        newUser.setPassword(hashPassword(password));
+        newUser.setPassword(password);
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setPhone(phone);
 
-        session.save(newUser);
+        putUser(session, newUser);
     }
 
     public static void putUser(Session session, User user)
@@ -227,6 +282,11 @@ public class Database
 
     public static User getUser(Session session, String loginName)
     {
+        if (!isUser(session, loginName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("User not found.").build());
+        }
+
         return session.get(User.class, loginName);
     }
 
@@ -240,11 +300,11 @@ public class Database
     {
         Admin newAdmin = new Admin();
         newAdmin.setLoginName(loginName);
-        newAdmin.setPassword(hashPassword(password));
+        newAdmin.setPassword(password);
         newAdmin.setFirstName(firstName);
         newAdmin.setLastName(lastName);
 
-        session.save(newAdmin);
+        putAdmin(session, newAdmin);
     }
 
     public static void putAdmin(Session session, Admin admin)
@@ -257,6 +317,11 @@ public class Database
 
     public static Admin getAdmin(Session session, String loginName)
     {
+        if (!isAdmin(session, loginName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Admin not found.").build());
+        }
+
         return session.get(Admin.class, loginName);
     }
 
