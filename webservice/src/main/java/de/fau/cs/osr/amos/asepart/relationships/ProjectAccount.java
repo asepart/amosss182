@@ -12,10 +12,10 @@ public abstract class ProjectAccount
     @GeneratedValue
     private Integer relId;
 
-    @Column(name = "project_name")
+    @Column(name = "project_name", nullable = false)
     private String projectName;
 
-    @Column(name = "login_name")
+    @Column(name = "login_name", nullable = false)
     private String loginName;
 
     public Integer getRelId()

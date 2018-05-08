@@ -23,11 +23,20 @@ The following REST operations are available:
   Status code:    [200 OK]           if credentials are valid.
                   [401 Unauthorized] if credentials are not valid.
 
+- Create new ticket
+
+  HTTP operation: PUT
+  Path:           /tickets
+  Request-Body:   Ticket information as JSON object.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not an admin.
+
 - Create new project with an entry key
 
   HTTP operation: PUT
   Path:           /projects/{name}
-  Request-Body:   Entry key as ASCII string
+  Request-Body:   Entry key as ASCII string.
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if project already exists.
                   [401 Unauthorized] if the provided username or password is invalid.
@@ -37,13 +46,13 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /projects
-  Returns:        List<Project>
+  Returns:        JSON array of projects.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
 
 - Add user to project
 
-  HTTP operation: PUT
+  HTTP operation: POST
   Path:           /projects/{name}/users/{username}
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user is already member of project or user/project does not exist.
@@ -54,18 +63,28 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /projects/{name}/users
-  Returns:        List<User>
+  Returns:        JSON array of users.
   Status code:    [200 OK]           in case of success
-                  [401 Unauthorized] if the provided username or password is invalid
+                  [401 Unauthorized] if the provided username or password is invalid,
                   [403 Forbidden]    if the authorized user is not an admin for the project.
+                  [404 Not found]    if project does not exist.
 
 - Create user
 
   HTTP operation: PUT
   Path:           /users
-  Request-Body:   User information
+  Request-Body:   User information as JSON object.
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user already exists or user information is invalid.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not an admin.
+
+- List users
+
+  HTTP operation: GET
+  Path:           /users
+  Returns:        JSON array of users.
+                  [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized user is not an admin.
 
@@ -73,8 +92,17 @@ The following REST operations are available:
 
   HTTP operation: PUT
   Path:           /admins
-  Request-Body:   Admin information
+  Request-Body:   Admin information as JSON object.
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if admin already exists or admin information is invalid.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not an admin.
+
+- List admins
+
+  HTTP operation: GET
+  Path:           /admins
+  Returns:        JSON array of admins.
+                  [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized user is not an admin.

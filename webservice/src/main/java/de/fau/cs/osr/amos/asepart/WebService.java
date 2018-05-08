@@ -6,13 +6,8 @@ import java.net.UnknownHostException;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.print.attribute.standard.Media;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -52,10 +47,34 @@ public class WebService
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
+    @Path("/tickets")
+    @OPTIONS
+    @PermitAll
+    public Response tickets()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/tickets")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response createTicket(@Context SecurityContext sc, Ticket ticket)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.putTicket(session, ticket);
+            session.getTransaction().commit();
+
+            return Response.ok(String.format("Added new ticket with name \"%s\".", ticket.getTicketName())).build();
+        }
+    }
+
     @Path("/projects/{name}")
     @OPTIONS
     @PermitAll
-    public Response createProject()
+    public Response project()
     {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -69,7 +88,7 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putProject(session, name, entryKey);
+            Database.putProject(session, sc.getUserPrincipal().getName(), name, entryKey);
             session.getTransaction().commit();
         }
 
@@ -79,7 +98,7 @@ public class WebService
     @Path("/projects")
     @OPTIONS
     @PermitAll
-    public Response listProjects()
+    public Response projects()
     {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -92,7 +111,7 @@ public class WebService
     {
         try (Session session = Database.openSession())
         {
-            return Response.ok(Database.listProjects(session)).build();
+            return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
         }
     }
 
@@ -105,14 +124,14 @@ public class WebService
     }
 
     @Path("/projects/{name}/users/{username}")
-    @PUT
+    @POST
     @RolesAllowed({"Admin"})
     public Response addUserToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("username") String username)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.addUsersToProject(session, username, name);
+            Database.addUserToProject(session, sc.getUserPrincipal().getName(), username, name);
             session.getTransaction().commit();
         }
 
@@ -135,15 +154,20 @@ public class WebService
     {
         try (Session session = Database.openSession())
         {
-            User[] users = Database.getUsersOfProject(session, name);
+            User[] users = Database.getUsersOfProject(session, sc.getUserPrincipal().getName(), name);
             return Response.ok(users).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
     }
 
     @Path("/users")
     @OPTIONS
     @PermitAll
-    public Response addUser()
+    public Response users()
     {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -169,10 +193,22 @@ public class WebService
         }
     }
 
+    @Path("/users")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response listUsers(@Context SecurityContext sc)
+    {
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listUsers(session)).build();
+        }
+    }
+
     @Path("/admins")
     @OPTIONS
     @PermitAll
-    public Response addAdmin()
+    public Response admins()
     {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -198,6 +234,17 @@ public class WebService
         }
     }
 
+    @Path("/admins")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response listAdmins(@Context SecurityContext sc)
+    {
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listAdmins(session)).build();
+        }
+    }
     public static void main(String[] args)
     {
         try
