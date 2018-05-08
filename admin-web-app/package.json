@@ -17,7 +17,20 @@
     "eject": "react-scripts eject"
   },
   "jest": {
-  "coverageDirectory": "./coverage/",
-  "collectCoverage": true
+    "collectCoverageFrom" : [
+      "src/**/*.{js,jsx}",
+      "!<rootDir>/node_modules/",
+      "!<rootDir>/path/to/dir/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    },
+    "coverageReporters": ["text"],
+    "snapshotSerializers": ["my-serializer-module"]
   }
 }
