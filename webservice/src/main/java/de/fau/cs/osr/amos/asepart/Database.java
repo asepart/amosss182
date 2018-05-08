@@ -230,7 +230,7 @@ public class Database
 
         for (ProjectUser pu : resultList)
         {
-            users[index] = session.get(User.class, pu.getLoginName());
+            users[index] = getUser(session, pu.getLoginName());
             ++index;
         }
 
@@ -287,13 +287,34 @@ public class Database
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("User not found.").build());
         }
 
-        return session.get(User.class, loginName);
+        User user = session.get(User.class, loginName);
+        user.setPassword(null);
+
+        return user;
     }
 
     public static boolean isUser(Session session, String loginName)
     {
         User user = session.get(User.class, loginName);
         return user != null;
+    }
+
+    public static User[] listUsers(Session session)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<User> criteria = builder.createQuery(User.class);
+        criteria.from(User.class);
+
+        List<User> userList = session.createQuery(criteria).getResultList();
+        User[] users = new User[userList.size()];
+        users = userList.toArray(users);
+
+        for (int i = 0; i < users.length; i++)
+        {
+            users[i].setPassword(null);
+        }
+
+        return users;
     }
 
     public static void putAdmin(Session session, String loginName, String password, String firstName, String lastName)
@@ -322,12 +343,33 @@ public class Database
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Admin not found.").build());
         }
 
-        return session.get(Admin.class, loginName);
+        Admin admin = session.get(Admin.class, loginName);
+        admin.setPassword(null);
+
+        return admin;
     }
 
     public static boolean isAdmin(Session session, String loginName)
     {
         Admin admin = session.get(Admin.class, loginName);
         return admin != null;
+    }
+
+    public static Admin[] listAdmins(Session session)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Admin> criteria = builder.createQuery(Admin.class);
+        criteria.from(Admin.class);
+
+        List<Admin> adminList = session.createQuery(criteria).getResultList();
+        Admin[] admins = new Admin[adminList.size()];
+        admins = adminList.toArray(admins);
+
+        for (int i = 0; i < admins.length; i++)
+        {
+            admins[i].setPassword(null);
+        }
+
+        return admins;
     }
 }
