@@ -17,9 +17,18 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
+
+import de.fau.cs.osr.amos.asepart.WebServiceSecurityContext;
+import de.fau.cs.osr.amos.asepart.Database;
+import de.fau.cs.osr.amos.asepart.entities.Admin;
+import de.fau.cs.osr.amos.asepart.entities.User;
+import org.hibernate.Session;
+
+// TODO: (maybe) introduce login limit to avoid brute force attacks
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -28,17 +37,16 @@ public class AuthenticationFilter implements ContainerRequestFilter
     @Context
     private ResourceInfo resourceInfo;
 
+    private static final String ROLE_PROPERTY = "X-ASEPART-Role";
+
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Basic";
 
-    private static final Response ACCESS_UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED)
-            .entity("Your identification is invalid.").build();
-
-    private static final Response ACCESS_FORBIDDEN = Response.status(Response.Status.FORBIDDEN)
-            .entity("Your account has no rights to access this ressource.").build();
+    private static final String ACCESS_UNAUTHORIZED = "Your identification is invalid.";
+    private static final String ACCESS_FORBIDDEN = "Your account has no rights to access this resource.";
 
     @Override
-    public void filter(ContainerRequestContext requestContext)
+    public void filter(ContainerRequestContext request)
     {
         final Method method = resourceInfo.getResourceMethod();
 
@@ -46,7 +54,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
             return;
 
         // Get request headers
-        final MultivaluedMap<String, String> headers = requestContext.getHeaders();
+        final MultivaluedMap<String, String> headers = request.getHeaders();
 
         // Fetch authorization header
         final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
@@ -54,7 +62,17 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // If no authorization information present; block access
         if (authorization == null || authorization.isEmpty())
         {
-            requestContext.abortWith(ACCESS_UNAUTHORIZED);
+            request.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build());
+            return;
+        }
+
+        final List<String> role = headers.get(ROLE_PROPERTY);
+
+        // If no role information present; block access
+        if (role == null || role.isEmpty())
+        {
+            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+            return;
         }
 
         // Get encoded username and password
@@ -68,67 +86,51 @@ public class AuthenticationFilter implements ContainerRequestFilter
         final String accountName = tokenizer.nextToken();
         final String password = tokenizer.nextToken();
 
+        // Get role name
+        final String roleName = role.get(0);
+
         if (method.isAnnotationPresent(RolesAllowed.class))
         {
             RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
             Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
 
-            // Are credentials correct and authorized for ressource?
-            final Response error = checkAuthorized(accountName, password, rolesSet);
-            if (error != null)
-                requestContext.abortWith(error);
-        }
-
-        // TODO pass account name to security context
-    }
-
-    private Response checkAuthorized(final String loginName, final String password, final Set<String> rolesSet)
-    {
-        return null;
-
-        // TODO enable authenfication
-
-        /*
-        Session session = DatabaseController.newSession();
-        session.beginTransaction();
-
-        try
-        {
-            Account account = session.get(Account.class, loginName);
-            if (account == null) // account with loginName does not exist
-                return ACCESS_UNAUTHORIZED;
-
-            final String savedHash = account.getPasswordHash();
-            if (!BCrypt.checkpw(password, savedHash)) // password does not match
-                return ACCESS_UNAUTHORIZED;
-
-            for (String role : rolesSet) // check if account is in any allowed role
+            if (!rolesSet.contains(roleName))
             {
-                if (role.equals("Admin"))
-                {
-                    final Admin admin = session.get(Admin.class, account.getLoginName());
+                request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+                return;
+            }
 
-                    if (admin != null)
-                        return null;
-                }
-
-                else if (role.equals("User"))
-                {
-                    final User user = session.get(User.class, account.getLoginName());
-
-                    if (user != null)
-                        return null;
-                }
+            final Response error = checkPassword(accountName, password, roleName);
+            if (error != null)
+            {
+                request.abortWith(error);
+                return;
             }
         }
 
-        finally
+        SecurityContext sc = new WebServiceSecurityContext(accountName, roleName, request.getUriInfo().getRequestUri().getScheme());
+        request.setSecurityContext(sc);
+    }
+
+    private Response checkPassword(final String loginName, final String password, final String role)
+    {
+        try (Session session = Database.openSession())
         {
-            session.getTransaction().commit();
-            session.close();
+            switch (role)
+            {
+                case "Admin":
+                    if (Database.authenticate(session, loginName, password, Admin.class))
+                        return null;
+                    else break;
+                case "User":
+                    if (Database.authenticate(session, loginName, password, User.class))
+                        return null;
+                    else break;
+                default:
+                    return Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build();
+            }
         }
 
-        return ACCESS_FORBIDDEN;
-        */
+        return Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build();
     }
 }
