@@ -12,15 +12,11 @@ matrix:
       node_js: 8
       install:
         - npm install -g codecov
-        - npm install -g istanbul
       script:
         - cd user-app && npm install && npm test
-        - ls
-        - ls ..
-        - istanbul cover _mocha
-        - codecov
+        - jest && codecov
         - cd ../admin-web-app && npm install && npm test
-        - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+        #- istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
         - codecov
 
 before_deploy:
