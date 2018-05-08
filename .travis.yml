@@ -13,11 +13,8 @@ matrix:
       install:
         - npm install -g codecov
       script:
-        - cd user-app && npm install && npm test
-        - jest && codecov
-        - cd ../admin-web-app && npm install && npm test
-        #- istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
-        - codecov
+        - cd user-app && npm install && npm test && jest && codecov
+        - cd ../admin-web-app && npm install && npm test && jest && codecov
 
 before_deploy:
   - echo 'ready P1?'
