@@ -65,8 +65,8 @@ export default class Login extends Component {
 	render() {
 		return (<View style={styles.container}>
 
-			<TextInput  onChangeText={(val) => this.setState({email: val})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
-			<TextInput onChangeText={(val) => this.setState({password: val})} placeholder="password" placeholderTextColor="#FFF"  secureTextEntry style={styles.input}/>
+			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
+			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF"  secureTextEntry style={styles.input}/>
 			<TouchableOpacity onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 			
 				<Text style={styles.buttonText}>LOGIN</Text>

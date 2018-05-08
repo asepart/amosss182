@@ -4,6 +4,8 @@ var username = "";
 var psw = "";
 var auth=false;
 
+window.btoa = require('Base64').btoa;
+
 export function setPSW(lpsw) {
 	psw = lpsw;
 }
@@ -12,7 +14,9 @@ export function setUsername(lUsername) {
 }
 
 export function getAuth() {
+	
 	return {
+		
 		'Accept': 'application/json',
 		'X-ASEPART-Role': 'User',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)

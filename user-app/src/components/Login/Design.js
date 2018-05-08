@@ -13,6 +13,7 @@ export default styles=StyleSheet.create({
       
   
     },
+    //Text input boxes
     input: {
       height: 40,
       width: 200,
@@ -21,7 +22,7 @@ export default styles=StyleSheet.create({
       marginBottom: 10,
       paddingHorizontal: 10
     },
-  
+    //button
     buttonContainer: {
       backgroundColor: '#62757f',
       paddingVertical: 15,
@@ -37,4 +38,5 @@ export default styles=StyleSheet.create({
     error: {
       color: 'red'
     }
+    //logo, text normal, text large,text small, 
   });
