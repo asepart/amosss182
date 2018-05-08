@@ -16,6 +16,7 @@ export default styles=StyleSheet.create({
     input: {
       height: 40,
       width: 200,
+      color: '#FFF',
       backgroundColor: '#607d8b',
       marginBottom: 10,
       paddingHorizontal: 10
@@ -32,5 +33,8 @@ export default styles=StyleSheet.create({
       color: '#FFF',
       fontWeight: '700'
   
+    },
+    error: {
+      color: 'red'
     }
   });

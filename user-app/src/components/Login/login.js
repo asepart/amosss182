@@ -15,10 +15,10 @@ import {
  //Design template 
 import styles from './Design';
 
-import {setUsername, setPSW, authenticate} from './auth';
+import {setUsername, setPSW, isAuth} from './auth';
 import {setState} from './state';
 
-class Login extends Component {
+export default class Login extends Component {
 
 	//setting page title 
 	static navigationOptions= {
@@ -39,32 +39,33 @@ class Login extends Component {
 			email: "",
 			password: "",
 			error: "",
-			showProgress: false
 		}
 	}
 
 	
 	 async onLoginPressed() {
 
-		
-		this.setState({showProgress: true})
 		setUsername(this.state.email);
 		setPSW(this.state.password);
 
-		if(authenticate()){
-		setState({isAuth: true});
-
-		//navigate to different site
+		if(await isAuth()){
+			setState({isAuth: true});
+			//navigate to different site
 		const { navigate } = this.props.navigation;
 		navigate("Second", { name: "SecondScreen" })	
+		} else {
+			this.setState({error: "Invalid credentials!"});
 		}
+	
+		
+	
 	}
 
 
 	render() {
 		return (<View style={styles.container}>
 
-			<TextInput  onChangeText={(val) => this.setState({email: val})} placeholder="email" placeholderTextColor="#FFF" style={styles.input}/>
+			<TextInput  onChangeText={(val) => this.setState({email: val})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
 			<TextInput onChangeText={(val) => this.setState({password: val})} placeholder="password" placeholderTextColor="#FFF"  secureTextEntry style={styles.input}/>
 			<TouchableOpacity onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 			
@@ -72,9 +73,11 @@ class Login extends Component {
 
 			</TouchableOpacity>
 
+			<Text style={styles.error}>
+					{this.state.error}
+				</Text>
 		</View>);
 	}
 }
 
-export default Login;
 
