@@ -15,7 +15,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
   "jest": {
   "coverageDirectory": "./coverage/",
   "collectCoverage": true
