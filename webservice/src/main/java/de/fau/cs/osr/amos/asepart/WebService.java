@@ -130,7 +130,7 @@ public class WebService
     }
 
     @Path("/projects/{name}/users/{username}")
-    @PUT
+    @POST
     @RolesAllowed({"Admin"})
     public Response addUserToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("username") String username)
     {

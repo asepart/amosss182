@@ -52,7 +52,7 @@ The following REST operations are available:
 
 - Add user to project
 
-  HTTP operation: PUT
+  HTTP operation: POST
   Path:           /projects/{name}/users/{username}
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user is already member of project or user/project does not exist.
