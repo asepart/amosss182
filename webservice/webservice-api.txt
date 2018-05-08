@@ -32,6 +32,16 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized user is not an admin.
 
+- List tickets of project
+
+  HTTP operation: GET
+  Path:           /projects/{name}/tickets
+  Returns:        JSON array of tickets.
+  Status code:    [200 OK]           in case of success
+                  [401 Unauthorized] if the provided username or password is invalid,
+                  [403 Forbidden]    if the authorized user is not an admin for the project.
+                  [404 Not found]    if project does not exist.
+
 - Create new project with an entry key
 
   HTTP operation: PUT
