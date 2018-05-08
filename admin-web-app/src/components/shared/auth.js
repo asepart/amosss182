@@ -2,8 +2,7 @@ import {URL} from '../shared/const';
 
 var username = "";
 var psw = "";
-var lastAuth = 0;
-export var watcher = {counter: 0};
+var auth=false;
 
 export function setPSW(lpsw) {
 	psw = lpsw;
@@ -11,40 +10,37 @@ export function setPSW(lpsw) {
 export function setUsername(lUsername) {
 	username = lUsername;
 }
-export function revokeAuth() {
-	lastAuth = 0;
-}
 
 export function getAuth() {
-	let headers = new Headers();
-	headers.append('Accept', 'application/json');
-	headers.append('X-ASEPART-Role', 'Admin');
-	headers.append('Authorization', 'Basic ' + btoa(username + ":" + psw));
-	return (headers);
+	return {
+		'Accept': 'application/json',
+		'X-ASEPART-Role': 'Admin',
+		'Authorization': 'Basic ' + btoa(username + ":" + psw)
+	};
 }
 
-export async function authenticate() {
+async function authenticate() {
 	var response = await fetch(URL + '/login', {
 		method: 'GET',
-		headers: getAuth
+		headers: getAuth()
 	})
-		switch (response.status) {
-			case 200:
-				lastAuth = Date.now();
-				return true;
-			case 401:
-				lastAuth = false;
-				return false;
-			default:
-				console.error("Error:" + response.status);
-				console.error(response.text);
-		}
-
+	switch (response.status) {
+		case 200:
+			auth=true;
+			return true;
+		case 401:
+			auth=false;
+			return false;
+		default:
+			console.error("Error:" + response.status);
+			console.error(response.text);
+	}
 }
 
-export function isAuth() {
-	if (new Date(Date.now() - lastAuth).getMinutes() < 5 && lastAuth === true) {
+export async function isAuth() {
+	if (auth)
 		return true;
-	}
-	return authenticate();
+	if (username === '' || psw === '')
+		return false;
+	return await authenticate();
 }

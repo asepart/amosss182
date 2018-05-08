@@ -11,13 +11,13 @@ The app has the following main features:
 
 ### Web Service Backend
 
-Currently, there is a demo REST service which can be build and executed using:
+The backend for the mobile and the web app is implemented in a REST service, which can be build and executed using:
 
 `$ cd webservice`
 
 `$ mvn clean compile`
 
-`$ mvn exec:java -Dexec.mainClass="de.fau.cs.osr.amos.asepart.WebService"`
+`$ mvn exec:java`
 
 On port 12345, the service will respond with "Hello World" to any GET request and show the number of requests made in total. To build a docker image containing the service, run:
 
