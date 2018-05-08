@@ -70,6 +70,24 @@ public class WebService
             return Response.ok(String.format("Added new ticket with name \"%s\".", ticket.getTicketName())).build();
         }
     }
+    
+    @Path("/projects/{name}/tickets")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("name") String name)
+    {
+        try (Session session = Database.openSession())
+        {
+            Ticket[] tickets = Database.getTicketsOfProject(session, sc.getUserPrincipal().getName(), name);
+            return Response.ok(tickets).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
 
     @Path("/projects/{name}")
     @OPTIONS
@@ -245,6 +263,7 @@ public class WebService
             return Response.ok(Database.listAdmins(session)).build();
         }
     }
+    
     public static void main(String[] args)
     {
         try

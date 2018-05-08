@@ -109,6 +109,31 @@ public class Database
     {
         session.save(ticket);
     }
+    
+    public static Ticket[] getTicketsOfProject(Session session, String adminName, String projectName)
+    {
+        if (!Database.isProject(session, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
+        }
+
+        if (!Database.isAccountPartOfProject(session, ProjectAdmin.class, adminName, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to view that project.").build());
+        }
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ProjectTicket> criteria = builder.createQuery(ProjectTicket.class);
+
+        Root<ProjectTicket> columns = criteria.from(ProjectTicket.class);
+        criteria.where(builder.equal(columns.get("projectName"), projectName));
+        List<ProjectTicket> resultList = session.createQuery(criteria).getResultList();
+
+        Ticket[] tickets = new Ticket[resultList.size()];
+        tickets = resultList.toArray(tickets);
+
+        return tickets;
+    }
 
     public static void putProject(Session session, String adminName, String projectName, String entryKey)
     {
