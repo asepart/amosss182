@@ -13,8 +13,10 @@ matrix:
       install:
         - npm install -g codecov
       script:
-        - cd user-app && npm install && npm test && jest && codecov
-        - cd ../admin-web-app && npm install && npm test && jest && codecov
+        - cd user-app && npm install && npm test && jest
+        - cd ../admin-web-app && npm install && npm test && jest
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 
 before_deploy:
   - echo 'ready P1?'
