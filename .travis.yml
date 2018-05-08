@@ -13,7 +13,7 @@ matrix:
       install:
         - npm install -g codecov
       script:
-        - cd user-app && npm install && npm test && jest
+        - cd user-app && npm install && npm test -- --coverage
         - cd ../admin-web-app && npm install && npm test
         #- jest
       after_success:
