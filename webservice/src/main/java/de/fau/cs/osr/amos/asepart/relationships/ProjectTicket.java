@@ -1,12 +1,14 @@
 package de.fau.cs.osr.amos.asepart.relationships;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 @MappedSuperclass
+@Entity
 @Table(name = "projects_tickets")
 public class ProjectTicket
 {
@@ -17,8 +19,8 @@ public class ProjectTicket
     @Column(name = "project_name", nullable = false)
     private String projectName;
 
-    @Column(name = "ticket_id", nullable = false)
-    private String ticketId;
+    @Column(name = "ticket_name", nullable = false)
+    private String ticketName;
 
     public Integer getRelId()
     {
@@ -40,13 +42,13 @@ public class ProjectTicket
         this.projectName = projectName;
     }
 
-    public String getTicketId()
+    public String getTicketName()
     {
-        return ticketId;
+        return ticketName;
     }
 
-    public void setTicketId(String ticketId)
+    public void setTicketName(String ticketName)
     {
-        this.ticketId = ticketId;
+        this.ticketName = ticketName;
     }
 }

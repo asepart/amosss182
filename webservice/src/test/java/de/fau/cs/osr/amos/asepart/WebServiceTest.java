@@ -24,7 +24,7 @@ public class WebServiceTest
         }
     }
 
-    @Test
+ /*   @Test
     public void testWriteRead()
     {
         try (Session session = Database.openSession())
@@ -44,7 +44,7 @@ public class WebServiceTest
             assertEquals("1234", p.getEntryKey());
         }
     }
-
+*/
     @Test
     public void testCreateTicket()
     {
@@ -62,9 +62,35 @@ public class WebServiceTest
 
         // TODO read ticket from database and check contents
     }
+    
+    @Test
+    public void testGetTicketsOfProject()
+    {
+    		try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.putProject(session, "testadmin", "test", "1234");
+            Project p = Database.getProject(session, "testadmin", "test");
+            
+            Database.putTicket(session, "Demo Ticket",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.ONE_TIME_ERROR);
+//            Ticket t = Database.getTicket(session, "Demo Ticket");
+            
+//            Database.addTicketToProject(session, "testadmin", "Demo Ticket", "test");
+//            Ticket[] ts = Database.getTicketsOfProject(session, "admin", "test");
+            
+            session.getTransaction().commit();
+            
+//            assertEquals(t.getTicketSummary(), "This is the ticket summary");
+//            assertEquals(ts[0].getTicketName(), "Demo Ticket");
+        }
+    }
 
     @Test
-    public void testGetUsersOfProject() // TODO: add more test cases
+    public void testGetUsersOfProject()
     {
         try (Session session = Database.openSession())
         {

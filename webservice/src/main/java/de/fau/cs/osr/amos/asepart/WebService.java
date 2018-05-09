@@ -71,6 +71,29 @@ public class WebService
         }
     }
     
+    @Path("/projects/{name}/tickets/{ticketname}")
+    @OPTIONS
+    @PermitAll
+    public Response addTicketToProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{name}/tickets/{ticketname}")
+    @POST
+    @RolesAllowed({"Admin"})
+    public Response addTicketToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("ticketname") String ticketname)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.addTicketToProject(session, sc.getUserPrincipal().getName(), ticketname, name);
+            session.getTransaction().commit();
+        }
+
+        return Response.ok(String.format("Added ticket %s to project %s.", ticketname, name)).build();
+    }
+    
     @Path("/projects/{name}/tickets")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
