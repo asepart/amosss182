@@ -1,5 +1,9 @@
 # amosss182
 
+[![Build Status](https://travis-ci.org/asepart/amosss182.svg?branch=master)](https://travis-ci.org/asepart/amosss182)
+[![codecov](https://codecov.io/gh/asepart/amosss182/branch/master/graph/badge.svg)](https://codecov.io/gh/asepart/amosss182)
+[![codecov](https://codecov.io/gh/asepart/amosss182/branch/12_test_coverage/graph/badge.svg)](https://codecov.io/gh/asepart/amosss182)
+
 The team develops an app to manage testdrivers.
 The app has the following main features:
 * Android App
