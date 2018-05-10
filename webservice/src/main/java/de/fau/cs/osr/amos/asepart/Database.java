@@ -151,6 +151,31 @@ public class Database
         return session.get(Project.class, projectName);
     }
 
+    public static Project getProjectByKey(Session session, String entryKey)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
+
+        Root<Project> columns = criteria.from(Project.class);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("entryKey"), entryKey));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Project> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Key not valid.").build());
+        }
+
+        if (resultList.size() >= 2)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database error.").build());
+        }
+
+        return resultList.get(0);
+    }
+
     public static Project[] listProjects(Session session, String adminName)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -265,47 +290,43 @@ public class Database
         else return true;
     }
 
-    public static void joinProject(Session session, String userName, String projectName, String entryKey)
+    public static String joinProject(Session session, String userName, String entryKey)
     {
-        Project project = session.get(Project.class, projectName);
-
-        if (project == null)
-        {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
-        }
-
-        if (!project.getEntryKey().equals(entryKey))
-        {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("The provided entry key is invalid.").build());
-        }
+        Project project = getProjectByKey(session, entryKey);
+        String projectName = project.getProjectName();
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
 
         Root<ProjectUser> columns = criteria.from(ProjectUser.class);
-
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(builder.equal(columns.get("projectName"), projectName));
         predicates.add(builder.equal(columns.get("loginName"), userName));
+
         criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
         List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
 
         if (resultList.size() == 0)
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are allowed to join this project.").build());
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to join this project.").build());
         }
 
         if (resultList.size() >= 2)
         {
-            // database inconsistent, this should never happen
-            // TODO: add some logging mechanism to inform db admin
-            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Service unavailable.").build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database error.").build());
         }
 
         ProjectUser pu = resultList.get(0);
+
+        if (pu.getJoined())
+        {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("You have already joined the project.").build());
+        }
+
         pu.setJoined(true);
 
         session.save(pu);
+        return projectName;
     }
 
     public static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)

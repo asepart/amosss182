@@ -171,7 +171,7 @@ public class WebService
         }
     }
 
-    @Path("/projects/{name}/join")
+    @Path("/join")
     @OPTIONS
     @PermitAll
     public Response joinProject()
@@ -179,15 +179,16 @@ public class WebService
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @Path("/projects/{name}/join")
+    @Path("/join")
     @POST
+    @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"User"})
-    public Response joinProject(@Context SecurityContext sc, @PathParam("name") String name, String entryKey)
+    public Response joinProject(@Context SecurityContext sc, String entryKey)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.joinProject(session, sc.getUserPrincipal().getName(), name, entryKey);
+            String name = Database.joinProject(session, sc.getUserPrincipal().getName(), entryKey);
             session.getTransaction().commit();
 
             return Response.ok(String.format("You joined project %s.", name)).build();

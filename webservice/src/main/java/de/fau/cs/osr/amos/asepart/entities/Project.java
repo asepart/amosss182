@@ -13,7 +13,7 @@ public class Project
     @Column(name = "project_name")
     private String projectName;
 
-    @Column(name = "entry_key", nullable = false)
+    @Column(name = "entry_key", nullable = false, unique = true)
     private String entryKey;
 
     public String getProjectName()
