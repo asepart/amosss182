@@ -48,12 +48,17 @@ public class Database
 
             factory = configuration.buildSessionFactory(serviceRegistry);
 
-            // Create default admin and user for testing
+            // Create sample data for testing
             try (Session session = Database.openSession())
             {
                 session.beginTransaction();
+
                 Database.putAdmin(session, "admin", "admin", "Default", "Admin");
                 Database.putUser(session, "user", "user", "Default", "User", "+4917123456");
+
+                Database.putProject(session, "admin", "testproject", "pizza");
+                Database.addUserToProject(session, "admin", "user", "testproject");
+
                 session.getTransaction().commit();
             }
         }
@@ -258,6 +263,49 @@ public class Database
             return false;
 
         else return true;
+    }
+
+    public static void joinProject(Session session, String userName, String projectName, String entryKey)
+    {
+        Project project = session.get(Project.class, projectName);
+
+        if (project == null)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
+        }
+
+        if (!project.getEntryKey().equals(entryKey))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("The provided entry key is invalid.").build());
+        }
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
+
+        Root<ProjectUser> columns = criteria.from(ProjectUser.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("projectName"), projectName));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+        List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are allowed to join this project.").build());
+        }
+
+        if (resultList.size() >= 2)
+        {
+            // database inconsistent, this should never happen
+            // TODO: add some logging mechanism to inform db admin
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Service unavailable.").build());
+        }
+
+        ProjectUser pu = resultList.get(0);
+        pu.setJoined(true);
+
+        session.save(pu);
     }
 
     public static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
