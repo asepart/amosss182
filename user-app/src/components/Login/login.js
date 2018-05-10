@@ -7,7 +7,7 @@ import {
 	StyleSheet
 } from 'react-native';
 
-//Navigation library (need to add to BoM)
+//Navigation library 
 import {
 	StackNavigator,
   } from 'react-navigation';
@@ -50,9 +50,11 @@ export default class Login extends Component {
 
 		if(await isAuth()){
 			setState({isAuth: true});
+
 			//navigate to different site
 		const { navigate } = this.props.navigation;
-		navigate("Second", { name: "SecondScreen" })	
+		navigate("Second", { name: "Projects" })
+
 		} else {
 			this.setState({error: "Invalid credentials!"});
 		}
@@ -63,7 +65,7 @@ export default class Login extends Component {
 
 
 	render() {
-		return (<View style={styles.container}>
+		return (<View style={styles.containerAlign}>
 
 			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
 			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF"  secureTextEntry style={styles.input}/>
