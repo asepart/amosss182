@@ -6,8 +6,15 @@ import java.net.UnknownHostException;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.print.attribute.standard.Media;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -156,6 +163,35 @@ public class WebService
         {
             User[] users = Database.getUsersOfProject(session, sc.getUserPrincipal().getName(), name);
             return Response.ok(users).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
+    @Path("/join")
+    @OPTIONS
+    @PermitAll
+    public Response joinProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/join")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"User"})
+    public Response joinProject(@Context SecurityContext sc, String entryKey)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            String name = Database.joinProject(session, sc.getUserPrincipal().getName(), entryKey);
+            session.getTransaction().commit();
+
+            return Response.ok(String.format("You joined project %s.", name)).build();
         }
 
         catch (WebApplicationException e)

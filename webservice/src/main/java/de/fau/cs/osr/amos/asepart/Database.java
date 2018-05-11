@@ -48,12 +48,17 @@ public class Database
 
             factory = configuration.buildSessionFactory(serviceRegistry);
 
-            // Create default admin and user for testing
+            // Create sample data for testing
             try (Session session = Database.openSession())
             {
                 session.beginTransaction();
+
                 Database.putAdmin(session, "admin", "admin", "Default", "Admin");
                 Database.putUser(session, "user", "user", "Default", "User", "+4917123456");
+
+                Database.putProject(session, "admin", "testproject", "pizza");
+                Database.addUserToProject(session, "admin", "user", "testproject");
+
                 session.getTransaction().commit();
             }
         }
@@ -144,6 +149,31 @@ public class Database
         }
 
         return session.get(Project.class, projectName);
+    }
+
+    public static Project getProjectByKey(Session session, String entryKey)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
+
+        Root<Project> columns = criteria.from(Project.class);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("entryKey"), entryKey));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Project> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Key not valid.").build());
+        }
+
+        if (resultList.size() >= 2)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database error.").build());
+        }
+
+        return resultList.get(0);
     }
 
     public static Project[] listProjects(Session session, String adminName)
@@ -258,6 +288,45 @@ public class Database
             return false;
 
         else return true;
+    }
+
+    public static String joinProject(Session session, String userName, String entryKey)
+    {
+        Project project = getProjectByKey(session, entryKey);
+        String projectName = project.getProjectName();
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ProjectUser> criteria = builder.createQuery(ProjectUser.class);
+
+        Root<ProjectUser> columns = criteria.from(ProjectUser.class);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("projectName"), projectName));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+        List<ProjectUser> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to join this project.").build());
+        }
+
+        if (resultList.size() >= 2)
+        {
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database error.").build());
+        }
+
+        ProjectUser pu = resultList.get(0);
+
+        if (pu.getJoined())
+        {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("You have already joined the project.").build());
+        }
+
+        pu.setJoined(true);
+
+        session.save(pu);
+        return projectName;
     }
 
     public static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
