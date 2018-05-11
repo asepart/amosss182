@@ -17,7 +17,13 @@ export default class UserList extends Component {
 	}
 
 	componentDidMount() {
-		return fetch(URL + '/projects/' + this.props.project + '/users', {method:'GET', headers: getAuth()})
+		var url = URL;
+		if (this.props.project !== '') {
+			url += '/projects/' + this.props.project + '/users';
+		} else {
+			url += '/users';
+		}
+		return fetch(url, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -48,19 +54,27 @@ export default class UserList extends Component {
 
 		const columns = [
 			{
-				Header: 'Name',
-				accessor: '',
+				Header: 'Given Name',
+				accessor: 'firstName',
+				Cell: props => <ProjectButton proj={props.value}/>
+			}, {
+				Header: 'Surname',
+				accessor: 'lastName',
+				Cell: props => <ProjectButton proj={props.value}/>
+			}, {
+				Header: 'login name',
+				accessor: 'loginName',
 				Cell: props => <ProjectButton proj={props.value}/>
 			}, {
 				Header: 'Phone',
-				accessor: '' // String-based value accessors!
+				accessor: 'phone' // String-based value accessors!
 			}
 		]
 
 		return (
 			<View>
 				<Button
-					onPress = { this.showAddProject }
+					onPress = { this.showAddUser }
 					title = "Add User"
 					color = "#841584"
 				/>
