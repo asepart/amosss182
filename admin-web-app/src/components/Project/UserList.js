@@ -8,7 +8,7 @@ import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
 
-export default class ProjectList extends Component {
+export default class UserList extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -17,7 +17,13 @@ export default class ProjectList extends Component {
 	}
 
 	componentDidMount() {
-		return fetch(URL + '/projects', {method:'GET', headers: getAuth()})
+		var url = URL;
+		if (this.props.project !== '') {
+			url += '/projects/' + this.props.project + '/users';
+		} else {
+			url += '/users';
+		}
+		return fetch(url, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -29,19 +35,11 @@ export default class ProjectList extends Component {
 		});
 	}
 
-	showAddProject () {
+	showAddUser () {
 		setState({
 			isAuth: true,
-			show: 'addProject',
-			param: ''
-		});
-	}
-
-	showUserManagement () {
-		setState({
-			isAuth: true,
-			show: 'listUsers',
-			param: ''
+			show: 'addUser',
+			param: this.props.project
 		});
 	}
 
@@ -56,25 +54,28 @@ export default class ProjectList extends Component {
 
 		const columns = [
 			{
-				Header: 'Project Name',
-				accessor: 'projectName',
+				Header: 'Given Name',
+				accessor: 'firstName',
 				Cell: props => <ProjectButton proj={props.value}/>
 			}, {
-				Header: 'Entrycode',
-				accessor: 'entryKey' // String-based value accessors!
+				Header: 'Surname',
+				accessor: 'lastName',
+				Cell: props => <ProjectButton proj={props.value}/>
+			}, {
+				Header: 'login name',
+				accessor: 'loginName',
+				Cell: props => <ProjectButton proj={props.value}/>
+			}, {
+				Header: 'Phone',
+				accessor: 'phone' // String-based value accessors!
 			}
 		]
 
 		return (
 			<View>
 				<Button
-					onPress = { this.showAddProject }
-					title = "Add Project"
-					color = "#841584"
-				/>
-				<Button
-					onPress = { this.showUserManagement }
-					title = "User Management"
+					onPress = { this.showAddUser.bind(this) }
+					title = "Add User"
 					color = "#841584"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>

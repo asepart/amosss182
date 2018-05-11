@@ -6,7 +6,7 @@ export default class ProjectButton extends Component {
 	displayProject() {
 		setState({
 			isAuth: true,
-			show: 'project',
+			show: 'listUsers',
 			param: this
 		});
 	}
