@@ -74,7 +74,7 @@ export default class UserList extends Component {
 		return (
 			<View>
 				<Button
-					onPress = { this.showAddUser }
+					onPress = { this.showAddUser.bind(this) }
 					title = "Add User"
 					color = "#841584"
 				/>

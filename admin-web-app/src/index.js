@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Text} from 'react-native';
 import './index.css';
 import Login from './components/Login/login';
 import ProjectList from './components/Project/ProjectList';
 import ProjectAdd from './components/Project/ProjectAdd';
 import UserList from './components/Project/UserList';
+import UserAdd from './components/Project/UserAdd';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 
@@ -36,7 +36,7 @@ class Page extends Component{
 			case 'listUsers':
 				return (<UserList project={this.state.param}/>);
 			case 'addUser':
-				return (<Text>add User</Text>); //(<addUser project={this.state.param}/>);
+				return (<UserAdd project={this.state.param}/>);
 			default:
 				return (<ProjectList/>);
 		}
