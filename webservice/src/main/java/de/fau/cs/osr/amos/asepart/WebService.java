@@ -54,7 +54,7 @@ public class WebService
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
-    @Path("/tickets")
+    @Path("/projects/{name}/tickets/")
     @OPTIONS
     @PermitAll
     public Response tickets()
@@ -62,19 +62,43 @@ public class WebService
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @Path("/tickets")
+    @Path("/projects/{name}/tickets/")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response createTicket(@Context SecurityContext sc, Ticket ticket)
+    public Response createTicket(@Context SecurityContext sc, @PathParam("name") String name, Ticket ticket)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putTicket(session, ticket);
+            Integer id = Database.putTicket(session, ticket);
+            Database.addTicketToProject(session, sc.getUserPrincipal().getName(), id, name);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added new ticket with name \"%s\".", ticket.getTicketName())).build();
+            return Response.ok(String.format("Added ticket %s to project %s.", ticket.getTicketName(), name)).build();
+        }
+        
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+    
+    @Path("/projects/{name}/tickets")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("name") String name)
+    {
+        try (Session session = Database.openSession())
+        {
+            Ticket[] tickets = Database.getTicketsOfProject(session, sc.getUserPrincipal().getName(), name);
+            return Response.ok(tickets).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
     }
 
@@ -281,6 +305,7 @@ public class WebService
             return Response.ok(Database.listAdmins(session)).build();
         }
     }
+    
     public static void main(String[] args)
     {
         try

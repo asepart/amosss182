@@ -41,6 +41,7 @@ public class Database
             configuration.addAnnotatedClass(ProjectAccount.class);
             configuration.addAnnotatedClass(ProjectAdmin.class);
             configuration.addAnnotatedClass(ProjectUser.class);
+            configuration.addAnnotatedClass(ProjectTicket.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());
@@ -98,7 +99,7 @@ public class Database
         return false;
     }
 
-    public static void putTicket(Session session, String ticketName, String ticketSummary,
+    public static Integer putTicket(Session session, String ticketName, String ticketSummary,
                                  String ticketDescription, TicketCategory ticketCategory)
     {
         Ticket ticket = new Ticket();
@@ -107,12 +108,84 @@ public class Database
         ticket.setTicketDescription(ticketDescription);
         ticket.setTicketCategory(ticketCategory);
 
-        putTicket(session, ticket);
+        return putTicket(session, ticket);
     }
 
-    public static void putTicket(Session session, Ticket ticket)
+    public static Integer putTicket(Session session, Ticket ticket)
     {
-        session.save(ticket);
+    		Integer id = (Integer) session.save(ticket);
+    		return id;
+    }
+    
+    public static boolean isTicket(Session session, Integer ticketId)
+    {
+        Ticket ticket = session.get(Ticket.class, ticketId);
+        return ticket != null;
+    }
+    
+    public static Ticket getTicket(Session session, Integer ticketId)
+    {
+        if (!isTicket(session, ticketId))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Ticket not found.").build());
+        }
+
+        Ticket ticket = session.get(Ticket.class, ticketId);
+
+        return ticket;
+    }
+    
+    public static void addTicketToProject(Session session, String admin, Integer ticketId, String project)
+    {
+        if (!isTicket(session, ticketId))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket does not exist.").build());
+
+        if (!isProject(session, project))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
+
+        if (isTicketPartOfProject(session, ProjectTicket.class, ticketId, project))
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket already added to project.").build());
+
+        if (!isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build());
+
+        ProjectTicket pt = new ProjectTicket();
+        pt.setTicketName(getTicket(session, ticketId).getTicketName());
+        pt.setProjectName(project);
+        pt.setRelId(getTicket(session, ticketId).getId());
+
+        session.save(pt);
+    }
+    
+    public static Ticket[] getTicketsOfProject(Session session, String adminName, String projectName)
+    {
+        if (!Database.isProject(session, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
+        }
+
+        if (!Database.isAccountPartOfProject(session, ProjectAdmin.class, adminName, projectName))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to view that project.").build());
+        }
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ProjectTicket> criteria = builder.createQuery(ProjectTicket.class);
+
+        Root<ProjectTicket> columns = criteria.from(ProjectTicket.class);
+        criteria.where(builder.equal(columns.get("projectName"), projectName));
+        List<ProjectTicket> resultList = session.createQuery(criteria).getResultList();
+
+        Ticket[] tickets = new Ticket[resultList.size()];
+        int index = 0;
+
+        for (ProjectTicket pt : resultList)
+        {
+        		tickets[index] = getTicket(session, pt.getRelId());
+            ++index;
+        }
+
+        return tickets;
     }
 
     public static void putProject(Session session, String adminName, String projectName, String entryKey)
@@ -283,6 +356,29 @@ public class Database
         criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
 
         List<ProjectAccount> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+            return false;
+
+        else return true;
+    }
+    
+    public static boolean isTicketPartOfProject(Session session, Class<? extends ProjectTicket> relationship, Integer ticketId, String project)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+
+        @SuppressWarnings("unchecked")
+        CriteriaQuery<ProjectTicket> criteria = (CriteriaQuery<ProjectTicket>) builder.createQuery(relationship);
+
+        @SuppressWarnings("unchecked")
+        Root<ProjectTicket> columns = (Root<ProjectTicket>) criteria.from(relationship);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("projectName"), project));
+        predicates.add(builder.equal(columns.get("relId"), ticketId));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<ProjectTicket> resultList = session.createQuery(criteria).getResultList();
 
         if (resultList.size() == 0)
             return false;
