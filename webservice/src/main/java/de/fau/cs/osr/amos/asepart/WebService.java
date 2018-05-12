@@ -47,7 +47,7 @@ public class WebService
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
-    @Path("/tickets")
+    @Path("/projects/{name}/tickets/")
     @OPTIONS
     @PermitAll
     public Response tickets()
@@ -55,43 +55,26 @@ public class WebService
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @Path("/tickets")
+    @Path("/projects/{name}/tickets/")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response createTicket(@Context SecurityContext sc, Ticket ticket)
+    public Response createTicket(@Context SecurityContext sc, @PathParam("name") String name, Ticket ticket)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putTicket(session, ticket);
+            Integer id = Database.putTicket(session, ticket);
+            Database.addTicketToProject(session, sc.getUserPrincipal().getName(), id, name);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added new ticket with name \"%s\".", ticket.getTicketName())).build();
+            return Response.ok(String.format("Added ticket %s to project %s.", ticket.getTicketName(), name)).build();
         }
-    }
-    
-    @Path("/projects/{name}/tickets/{ticketname}")
-    @OPTIONS
-    @PermitAll
-    public Response addTicketToProject()
-    {
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @Path("/projects/{name}/tickets/{ticketname}")
-    @POST
-    @RolesAllowed({"Admin"})
-    public Response addTicketToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("ticketname") String ticketname)
-    {
-        try (Session session = Database.openSession())
+        
+        catch (WebApplicationException e)
         {
-            session.beginTransaction();
-            Database.addTicketToProject(session, sc.getUserPrincipal().getName(), ticketname, name);
-            session.getTransaction().commit();
+            return e.getResponse();
         }
-
-        return Response.ok(String.format("Added ticket %s to project %s.", ticketname, name)).build();
     }
     
     @Path("/projects/{name}/tickets")

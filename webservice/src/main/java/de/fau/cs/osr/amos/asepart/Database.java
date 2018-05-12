@@ -41,6 +41,7 @@ public class Database
             configuration.addAnnotatedClass(ProjectAccount.class);
             configuration.addAnnotatedClass(ProjectAdmin.class);
             configuration.addAnnotatedClass(ProjectUser.class);
+            configuration.addAnnotatedClass(ProjectTicket.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());
@@ -93,7 +94,7 @@ public class Database
         return false;
     }
 
-    public static void putTicket(Session session, String ticketName, String ticketSummary,
+    public static Integer putTicket(Session session, String ticketName, String ticketSummary,
                                  String ticketDescription, TicketCategory ticketCategory)
     {
         Ticket ticket = new Ticket();
@@ -102,49 +103,51 @@ public class Database
         ticket.setTicketDescription(ticketDescription);
         ticket.setTicketCategory(ticketCategory);
 
-        putTicket(session, ticket);
+        return putTicket(session, ticket);
     }
 
-    public static void putTicket(Session session, Ticket ticket)
+    public static Integer putTicket(Session session, Ticket ticket)
     {
-        session.save(ticket);
+    		Integer id = (Integer) session.save(ticket);
+    		return id;
     }
     
-    public static boolean isTicket(Session session, String ticketName)
+    public static boolean isTicket(Session session, Integer ticketId)
     {
-        Ticket ticket = session.get(Ticket.class, ticketName);
+        Ticket ticket = session.get(Ticket.class, ticketId);
         return ticket != null;
     }
     
-    public static Ticket getTicket(Session session, String ticketName)
+    public static Ticket getTicket(Session session, Integer ticketId)
     {
-        if (!isTicket(session, ticketName))
+        if (!isTicket(session, ticketId))
         {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Ticket not found.").build());
         }
 
-        Ticket ticket = session.get(Ticket.class, ticketName);
+        Ticket ticket = session.get(Ticket.class, ticketId);
 
         return ticket;
     }
     
-    public static void addTicketToProject(Session session, String admin, String ticket, String project)
+    public static void addTicketToProject(Session session, String admin, Integer ticketId, String project)
     {
-        if (!isTicket(session, ticket))
+        if (!isTicket(session, ticketId))
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket does not exist.").build());
 
         if (!isProject(session, project))
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
 
-        if (isTicketPartOfProject(session, ProjectTicket.class, ticket, project))
+        if (isTicketPartOfProject(session, ProjectTicket.class, ticketId, project))
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket already added to project.").build());
 
         if (!isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build());
 
         ProjectTicket pt = new ProjectTicket();
-        pt.setTicketName(ticket);
+        pt.setTicketName(getTicket(session, ticketId).getTicketName());
         pt.setProjectName(project);
+        pt.setRelId(getTicket(session, ticketId).getId());
 
         session.save(pt);
     }
@@ -169,12 +172,11 @@ public class Database
         List<ProjectTicket> resultList = session.createQuery(criteria).getResultList();
 
         Ticket[] tickets = new Ticket[resultList.size()];
-        tickets = resultList.toArray(tickets);
         int index = 0;
-        
+
         for (ProjectTicket pt : resultList)
         {
-            tickets[index] = getTicket(session, pt.getTicketName());
+        		tickets[index] = getTicket(session, pt.getRelId());
             ++index;
         }
 
@@ -331,7 +333,7 @@ public class Database
         else return true;
     }
     
-    public static boolean isTicketPartOfProject(Session session, Class<? extends ProjectTicket> relationship, String ticketName, String project)
+    public static boolean isTicketPartOfProject(Session session, Class<? extends ProjectTicket> relationship, Integer ticketId, String project)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
 
@@ -343,7 +345,7 @@ public class Database
 
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(builder.equal(columns.get("projectName"), project));
-        predicates.add(builder.equal(columns.get("ticketName"), ticketName));
+        predicates.add(builder.equal(columns.get("relId"), ticketId));
         criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
 
         List<ProjectTicket> resultList = session.createQuery(criteria).getResultList();

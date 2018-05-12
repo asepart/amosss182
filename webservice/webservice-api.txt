@@ -23,23 +23,15 @@ The following REST operations are available:
   Status code:    [200 OK]           if credentials are valid.
                   [401 Unauthorized] if credentials are not valid.
 
-- Create new ticket
+- Create new ticket in project
 
   HTTP operation: PUT
-  Path:           /tickets
+  Path:           /projects/{name}/tickets
   Request-Body:   Ticket information as JSON object.
-  Status code:    [200 OK]           in case of success.
-                  [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin.
-
-- Add ticket to project
-
-  HTTP operation: POST
-  Path:           /projects/{name}/users/{ticketname}
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if ticket is already in project or ticket/project does not exist.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin for the project.
+                  [403 Forbidden]    if the authorized user is not an admin.
 
 - List tickets of project
 

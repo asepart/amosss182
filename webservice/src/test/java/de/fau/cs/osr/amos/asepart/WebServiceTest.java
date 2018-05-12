@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import javax.ws.rs.WebApplicationException;
+
 import org.hibernate.Session;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
@@ -45,22 +47,35 @@ public class WebServiceTest
         }
     }
 */
+    
     @Test
-    public void testCreateTicket()
+    public void testCreateTicket() 
     {
-        try (Session session = Database.openSession())
+    		try (Session session = Database.openSession())
         {
             session.beginTransaction();
-
-            Database.putTicket(session, "Demo Ticket",
+            
+            Database.putProject(session, "testadmin", "test", "1234");
+            
+            Integer id = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR);
-
+            Ticket t = Database.getTicket(session, id);
+            Database.addTicketToProject(session, "testadmin", id, "test");
+            
+            Integer idd = Database.putTicket(session, t);
+            Database.addTicketToProject(session, "testadmin", idd, "test");
+            
             session.getTransaction().commit();
+            
+            assertEquals(1, 0);
         }
-
-        // TODO read ticket from database and check contents
+    		
+    		catch (WebApplicationException e) 
+    		{
+    			assertEquals(1, 1);
+    		}
     }
     
     @Test
@@ -70,22 +85,45 @@ public class WebServiceTest
         {
             session.beginTransaction();
 
-            Database.putProject(session, "testadmin", "test", "1234");
-            Project p = Database.getProject(session, "testadmin", "test");
+            Database.putProject(session, "testadmin", "test1", "1234");
+            Database.putProject(session, "testadmin", "test2", "12345");
             
-            Database.putTicket(session, "Demo Ticket",
+            Integer id = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR);
-//            Ticket t = Database.getTicket(session, "Demo Ticket");
+            Database.addTicketToProject(session, "testadmin", id, "test1");
             
-//            Database.addTicketToProject(session, "testadmin", "Demo Ticket", "test");
-//            Ticket[] ts = Database.getTicketsOfProject(session, "admin", "test");
+            Integer id2 = Database.putTicket(session, "Demo Ticket",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.ONE_TIME_ERROR);
+            Database.addTicketToProject(session, "testadmin", id2, "test1");
+            
+            Integer id3 = Database.putTicket(session, "Demo Ticket 3",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.ONE_TIME_ERROR);
+            Database.addTicketToProject(session, "testadmin", id3, "test1");
+            
+            Integer id4 = Database.putTicket(session, "Demo Ticket 4",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.ONE_TIME_ERROR);
+            Database.addTicketToProject(session, "testadmin", id4, "test2");
+            
+            Ticket t = Database.getTicket(session, id);
+            Ticket[] ts = Database.getTicketsOfProject(session, "testadmin", "test1");
+            Ticket[] ts2 = Database.getTicketsOfProject(session, "testadmin", "test2");
             
             session.getTransaction().commit();
             
-//            assertEquals(t.getTicketSummary(), "This is the ticket summary");
-//            assertEquals(ts[0].getTicketName(), "Demo Ticket");
+            assertEquals(t.getTicketSummary(), "This is the ticket summary");
+            assertEquals(ts[0].getTicketName(), "Demo Ticket");
+            assertEquals(ts[1].getTicketName(), "Demo Ticket");
+            assertEquals(ts[2].getTicketName(), "Demo Ticket 3");
+            assertEquals(ts2[0].getTicketName(), "Demo Ticket 4");
+            assertNotEquals(ts[0], ts[1]);
         }
     }
 
