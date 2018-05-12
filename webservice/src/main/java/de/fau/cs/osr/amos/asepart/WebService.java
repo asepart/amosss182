@@ -6,21 +6,14 @@ import java.net.UnknownHostException;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
+import de.fau.cs.osr.amos.asepart.relationships.ProjectUser;
 import org.hibernate.Session;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -52,6 +45,26 @@ public class WebService
          */
 
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
+    }
+
+    @Path("/projects")
+    @OPTIONS
+    @PermitAll
+    public Response projects()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response listProjects(@Context SecurityContext sc)
+    {
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
+        }
     }
 
     @Path("/projects/{name}/tickets/")
@@ -126,26 +139,6 @@ public class WebService
         return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
     }
 
-    @Path("/projects")
-    @OPTIONS
-    @PermitAll
-    public Response projects()
-    {
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @Path("/projects")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
-    public Response listProjects(@Context SecurityContext sc)
-    {
-        try (Session session = Database.openSession())
-        {
-            return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
-        }
-    }
-
     @Path("/projects/{name}/users/{username}")
     @OPTIONS
     @PermitAll
@@ -216,6 +209,33 @@ public class WebService
             session.getTransaction().commit();
 
             return Response.ok(String.format("You joined project %s.", name)).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
+    @Path("/join")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"User"})
+    public Response joinProjectPreview(@Context SecurityContext sc, @QueryParam("key") String entryKey)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Project project = Database.getProjectByKey(session, entryKey);
+            boolean authorized = Database.isAccountPartOfProject(session, ProjectUser.class, sc.getUserPrincipal().getName(), project.getProjectName());
+
+            session.getTransaction().commit();
+
+            if (!authorized)
+                return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to join this project.").build();
+            else
+                return Response.ok(project.getProjectName()).build();
         }
 
         catch (WebApplicationException e)
