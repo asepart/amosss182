@@ -1,23 +1,21 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {Component} from 'react';
+import { StyleSheet, Text, View, AppRegistry} from 'react-native';
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
-      </View>
-    );
-  }
-}
+import Login from './src/components/Login/login';
+import SecondScreen from './src/components/secondScreen';
+import Projects from '../user-app/src/components/Projects/projects';
+import JoinProject from '../user-app/src/components/Projects/joinProject';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+import {
+  StackNavigator,
+} from 'react-navigation';
+
+const AppNavigation = StackNavigator({
+  First: { screen: Login },
+  Second: { screen: Projects },
+  Third: {screen: JoinProject}
 });
+export default AppNavigation;
+
+AppRegistry.registerComponent('user-app', () => AppNavigation);
+

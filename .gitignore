@@ -1,3 +1,5 @@
 *.idea
 *.iml
 webservice/target
+
+**/.DS_Store

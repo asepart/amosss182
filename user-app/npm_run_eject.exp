@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+spawn npm run eject
+
+expect "How would you like to eject from create-react-native-app?"
+
+send "\r";
+
+expect "What should your app appear as on a user's home screen?"
+
+send "Asepart";
+
+send "\r";
+
+expect "What should your Android Studio and Xcode projects be called?"
+
+send "\r";
+
+interact
