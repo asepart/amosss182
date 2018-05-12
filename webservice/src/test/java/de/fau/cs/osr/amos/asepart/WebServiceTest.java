@@ -26,7 +26,7 @@ public class WebServiceTest
         }
     }
 
- /*   @Test
+    @Test
     public void testWriteRead()
     {
         try (Session session = Database.openSession())
@@ -37,7 +37,7 @@ public class WebServiceTest
                     "Jon", "Snow", "00000000000");
             User u = Database.getUser(session, "knowsnothing");
 
-            Database.putProject(session, "testadmin", "test", "1234");
+            Database.putProject(session, "testadmin", "test0", "1234");
             Project p = Database.getProject(session, "testadmin", "test");
 
             session.getTransaction().commit();
@@ -46,7 +46,6 @@ public class WebServiceTest
             assertEquals("1234", p.getEntryKey());
         }
     }
-*/
     
     @Test
     public void testCreateTicket() 
