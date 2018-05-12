@@ -38,7 +38,7 @@ public class WebServiceTest
             User u = Database.getUser(session, "knowsnothing");
 
             Database.putProject(session, "testadmin", "test0", "1234");
-            Project p = Database.getProject(session, "testadmin", "test");
+            Project p = Database.getProject(session, "testadmin", "test0");
 
             session.getTransaction().commit();
 
@@ -54,7 +54,7 @@ public class WebServiceTest
         {
             session.beginTransaction();
             
-            Database.putProject(session, "testadmin", "test", "1234");
+            Database.putProject(session, "testadmin", "test", "12345");
             
             Integer id = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
@@ -84,8 +84,8 @@ public class WebServiceTest
         {
             session.beginTransaction();
 
-            Database.putProject(session, "testadmin", "test1", "1234");
-            Database.putProject(session, "testadmin", "test2", "12345");
+            Database.putProject(session, "testadmin", "test1", "123456");
+            Database.putProject(session, "testadmin", "test2", "1234567");
             
             Integer id = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
