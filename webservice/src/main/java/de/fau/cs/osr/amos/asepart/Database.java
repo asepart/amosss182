@@ -181,7 +181,7 @@ public class Database
 
         for (ProjectTicket pt : resultList)
         {
-            tickets[index] = getTicket(session, pt.getRelId());
+            tickets[index] = getTicket(session, pt.getTicketId());
             ++index;
         }
 
