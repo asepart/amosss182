@@ -164,4 +164,36 @@ public class WebServiceTest
             assertEquals(expected[1].getLoginName(), actual2[1].getLoginName());
         }
     }
+
+    @Test
+    public void testChatMessages()
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.putProject(session, "testadmin", "chattest", "32423");
+
+            Integer ticketId = Database.putTicket(session, "Chat Ticket",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.ONE_TIME_ERROR,
+                    2);
+            Database.addTicketToProject(session, "testadmin", ticketId, "chattest");
+
+            Database.putUser(session, "chatuser", "lolrofl",
+                    "Chat", "User", "3242342323");
+
+            Database.addUserToProject(session, "testadmin", "chatuser", "chattest");
+
+            String message = "Hello, World!";
+
+            Database.putMessage(session, ticketId, message, "chatuser", "User");
+            Message[] messages = Database.listMessages(session, ticketId, "chatuser", "User");
+
+            session.getTransaction().commit();
+
+            assertEquals(message, messages[0].getContent());
+        }
+    }
 }
