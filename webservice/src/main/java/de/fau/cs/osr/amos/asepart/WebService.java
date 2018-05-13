@@ -3,17 +3,26 @@ package de.fau.cs.osr.amos.asepart;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.Principal;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import de.fau.cs.osr.amos.asepart.relationships.ProjectUser;
 import org.hibernate.Session;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -22,6 +31,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
 import de.fau.cs.osr.amos.asepart.entities.*;
+import de.fau.cs.osr.amos.asepart.relationships.*;
 
 @Path("/")
 public class WebService
@@ -65,6 +75,11 @@ public class WebService
         {
             return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/projects/{name}/tickets/")
@@ -76,7 +91,7 @@ public class WebService
     }
 
     @Path("/projects/{name}/tickets/")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
     public Response createTicket(@Context SecurityContext sc, @PathParam("name") String name, Ticket ticket)
@@ -136,6 +151,11 @@ public class WebService
             session.getTransaction().commit();
         }
 
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+
         return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
     }
 
@@ -157,6 +177,11 @@ public class WebService
             session.beginTransaction();
             Database.addUserToProject(session, sc.getUserPrincipal().getName(), username, name);
             session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
 
         return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
@@ -244,6 +269,58 @@ public class WebService
         }
     }
 
+    @Path("/messages/{ticket}")
+    @OPTIONS
+    @PermitAll
+    public Response messages()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/messages/{ticket}")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"Admin", "User"})
+    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId, String message)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.putMessage(session, ticketId, message, principal.getName(), role );
+            session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+
+        return Response.ok("Message sent.").build();
+    }
+
+    @Path("/messages/{ticket}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin", "User"})
+    public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listMessages(session, ticketId, principal.getName(), role)).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
     @Path("/users")
     @OPTIONS
     @PermitAll
@@ -253,7 +330,7 @@ public class WebService
     }
 
     @Path("/users")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
     public Response addUser(@Context SecurityContext sc, User newUser)
@@ -271,6 +348,11 @@ public class WebService
 
             return Response.ok(String.format("Added new user %s.", newUser.getLoginName())).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/users")
@@ -283,6 +365,11 @@ public class WebService
         {
             return Response.ok(Database.listUsers(session)).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/admins")
@@ -294,7 +381,7 @@ public class WebService
     }
 
     @Path("/admins")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
     public Response addAdmin(@Context SecurityContext sc, Admin newAdmin)
@@ -312,6 +399,11 @@ public class WebService
 
             return Response.ok(String.format("Added new admin %s.", newAdmin.getLoginName())).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/admins")
@@ -323,6 +415,11 @@ public class WebService
         try (Session session = Database.openSession())
         {
             return Response.ok(Database.listAdmins(session)).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
     }
     

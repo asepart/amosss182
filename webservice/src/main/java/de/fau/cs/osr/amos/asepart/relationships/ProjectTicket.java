@@ -9,14 +9,14 @@ import javax.persistence.Table;
 @Table(name = "projects_tickets")
 public class ProjectTicket
 {
-	@Id
+    @Id
     private Integer relId;
 
     @Column(name = "project_name", nullable = false)
     private String projectName;
 
-    @Column(name = "ticket_name", nullable = false)
-    private String ticketName;
+    @Column(name = "ticket_id", nullable = false)
+    private Integer ticketId;
 
     public Integer getRelId()
     {
@@ -38,13 +38,13 @@ public class ProjectTicket
         this.projectName = projectName;
     }
 
-    public String getTicketName()
+    public Integer getTicketId()
     {
-        return ticketName;
+        return ticketId;
     }
 
-    public void setTicketName(String ticketName)
+    public void setTicketId(Integer ticketId)
     {
-        this.ticketName = ticketName;
+        this.ticketId = ticketId;
     }
 }
