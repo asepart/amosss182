@@ -24,6 +24,15 @@ The following REST operations are available:
   Status code:    [200 OK]           if credentials are valid.
                   [401 Unauthorized] if credentials are not valid.
 
+- List existing projects the admin is able to view
+
+  HTTP operation: GET
+  Path:           /projects
+  Roles:          Admin
+  Returns:        JSON array of projects.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+
 - Create new ticket in project
 
   HTTP operation: PUT
@@ -55,15 +64,6 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the specified user is not an admin.
 
-- List existing projects the admin is able to view
-
-  HTTP operation: GET
-  Path:           /projects
-  Roles:          Admin
-  Returns:        JSON array of projects.
-  Status code:    [200 OK]           in case of success.
-                  [401 Unauthorized] if the provided username or password is invalid.
-
 - Add user to project
 
   HTTP operation: POST
@@ -93,6 +93,17 @@ The following REST operations are available:
   Request-Body:   Entry key as ASCII string.
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user has already joined.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not a member of the project.
+                  [404 Not found]    if entry key is invalid.
+
+- Get name of the project the user got an entry key for
+
+  HTTP operation: GET
+  Path:           /join?key=<key>
+  Roles:          User
+  Returns:        Name of project as an ASCII string.
+  Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized user is not a member of the project.
                   [404 Not found]    if entry key is invalid.

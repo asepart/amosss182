@@ -99,8 +99,8 @@ public class Database
         return false;
     }
 
-    public static Integer putTicket(Session session, String ticketName, String ticketSummary,
-                                 String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
+    public static Integer putTicket(Session session, String ticketName, String ticketSummary, String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
+
     {
         Ticket ticket = new Ticket();
         ticket.setTicketName(ticketName);
@@ -114,16 +114,16 @@ public class Database
 
     public static Integer putTicket(Session session, Ticket ticket)
     {
-    		Integer id = (Integer) session.save(ticket);
-    		return id;
+        Integer id = (Integer) session.save(ticket);
+        return id;
     }
-    
+
     public static boolean isTicket(Session session, Integer ticketId)
     {
         Ticket ticket = session.get(Ticket.class, ticketId);
         return ticket != null;
     }
-    
+
     public static Ticket getTicket(Session session, Integer ticketId)
     {
         if (!isTicket(session, ticketId))
@@ -135,20 +135,20 @@ public class Database
 
         return ticket;
     }
-    
+
     public static void addTicketToProject(Session session, String admin, Integer ticketId, String project)
     {
         if (!isTicket(session, ticketId))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket does not exist.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket does not exist.").build()); }
 
         if (!isProject(session, project))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build()); }
 
         if (isTicketPartOfProject(session, ProjectTicket.class, ticketId, project))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket already added to project.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Ticket already added to project.").build()); }
 
         if (!isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build()); }
 
         ProjectTicket pt = new ProjectTicket();
         pt.setTicketName(getTicket(session, ticketId).getTicketName());
@@ -157,7 +157,7 @@ public class Database
 
         session.save(pt);
     }
-    
+
     public static Ticket[] getTicketsOfProject(Session session, String adminName, String projectName)
     {
         if (!Database.isProject(session, projectName))
@@ -182,7 +182,7 @@ public class Database
 
         for (ProjectTicket pt : resultList)
         {
-        		tickets[index] = getTicket(session, pt.getRelId());
+            tickets[index] = getTicket(session, pt.getRelId());
             ++index;
         }
 
@@ -262,7 +262,7 @@ public class Database
         for (Project p : projectList)
         {
             if (isAccountPartOfProject(session, ProjectAdmin.class, adminName, p.getProjectName()))
-                filteredProjectList.add(p);
+            { filteredProjectList.add(p); }
         }
 
         Project[] projects = new Project[filteredProjectList.size()];
@@ -274,16 +274,16 @@ public class Database
     public static void addUserToProject(Session session, String admin, String user, String project)
     {
         if (!isUser(session, user))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User does not exist.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User does not exist.").build()); }
 
         if (!isProject(session, project))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build()); }
 
         if (isAccountPartOfProject(session, ProjectUser.class, user, project))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User already member of project.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User already member of project.").build()); }
 
         if (!isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not an admin of this project.").build()); }
 
         ProjectUser pu = new ProjectUser();
         pu.setLoginName(user);
@@ -295,13 +295,13 @@ public class Database
     public static void addAdminToProject(Session session, String admin, String project)
     {
         if (!isAdmin(session, admin))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin does not exist.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin does not exist.").build()); }
 
         if (!isProject(session, project))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Project does not exist.").build()); }
 
         if (isAccountPartOfProject(session, ProjectAdmin.class, admin, project))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin already member of project.").build());
+        { throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin already member of project.").build()); }
 
         ProjectAdmin pa = new ProjectAdmin();
         pa.setLoginName(admin);
@@ -359,11 +359,11 @@ public class Database
         List<ProjectAccount> resultList = session.createQuery(criteria).getResultList();
 
         if (resultList.size() == 0)
-            return false;
+        { return false; }
 
-        else return true;
+        else { return true; }
     }
-    
+
     public static boolean isTicketPartOfProject(Session session, Class<? extends ProjectTicket> relationship, Integer ticketId, String project)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -382,9 +382,9 @@ public class Database
         List<ProjectTicket> resultList = session.createQuery(criteria).getResultList();
 
         if (resultList.size() == 0)
-            return false;
+        { return false; }
 
-        else return true;
+        else { return true; }
     }
 
     public static String joinProject(Session session, String userName, String entryKey)
