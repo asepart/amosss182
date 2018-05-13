@@ -29,6 +29,9 @@ public class Ticket
     @Column(name = "ticket_category", nullable = false)
     private TicketCategory ticketCategory;
 
+    @Column(name = "required_observations", nullable = false)
+    private Integer requiredObservations;
+    
     public Integer getId()
     {
         return id;
@@ -77,5 +80,15 @@ public class Ticket
     public void setTicketCategory(TicketCategory ticketCategory)
     {
         this.ticketCategory = ticketCategory;
+    }
+    
+    public Integer getRequiredObservations()
+    {
+        return requiredObservations;
+    }
+
+    public void setRequiredObservations(Integer requiredObservations)
+    {
+        this.requiredObservations = requiredObservations;
     }
 }

@@ -59,7 +59,8 @@ public class WebServiceTest
             Integer id = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
-                    TicketCategory.ONE_TIME_ERROR);
+                    TicketCategory.ONE_TIME_ERROR,
+                    13);
             Ticket t = Database.getTicket(session, id);
             Database.addTicketToProject(session, "testadmin", id, "test");
             
@@ -90,25 +91,29 @@ public class WebServiceTest
             Integer id = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
-                    TicketCategory.ONE_TIME_ERROR);
+                    TicketCategory.ONE_TIME_ERROR,
+                    13);
             Database.addTicketToProject(session, "testadmin", id, "test1");
             
             Integer id2 = Database.putTicket(session, "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
-                    TicketCategory.ONE_TIME_ERROR);
+                    TicketCategory.ONE_TIME_ERROR,
+                    13);
             Database.addTicketToProject(session, "testadmin", id2, "test1");
             
             Integer id3 = Database.putTicket(session, "Demo Ticket 3",
                     "This is the ticket summary",
                     "Here is the description",
-                    TicketCategory.ONE_TIME_ERROR);
+                    TicketCategory.ONE_TIME_ERROR,
+                    13);
             Database.addTicketToProject(session, "testadmin", id3, "test1");
             
             Integer id4 = Database.putTicket(session, "Demo Ticket 4",
                     "This is the ticket summary",
                     "Here is the description",
-                    TicketCategory.ONE_TIME_ERROR);
+                    TicketCategory.ONE_TIME_ERROR,
+                    13);
             Database.addTicketToProject(session, "testadmin", id4, "test2");
             
             Ticket t = Database.getTicket(session, id);

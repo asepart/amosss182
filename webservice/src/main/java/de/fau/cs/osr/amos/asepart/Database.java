@@ -100,13 +100,14 @@ public class Database
     }
 
     public static Integer putTicket(Session session, String ticketName, String ticketSummary,
-                                 String ticketDescription, TicketCategory ticketCategory)
+                                 String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
     {
         Ticket ticket = new Ticket();
         ticket.setTicketName(ticketName);
         ticket.setTicketSummary(ticketSummary);
         ticket.setTicketDescription(ticketDescription);
         ticket.setTicketCategory(ticketCategory);
+        ticket.setRequiredObservations(requiredObservations);
 
         return putTicket(session, ticket);
     }
