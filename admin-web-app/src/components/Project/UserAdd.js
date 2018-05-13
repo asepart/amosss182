@@ -30,8 +30,8 @@ export default class UserAdd extends Component {
 		});
 	}
 
-	putProject() {
-		fetch(URL + '/projects/' + this.props.project + '/users/' + this.state.userName, {
+	async putProject() {
+		await fetch(URL + '/projects/' + this.props.project + '/users/' + this.state.userName, {
 				method: 'PUT',
 				headers: getAuth()
 			})
