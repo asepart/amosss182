@@ -35,7 +35,7 @@ The following REST operations are available:
 
 - Create new ticket in project
 
-  HTTP operation: PUT
+  HTTP operation: POST
   Path:           /projects/{name}/tickets
   Request-Body:   Ticket information as JSON object.
   Status code:    [200 OK]           in case of success.
@@ -108,9 +108,31 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized user is not a member of the project.
                   [404 Not found]    if entry key is invalid.
 
+- Send a message in a ticket group chat
+
+  HTTP operation: POST
+  Path:           /messages/{ticket}
+  Roles:          Admin, User
+  Request Body:   The chat message as ASCII text.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not a member of the associated project.
+                  [404 Not found]    if ticket does not exist.
+
+- Lists messages of a ticket group chat
+
+  HTTP operation: GET
+  Path:           /messages/{ticket}
+  Roles:          Admin, User
+  Returns:        JSON array of chat messages.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized user is not a member of the associated project.
+                  [404 Not found]    if ticket does not exist.
+
 - Create user
 
-  HTTP operation: PUT
+  HTTP operation: POST
   Path:           /users
   Roles:          Admin
   Request-Body:   User information as JSON object.
@@ -131,7 +153,7 @@ The following REST operations are available:
 
 - Create admin
 
-  HTTP operation: PUT
+  HTTP operation: POST
   Path:           /admins
   Roles:          Admin
   Request-Body:   Admin information as JSON object.
