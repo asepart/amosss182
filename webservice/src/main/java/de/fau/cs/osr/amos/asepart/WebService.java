@@ -99,8 +99,7 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Integer id = Database.putTicket(session, ticket);
-            Database.addTicketToProject(session, sc.getUserPrincipal().getName(), id, name);
+            Database.putTicket(session, sc.getUserPrincipal().getName(), name, ticket);
             session.getTransaction().commit();
 
             return Response.ok(String.format("Added ticket %s to project %s.", ticket.getTicketName(), name)).build();

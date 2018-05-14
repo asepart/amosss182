@@ -32,6 +32,9 @@ public class Ticket
     @Column(name = "required_observations", nullable = false)
     private Integer requiredObservations;
     
+    @Column(name = "project_name")
+    private String projectName;
+    
     public Integer getId()
     {
         return id;
@@ -90,5 +93,15 @@ public class Ticket
     public void setRequiredObservations(Integer requiredObservations)
     {
         this.requiredObservations = requiredObservations;
+    }
+    
+    public String getProjectName()
+    {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName)
+    {
+        this.projectName = projectName;
     }
 }
