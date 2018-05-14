@@ -64,16 +64,12 @@ public class WebServiceTest
                     13);
             Ticket t = Database.getTicket(session, id);
 
-            Database.putTicket(session, "testadmin", "test", t);
-
             session.getTransaction().commit();
 
-            assertEquals(1, 0);
-        }
-
-        catch (WebApplicationException e)
-        {
-            assertEquals(1, 1);
+            assertEquals("This is the ticket summary", t.getTicketSummary());
+            assertEquals("Here is the description", t.getTicketDescription());
+            assertEquals(TicketCategory.ONE_TIME_ERROR, t.getTicketCategory());
+            assertEquals((Integer) 13, t.getRequiredObservations());
         }
     }
 
