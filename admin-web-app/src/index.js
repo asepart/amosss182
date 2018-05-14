@@ -8,6 +8,7 @@ import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
+import {isAuth} from './components/shared/auth';
 
 class Page extends Component{
 	handleGlobalState (){
@@ -24,6 +25,13 @@ class Page extends Component{
 			isAuth: false
 		};
 		registerFunc (this.handleGlobalState.bind(this));
+		this.checkAuth();
+	}
+	async checkAuth () {
+		if (await isAuth())
+			this.setState({
+				isAuth: true
+			});
 	}
 
 	render() {
