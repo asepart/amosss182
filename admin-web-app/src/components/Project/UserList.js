@@ -7,6 +7,8 @@ import ProjectButton from './ProjectButton';
 import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
+import Cookies from 'universal-cookie';
+
 
 export default class UserList extends Component {
 	constructor(props) {
@@ -14,6 +16,9 @@ export default class UserList extends Component {
 		this.state = {
 			isLoading: true
 		}
+		const cookies = new Cookies();
+
+		console.log(cookies.get('myCat')); // Pacman
 	}
 
 	componentDidMount() {

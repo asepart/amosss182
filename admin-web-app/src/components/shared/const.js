@@ -1,3 +1,6 @@
+import Cookies from 'universal-cookie';
+
+export const cki = new Cookies(document.cookie);
 export const URL = getURL();
 
 function getURL(){
