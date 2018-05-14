@@ -36,10 +36,10 @@ The following REST operations are available:
 - Create new ticket in project
 
   HTTP operation: POST
-  Path:           /projects/{name}/tickets
-  Request-Body:   Ticket information as JSON object.
+  Path:           /projects/{name}/tickets/
+  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null).
   Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if ticket is already in project or ticket/project does not exist.
+                  [400 Bad Request]  if ticket is already in project or project does not exist.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized user is not an admin.
 
@@ -135,7 +135,7 @@ The following REST operations are available:
   HTTP operation: POST
   Path:           /users
   Roles:          Admin
-  Request-Body:   User information as JSON object.
+  Request-Body:   User information as JSON object (firstName and lastName not to be null).
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user already exists or user information is invalid.
                   [401 Unauthorized] if the provided username or password is invalid.
@@ -156,7 +156,7 @@ The following REST operations are available:
   HTTP operation: POST
   Path:           /admins
   Roles:          Admin
-  Request-Body:   Admin information as JSON object.
+  Request-Body:   Admin information as JSON object (firstName and lastName not to be null).
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if admin already exists or admin information is invalid.
                   [401 Unauthorized] if the provided username or password is invalid.

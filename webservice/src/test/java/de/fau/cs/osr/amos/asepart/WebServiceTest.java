@@ -57,16 +57,14 @@ public class WebServiceTest
 
             Database.putProject(session, "testadmin", "test", "12345");
 
-            Integer id = Database.putTicket(session, "Demo Ticket",
+            Integer id = Database.putTicket(session, "testadmin", "test", "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
             Ticket t = Database.getTicket(session, id);
-            Database.addTicketToProject(session, "testadmin", id, "test");
 
-            Integer idd = Database.putTicket(session, t);
-            Database.addTicketToProject(session, "testadmin", idd, "test");
+            Database.putTicket(session, "testadmin", "test", t);
 
             session.getTransaction().commit();
 
@@ -89,33 +87,29 @@ public class WebServiceTest
             Database.putProject(session, "testadmin", "test1", "123456");
             Database.putProject(session, "testadmin", "test2", "1234567");
 
-            Integer id = Database.putTicket(session, "Demo Ticket",
+            Integer id = Database.putTicket(session, "testadmin", "test1", "Demo Ticket 1",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
-            Database.addTicketToProject(session, "testadmin", id, "test1");
 
-            Integer id2 = Database.putTicket(session, "Demo Ticket",
+            Integer id2 = Database.putTicket(session, "testadmin", "test1", "Demo Ticket 2",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
-            Database.addTicketToProject(session, "testadmin", id2, "test1");
 
-            Integer id3 = Database.putTicket(session, "Demo Ticket 3",
+            Integer id3 = Database.putTicket(session, "testadmin", "test1", "Demo Ticket 3",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
-            Database.addTicketToProject(session, "testadmin", id3, "test1");
 
-            Integer id4 = Database.putTicket(session, "Demo Ticket 4",
+            Integer id4 = Database.putTicket(session, "testadmin", "test2", "Demo Ticket 4",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
-            Database.addTicketToProject(session, "testadmin", id4, "test2");
 
             Ticket t = Database.getTicket(session, id);
             Ticket[] ts = Database.getTicketsOfProject(session, "testadmin", "test1");
@@ -124,8 +118,8 @@ public class WebServiceTest
             session.getTransaction().commit();
 
             assertEquals(t.getTicketSummary(), "This is the ticket summary");
-            assertEquals(ts[0].getTicketName(), "Demo Ticket");
-            assertEquals(ts[1].getTicketName(), "Demo Ticket");
+            assertEquals(ts[0].getTicketName(), "Demo Ticket 1");
+            assertEquals(ts[1].getTicketName(), "Demo Ticket 2");
             assertEquals(ts[2].getTicketName(), "Demo Ticket 3");
             assertEquals(ts2[0].getTicketName(), "Demo Ticket 4");
             assertNotEquals(ts[0], ts[1]);
@@ -174,12 +168,11 @@ public class WebServiceTest
 
             Database.putProject(session, "testadmin", "chattest", "32423");
 
-            Integer ticketId = Database.putTicket(session, "Chat Ticket",
+            Integer ticketId = Database.putTicket(session, "testadmin", "chattest", "Chat Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     2);
-            Database.addTicketToProject(session, "testadmin", ticketId, "chattest");
 
             Database.putUser(session, "chatuser", "lolrofl",
                     "Chat", "User", "3242342323");
