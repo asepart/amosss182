@@ -83,7 +83,7 @@ export default class UserAdd extends Component {
 						value = {this.state.userName}
 					/>
 					<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#841584" />
-					<Button onPress = { this.showProjectList } title = "Cancel" color = "#841584" />
+					<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#841584" />
 				</View>
 			);
 		}
@@ -95,7 +95,7 @@ export default class UserAdd extends Component {
 					value = {this.state.phone}
 				/>
 				<Button onPress = { this.addUser.bind(this) } title = "Add" color = "#841584" />
-				<Button onPress = { this.showProjectList } title = "Cancel" color = "#841584" />
+				<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#841584" />
 			</View>
 		);
 	}

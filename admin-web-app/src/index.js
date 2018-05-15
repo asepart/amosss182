@@ -4,6 +4,8 @@ import './index.css';
 import Login from './components/Login/login';
 import ProjectList from './components/Project/ProjectList';
 import ProjectAdd from './components/Project/ProjectAdd';
+import TicketCreate from './components/Project/TicketCreate';
+import TicketList from './components/Project/TicketList';
 import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
 import registerServiceWorker from './registerServiceWorker';
@@ -45,6 +47,10 @@ class Page extends Component{
 				return (<UserList project={this.state.param}/>);
 			case 'addUser':
 				return (<UserAdd project={this.state.param}/>);
+			case 'createTicket':
+				return (<TicketCreate project={this.state.param}/>);
+			case 'showTickets':
+				return (<TicketList project={this.state.param}/>);
 			default:
 				return (<ProjectList/>);
 		}
