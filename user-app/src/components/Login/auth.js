@@ -1,7 +1,8 @@
-import {URL} from './const';
+import {URL} from '../Login/const';
 
-var username = "";
-var psw = "";
+export var username = "";
+export var psw = "";
+
 var auth=false;
 
 window.btoa = require('Base64').btoa;

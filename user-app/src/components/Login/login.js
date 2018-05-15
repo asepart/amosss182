@@ -53,7 +53,8 @@ export default class Login extends Component {
 
 			//navigate to different site
 		const { navigate } = this.props.navigation;
-		navigate("Second", { name: "Projects" })
+
+		navigate("Third", { name: "JoinProject" })
 
 		} else {
 			this.setState({error: "Invalid credentials!"});
@@ -81,5 +82,4 @@ export default class Login extends Component {
 		</View>);
 	}
 }
-
 
