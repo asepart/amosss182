@@ -22,10 +22,18 @@ export default class ProjectInfo extends Component {
       var {params} = this.props.navigation.state;
       return (
         <View style={styles.container}>
-           
+           <TouchableOpacity 
+           onPress={()=>{
+            const { navigate } = this.props.navigation;
+            navigate("Sixth", { name: "GetMessages" })
+           }} 
+            style={styles.buttonContainer}>
 			
-				<Text style={styles.buttonText && styles.textLarge}>Here will be project info if key was valid</Text>
-
+				<Text style={styles.buttonText}>Enter Chat</Text>
+          
+			</TouchableOpacity>
+			
+				
 		
         
         </View>

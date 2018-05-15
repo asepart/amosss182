@@ -20,6 +20,17 @@ export default styles=StyleSheet.create({
   
     },
 
+    containerBottomAlign: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: '#34515e',
+      //alignItems moves items to upper center
+      alignItems: 'baseline',
+      //justifyContent moves items to center of page
+      justifyContent: 'center'
+  
+    },
+
     //Text input boxes
     input: {
       height: 40,
@@ -46,10 +57,10 @@ export default styles=StyleSheet.create({
     addButton: {
        alignItems:'center',
        justifyContent:'center',
-       width:50,
-       height:50,
+       width:60,
+       height:60,
        backgroundColor:'#62757f',
-       borderRadius:50,
+       borderRadius:60,
     
     },
     error: {
