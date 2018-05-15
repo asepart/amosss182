@@ -4,9 +4,6 @@ import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setKey, isValid} from './keyValid';
 
-
-
-
 import {
 	StackNavigator,
   } from 'react-navigation';
@@ -53,7 +50,7 @@ export default class JoinProject extends Component {
       
     
     }
-  
+
 
     render() {
       var {params} = this.props.navigation.state;

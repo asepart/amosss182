@@ -22,9 +22,9 @@ export default class ProjectAdd extends Component {
 		});
 	}
 
-	putProject() {
+	async putProject() {
 		let auth = getAuth();
-		fetch(URL + '/projects/' + this.state.projectName, {
+		await fetch(URL + '/projects/' + this.state.projectName, {
 				method: 'PUT',
 				headers: auth,
 				body: this.state.entryKey
