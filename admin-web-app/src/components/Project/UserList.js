@@ -47,6 +47,30 @@ export default class UserList extends Component {
 			param: this.props.project
 		});
 	}
+	
+	showCreateTicket () {
+		setState({
+			isAuth: true,
+			show: 'createTicket',
+			param: this.props.project
+		});
+	}
+	
+	showTicketList () {
+		setState({
+			isAuth: true,
+			show: 'showTickets',
+			param: this.props.project
+		});
+	}
+	
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: this.props.project
+		});
+	}
 
 	render() {
 		if (this.state.isLoading) {
@@ -76,6 +100,7 @@ export default class UserList extends Component {
 			}
 		]
 
+		if (this.props.project !== '') {
 		return (
 			<View>
 				<Button
@@ -83,8 +108,38 @@ export default class UserList extends Component {
 					title = "Add User"
 					color = "#841584"
 				/>
+				<Button
+					onPress = { this.showCreateTicket.bind(this) }
+					title = "Create Ticket"
+					color = "#841584"
+				/>
+				<Button
+					onPress = { this.showTicketList.bind(this) }
+					title = "Show Tickets"
+					color = "#841584"
+				/>
+				<Button
+					onPress = { this.showProjectList.bind(this) }
+					title = "Back"
+					color = "#841584"
+				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>
 			</View>
+		);
+		}
+		return( <View>
+			<Button
+				onPress = { this.showAddUser.bind(this) }
+				title = "Add User"
+				color = "#841584"
+			/>
+			<Button
+				onPress = { this.showProjectList.bind(this) }
+				title = "Back"
+				color = "#841584"
+			/>
+			<ReactTable data={this.state.dataSource} columns={columns}/>
+		</View>
 		);
 	}
 }

@@ -59,6 +59,12 @@ public class Database
 
                 Database.putProject(session, "admin", "testproject", "pizza");
                 Database.addUserToProject(session, "admin", "user", "testproject");
+                
+                Database.putTicket(session, "admin", "testproject", "Name",
+                        "Summary",
+                        "Description",
+                        TicketCategory.ONE_TIME_ERROR,
+                        13);
 
                 session.getTransaction().commit();
             }
