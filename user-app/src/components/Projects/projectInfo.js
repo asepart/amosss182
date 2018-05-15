@@ -16,9 +16,7 @@ export default class ProjectInfo extends Component {
 			color:'#FFF'
 		}
     } 
-  
-	
-	
+
 
     render() {
       var {params} = this.props.navigation.state;

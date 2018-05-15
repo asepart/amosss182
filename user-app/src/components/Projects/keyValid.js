@@ -1,16 +1,19 @@
 import {URL} from '../Login/const';
-import {getAuth} from '../Login/auth';
+import {getAuth,username,psw} from '../Login/auth';
 
-var key = "";
+export var key = "";
 var val=false;
+
+window.btoa = require('Base64').btoa;
 
 export function setKey(pkey) {
 	key = pkey;
 }
 
 
+
 async function validateKey() {
-	var response = await fetch(URL + '/join', {
+var response = await fetch(URL + '/join', {
         method: 'POST',
         headers: getAuth(),
         body:  key
@@ -20,14 +23,14 @@ async function validateKey() {
 		case 200:
 			val=true;
             return true;
-        // user already joined    
+        // username or password is invalid    
         case 401:
             val=false;
             return false;
-        // username or password is invalid    
+        // user had already joined 
         case 400:
-            val=false;
-            return false;
+            val=true;
+            return true;
         // user is not part of the project    
         case 403:
             val=false;
@@ -43,8 +46,8 @@ async function validateKey() {
 }
 
 export async function isValid() {
-	if (val)
-		return true;
+    if (val)
+        return true;
 	if (key === '')
 		return false;
 	return await validateKey();

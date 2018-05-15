@@ -5,6 +5,8 @@ import {setState} from '../Login/state';
 import {setKey, isValid} from './keyValid';
 
 
+
+
 import {
 	StackNavigator,
   } from 'react-navigation';
@@ -36,21 +38,22 @@ export default class JoinProject extends Component {
 
       setKey(this.state.entryKey);
   
-      if(await isValid()){
+     if(await isValid()){
         setState({isValid: true});
+  
   
         //navigate to different site
        const { navigate } = this.props.navigation;
         navigate("Fourth", { name: "ProjectInfo" })
   
-      } else {
-        this.setState({error: "Invalid Key!"});
+     } else {
+        this.setState({error: "something went wrong"});
       }
     
       
     
     }
-    
+  
 
     render() {
       var {params} = this.props.navigation.state;
@@ -63,12 +66,12 @@ export default class JoinProject extends Component {
            onPress={this.onJoinPressed.bind(this)} 
             style={styles.buttonContainer}>
 			
-				<Text style={styles.buttonText}>JOIN PROJECT</Text>
-
+				<Text style={styles.buttonText}>Join Project</Text>
+          
 			</TouchableOpacity>
         
       <Text style={styles.error}>
-					{this.state.error}
+          {this.state.error}
 				</Text>
         </View>
       );
