@@ -2,6 +2,7 @@ import {URL} from '../Login/const';
 
 export var username = "";
 export var psw = "";
+
 var auth=false;
 
 window.btoa = require('Base64').btoa;

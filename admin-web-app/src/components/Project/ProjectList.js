@@ -37,6 +37,14 @@ export default class ProjectList extends Component {
 		});
 	}
 
+	showUserManagement () {
+		setState({
+			isAuth: true,
+			show: 'listUsers',
+			param: ''
+		});
+	}
+
 	render() {
 		if (this.state.isLoading) {
 			return (
@@ -52,7 +60,7 @@ export default class ProjectList extends Component {
 				accessor: 'projectName',
 				Cell: props => <ProjectButton proj={props.value}/>
 			}, {
-				Header: 'Entrycode',
+				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
 			}
 		]
@@ -62,7 +70,12 @@ export default class ProjectList extends Component {
 				<Button
 					onPress = { this.showAddProject }
 					title = "Add Project"
-					color = "#841584"
+					color = "#0c3868"
+				/>
+				<Button
+					onPress = { this.showUserManagement }
+					title = "User Management"
+					color = "#0c3868"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>
 			</View>

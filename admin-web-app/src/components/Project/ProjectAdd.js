@@ -22,9 +22,9 @@ export default class ProjectAdd extends Component {
 		});
 	}
 
-	putProject() {
+	async putProject() {
 		let auth = getAuth();
-		fetch(URL + '/projects/' + this.state.projectName, {
+		await fetch(URL + '/projects/' + this.state.projectName, {
 				method: 'PUT',
 				headers: auth,
 				body: this.state.entryKey
@@ -62,8 +62,8 @@ export default class ProjectAdd extends Component {
 				onChangeText = { (text) => this.setState({entryKey: text})}
 				value = { this.state.entryKey }
 			/>
-			<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#841584" />
-			<Button onPress = { this.showProjectList } title = "Cancel" color = "#841584" />
+			<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#0c3868" />
+			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
 			</View>
 		);
 	}

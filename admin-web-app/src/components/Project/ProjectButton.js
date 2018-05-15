@@ -6,7 +6,7 @@ export default class ProjectButton extends Component {
 	displayProject() {
 		setState({
 			isAuth: true,
-			show: 'project',
+			show: 'listUsers',
 			param: this
 		});
 	}
@@ -15,7 +15,7 @@ export default class ProjectButton extends Component {
 			<Button
 			onPress = { this.displayProject.bind(this.props.proj) }
 			title = { this.props.proj }
-			color = "#841584" />
+			color = "#e6962c" />
 		);
 	}
 }

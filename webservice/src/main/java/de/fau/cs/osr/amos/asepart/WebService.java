@@ -3,11 +3,20 @@ package de.fau.cs.osr.amos.asepart;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.Principal;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.print.attribute.standard.Media;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,6 +31,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
 import de.fau.cs.osr.amos.asepart.entities.*;
+import de.fau.cs.osr.amos.asepart.relationships.*;
 
 @Path("/")
 public class WebService
@@ -47,7 +57,32 @@ public class WebService
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
-    @Path("/tickets")
+    @Path("/projects")
+    @OPTIONS
+    @PermitAll
+    public Response projects()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response listProjects(@Context SecurityContext sc)
+    {
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
+    @Path("/projects/{name}/tickets/")
     @OPTIONS
     @PermitAll
     public Response tickets()
@@ -55,19 +90,45 @@ public class WebService
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @Path("/tickets")
-    @PUT
+    @Path("/projects/{name}/tickets/")
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response createTicket(@Context SecurityContext sc, Ticket ticket)
+    public Response createTicket(@Context SecurityContext sc, @PathParam("name") String name, Ticket ticket)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putTicket(session, ticket);
+            Database.putTicket(session, sc.getUserPrincipal().getName(), name, ticket);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added new ticket with name \"%s\".", ticket.getTicketName())).build();
+            return Response.ok(String.format("Added ticket %s to project %s.", ticket.getTicketName(), name)).build();
+        }
+        
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+    
+    @Path("/projects/{name}/tickets")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin", "User"})
+    public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("name") String name)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            Ticket[] tickets = Database.getTicketsOfProject(session, sc.getUserPrincipal().getName(), role, name);
+            return Response.ok(tickets).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
     }
 
@@ -92,27 +153,12 @@ public class WebService
             session.getTransaction().commit();
         }
 
-        return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
-    }
-
-    @Path("/projects")
-    @OPTIONS
-    @PermitAll
-    public Response projects()
-    {
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @Path("/projects")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
-    public Response listProjects(@Context SecurityContext sc)
-    {
-        try (Session session = Database.openSession())
+        catch (WebApplicationException e)
         {
-            return Response.ok(Database.listProjects(session, sc.getUserPrincipal().getName())).build();
+            return e.getResponse();
         }
+
+        return Response.ok(String.format("Project %s created with %s.", name, entryKey)).build();
     }
 
     @Path("/projects/{name}/users/{username}")
@@ -133,6 +179,11 @@ public class WebService
             session.beginTransaction();
             Database.addUserToProject(session, sc.getUserPrincipal().getName(), username, name);
             session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
         }
 
         return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
@@ -164,6 +215,114 @@ public class WebService
         }
     }
 
+    @Path("/join")
+    @OPTIONS
+    @PermitAll
+    public Response joinProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/join")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"User"})
+    public Response joinProject(@Context SecurityContext sc, String entryKey)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            String name = Database.joinProject(session, sc.getUserPrincipal().getName(), entryKey);
+            session.getTransaction().commit();
+
+            return Response.ok(String.format("You joined project %s.", name)).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
+    @Path("/join")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"User"})
+    public Response joinProjectPreview(@Context SecurityContext sc, @QueryParam("key") String entryKey)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Project project = Database.getProjectByKey(session, entryKey);
+            boolean authorized = Database.isAccountPartOfProject(session, ProjectUser.class, sc.getUserPrincipal().getName(), project.getProjectName());
+
+            session.getTransaction().commit();
+
+            if (!authorized)
+                return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to join this project.").build();
+            else
+                return Response.ok(project.getProjectName()).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
+    @Path("/messages/{ticket}")
+    @OPTIONS
+    @PermitAll
+    public Response messages()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/messages/{ticket}")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"Admin", "User"})
+    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId, String message)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.putMessage(session, ticketId, message, principal.getName(), role );
+            session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+
+        return Response.ok("Message sent.").build();
+    }
+
+    @Path("/messages/{ticket}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin", "User"})
+    public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.listMessages(session, ticketId, principal.getName(), role)).build();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+    }
+
     @Path("/users")
     @OPTIONS
     @PermitAll
@@ -173,7 +332,7 @@ public class WebService
     }
 
     @Path("/users")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
     public Response addUser(@Context SecurityContext sc, User newUser)
@@ -191,6 +350,11 @@ public class WebService
 
             return Response.ok(String.format("Added new user %s.", newUser.getLoginName())).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/users")
@@ -203,6 +367,11 @@ public class WebService
         {
             return Response.ok(Database.listUsers(session)).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/admins")
@@ -214,7 +383,7 @@ public class WebService
     }
 
     @Path("/admins")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
     public Response addAdmin(@Context SecurityContext sc, Admin newAdmin)
@@ -232,6 +401,11 @@ public class WebService
 
             return Response.ok(String.format("Added new admin %s.", newAdmin.getLoginName())).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
 
     @Path("/admins")
@@ -244,7 +418,13 @@ public class WebService
         {
             return Response.ok(Database.listAdmins(session)).build();
         }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
     }
+    
     public static void main(String[] args)
     {
         try
