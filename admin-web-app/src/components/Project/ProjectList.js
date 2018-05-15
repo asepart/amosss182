@@ -60,7 +60,7 @@ export default class ProjectList extends Component {
 				accessor: 'projectName',
 				Cell: props => <ProjectButton proj={props.value}/>
 			}, {
-				Header: 'Entrycode',
+				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
 			}
 		]

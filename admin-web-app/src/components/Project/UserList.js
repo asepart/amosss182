@@ -84,18 +84,15 @@ export default class UserList extends Component {
 		const columns = [
 			{
 				Header: 'Given Name',
-				accessor: 'firstName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				accessor: 'firstName'
 			}, {
 				Header: 'Surname',
-				accessor: 'lastName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				accessor: 'lastName'
 			}, {
-				Header: 'login name',
-				accessor: 'loginName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				Header: 'Login Name',
+				accessor: 'loginName'
 			}, {
-				Header: 'Phone',
+				Header: 'Phone Number',
 				accessor: 'phone' // String-based value accessors!
 			}
 		]
