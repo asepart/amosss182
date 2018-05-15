@@ -117,9 +117,12 @@ public class WebService
     @RolesAllowed({"Admin", "User"})
     public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("name") String name)
     {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
         try (Session session = Database.openSession())
         {
-            Ticket[] tickets = Database.getTicketsOfProject(session, sc.getUserPrincipal().getName(), name);
+            Ticket[] tickets = Database.getTicketsOfProject(session, sc.getUserPrincipal().getName(), role, name);
             return Response.ok(tickets).build();
         }
 

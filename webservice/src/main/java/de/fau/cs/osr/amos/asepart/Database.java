@@ -149,14 +149,19 @@ public class Database
         return ticket;
     }
 
-    static Ticket[] getTicketsOfProject(Session session, String adminName, String projectName)
+    static Ticket[] getTicketsOfProject(Session session, String loginName, String role, String projectName)
     {
         if (!isProject(session, projectName))
         {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
         }
 
-        if (!isAccountPartOfProject(session, ProjectAdmin.class, adminName, projectName))
+        Class<? extends ProjectAccount> relationshipType = ProjectUser.class;
+
+        if (role.equals("Admin"))
+            relationshipType = ProjectAdmin.class;
+
+        if (!isAccountPartOfProject(session, relationshipType, loginName, projectName))
         {
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to view that project.").build());
         }

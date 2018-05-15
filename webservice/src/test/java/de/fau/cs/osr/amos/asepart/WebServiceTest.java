@@ -108,8 +108,8 @@ public class WebServiceTest
                     13);
 
             Ticket t = Database.getTicket(session, id);
-            Ticket[] ts = Database.getTicketsOfProject(session, "testadmin", "test1");
-            Ticket[] ts2 = Database.getTicketsOfProject(session, "testadmin", "test2");
+            Ticket[] ts = Database.getTicketsOfProject(session, "testadmin", "Admin", "test1");
+            Ticket[] ts2 = Database.getTicketsOfProject(session, "testadmin", "Admin", "test2");
 
             session.getTransaction().commit();
 
