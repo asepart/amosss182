@@ -36,7 +36,8 @@ The following REST operations are available:
 - Create new ticket in project
 
   HTTP operation: POST
-  Path:           /projects/{name}/tickets/
+  Path:           /projects/{name}/tickets
+  Roles:          Admin
   Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null).
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if project does not exist.
@@ -47,6 +48,7 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /projects/{name}/tickets
+  Roles:          Admin, User
   Returns:        JSON array of tickets.
   Status code:    [200 OK]           in case of success
                   [401 Unauthorized] if the provided username or password is invalid,

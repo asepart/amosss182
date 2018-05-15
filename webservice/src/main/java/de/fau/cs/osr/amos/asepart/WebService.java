@@ -114,7 +114,7 @@ public class WebService
     @Path("/projects/{name}/tickets")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("name") String name)
     {
         try (Session session = Database.openSession())
