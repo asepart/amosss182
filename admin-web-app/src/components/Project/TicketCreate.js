@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Button,TextInput,ActivityIndicator,View} from 'react-native';
+import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
@@ -41,12 +42,10 @@ export default class TicketCreate extends Component {
 	}
 
 	async createTicket() {
+		let auth = getAuthForPost();
 		await fetch(URL + '/projects/' + this.props.project + '/tickets/', {
 				method: 'POST',
-				headers: {
-				      'Accept': 'application/json',
-				      'Content-Type': 'application/json; charset=utf-8'
-				    },
+				headers: auth,
 				body: JSON.stringify({ticketName: this.state.ticketName, ticketSummary: this.state.ticketSummary, ticketDescription: this.state.ticketDescription, ticketCategory: this.state.ticketCategory, requiredObservations: this.state.requiredObservations})
 			})
 			.then((response) => response.json())
