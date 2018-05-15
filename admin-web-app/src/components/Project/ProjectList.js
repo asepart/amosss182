@@ -70,12 +70,12 @@ export default class ProjectList extends Component {
 				<Button
 					onPress = { this.showAddProject }
 					title = "Add Project"
-					color = "#841584"
+					color = "#0c3868"
 				/>
 				<Button
 					onPress = { this.showUserManagement }
 					title = "User Management"
-					color = "#841584"
+					color = "#0c3868"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>
 			</View>

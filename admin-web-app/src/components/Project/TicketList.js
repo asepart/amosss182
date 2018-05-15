@@ -83,12 +83,12 @@ export default class TicketList extends Component {
 				<Button
 					onPress = { this.showCreateTicket.bind(this) }
 					title = "Create Ticket"
-					color = "#841584"
+					color = "#0c3868"
 				/>
 				<Button
 					onPress = { this.showUserManagement.bind(this) }
 					title = "Back"
-					color = "#841584"
+					color = "#0e4a80"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>
 			</View>

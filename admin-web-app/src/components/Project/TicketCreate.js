@@ -99,8 +99,8 @@ export default class TicketCreate extends Component {
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {this.state.requiredObservations}
 					/>
-					<Button onPress = { this.createTicket.bind(this) } title = "Create" color = "#841584" />
-					<Button onPress = { this.showTicketList.bind(this) } title = "Cancel" color = "#841584" />
+					<Button onPress = { this.createTicket.bind(this) } title = "Create" color = "#0c3868" />
+					<Button onPress = { this.showTicketList.bind(this) } title = "Cancel" color = "#0e4a80" />
 				</View>
 		);
 	}
