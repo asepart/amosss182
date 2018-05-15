@@ -14,7 +14,7 @@ export default class GetMessages extends Component {
     static navigationOptions= {
 		title: 'Chat',
 		headerStyle: {
-			backgroundColor:'#8eacbb'
+			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
@@ -75,10 +75,10 @@ export default class GetMessages extends Component {
           keyExtractor={(item, id) => id}
         />
 
-        <TextInput onChangeText={(text) => this.setState({message: text})} placeholder="" style={styles.input} />
+        <TextInput onChangeText={(text) => this.setState({message: text})} placeholder="Message" underlineColorAndroid="transparent" style={styles.inputLong} />
             <TouchableOpacity
             onPress={this.onSendPressed.bind(this)} 
-             style={styles.addButton}>
+             style={styles.buttonLargeContainer}>
 			
 				<Text style={styles.buttonText}>SEND</Text>
 
@@ -88,6 +88,7 @@ export default class GetMessages extends Component {
                    
 				</Text>
       </View>
+      
     );
   }
 }

@@ -17,7 +17,7 @@ export default class JoinProject extends Component {
   static navigationOptions= {
 		title: 'Join Projects',
 		headerStyle: {
-			backgroundColor:'#8eacbb'
+			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
@@ -61,7 +61,7 @@ export default class JoinProject extends Component {
         <View style={styles.container}>
         <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
-        placeholder="Entry Key" placeholderTextColor="#FFF" style={styles.input}/>
+        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.input}/>
             <TouchableOpacity 
            onPress={this.onJoinPressed.bind(this)} 
             style={styles.buttonContainer}>

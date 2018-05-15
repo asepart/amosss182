@@ -24,7 +24,7 @@ export default class Login extends Component {
 	static navigationOptions= {
 		title: 'Login',
 		headerStyle: {
-			backgroundColor:'#8eacbb'
+			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
@@ -67,8 +67,8 @@ export default class Login extends Component {
 	render() {
 		return (<View style={styles.containerAlign}>
 
-			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
-			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF"  secureTextEntry style={styles.input}/>
+			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.input}/>
+			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input}/>
 			<TouchableOpacity onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 			
 				<Text style={styles.buttonText}>LOGIN</Text>
