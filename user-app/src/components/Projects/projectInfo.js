@@ -56,17 +56,19 @@ export default class ProjectInfo extends Component {
 	}
   
     static navigationOptions= {
-		title: 'Project Info',
+		title: 'Tickets',
 		headerStyle: {
-			backgroundColor:'#8eacbb'
+			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
 		}
     } 
 
+
     render() {
       var {params} = this.props.navigation.state;
+      
       if (this.state.isLoading) {
 			return (
 				<View style={{flex: 1,padding: 20}}>
@@ -80,9 +82,16 @@ export default class ProjectInfo extends Component {
                 <FlatList
                   style={styles.textLarge}
                   data={this.state.ticketList}
-                  renderItem={({item}) => <Text>{item.id}, {item.ticketSummary}, {item.ticketCategory}</Text>}
+                  renderItem={({item}) => <TouchableOpacity
+                 onPress={() =>{const { navigate } = this.props.navigation;
+                 navigate("Sixth", { name: "GetMessage" })} }
+                   style={styles.buttonContainer}>
+                   <Text style={styles.buttonText}>
+            {item.id}, {item.ticketSummary}, {item.ticketCategory}
+            </Text>
+            </TouchableOpacity>}
                   keyExtractor={(item, index) => index}
-                ></FlatList>
+                />
         </View>
       );
     }

@@ -82,8 +82,8 @@ export default class UserAdd extends Component {
 						onChangeText = {(text) => this.setState({userName: text})}
 						value = {this.state.userName}
 					/>
-					<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#841584" />
-					<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#841584" />
+					<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#0c3868" />
+					<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
 				</View>
 			);
 		}
@@ -94,8 +94,8 @@ export default class UserAdd extends Component {
 					onChangeText = {(text) => this.setState({phone: text})}
 					value = {this.state.phone}
 				/>
-				<Button onPress = { this.addUser.bind(this) } title = "Add" color = "#841584" />
-				<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#841584" />
+				<Button onPress = { this.addUser.bind(this) } title = "Add" color = "#0c3868" />
+				<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
 			</View>
 		);
 	}

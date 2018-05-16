@@ -84,18 +84,15 @@ export default class UserList extends Component {
 		const columns = [
 			{
 				Header: 'Given Name',
-				accessor: 'firstName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				accessor: 'firstName'
 			}, {
 				Header: 'Surname',
-				accessor: 'lastName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				accessor: 'lastName'
 			}, {
-				Header: 'login name',
-				accessor: 'loginName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				Header: 'Login Name',
+				accessor: 'loginName'
 			}, {
-				Header: 'Phone',
+				Header: 'Phone Number',
 				accessor: 'phone' // String-based value accessors!
 			}
 		]
@@ -106,22 +103,22 @@ export default class UserList extends Component {
 				<Button
 					onPress = { this.showAddUser.bind(this) }
 					title = "Add User"
-					color = "#841584"
+					color = "#0c3868"
 				/>
 				<Button
 					onPress = { this.showCreateTicket.bind(this) }
 					title = "Create Ticket"
-					color = "#841584"
+					color = "#0c3868"
 				/>
 				<Button
 					onPress = { this.showTicketList.bind(this) }
 					title = "Show Tickets"
-					color = "#841584"
+					color = "#0c3868"
 				/>
 				<Button
 					onPress = { this.showProjectList.bind(this) }
 					title = "Back"
-					color = "#841584"
+					color = "#0e4a80"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>
 			</View>
@@ -131,12 +128,12 @@ export default class UserList extends Component {
 			<Button
 				onPress = { this.showAddUser.bind(this) }
 				title = "Add User"
-				color = "#841584"
+				color = "#0c3868"
 			/>
 			<Button
 				onPress = { this.showProjectList.bind(this) }
 				title = "Back"
-				color = "#841584"
+				color = "#0e4a80"
 			/>
 			<ReactTable data={this.state.dataSource} columns={columns}/>
 		</View>
