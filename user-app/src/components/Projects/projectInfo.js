@@ -4,7 +4,7 @@ import styles from '../Login/Design';
 import {
 	StackNavigator,
   } from 'react-navigation';
-import {getAuth} from '../Login/auth';
+import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
 import {key} from './keyValid';
 
@@ -13,27 +13,49 @@ export default class ProjectInfo extends Component {
   constructor(props) {
 		super(props);
 		this.state = {
-			isLoading: true
-		}
+			isLoading: true,
+            projectName: '',
+            ticketList: [],
+		};
 	}
   
   componentDidMount() {
-		var url = URL;
-        var name = 'testproject';
-		url += '/projects/' + name + '/tickets';
-		return fetch(url, {method:'GET', headers: getAuth()})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
+    
+        fetch('https://asepartback-dev.herokuapp.com/join?key=' + key, 
+              {method:'GET', headers: 
+                 {'X-ASEPART-Role': 'User',
+                  'Authorization': 'Basic ' + btoa(username + ":" + psw)
+                 }
+              }
+        )
+        .then(response => {
+          return response.text();
+        }).then(responseText => {
+          if(responseText !== '') {
+            this.setState({
 				isLoading: false,
-				dataSource: responseJson
+				projectName: responseText,
 			}, function() {});
+            
+            var url = URL;
+            url += '/projects/' + this.state.projectName + '/tickets';
+            return fetch(url, {method:'GET', headers: getAuth()})
+              .then((response) => response.json())
+              .then((responseJson) => {
+                this.setState({
+                    isLoading: false,
+                    ticketList: responseJson
+                }, function() {});
+              }).catch((error) => {
+                console.error(error);
+              }); 
+          }
 		}).catch((error) => {
 			console.error(error);
 		});
 	}
   
-  static navigationOptions= {
+    static navigationOptions= {
 		title: 'Tickets',
 		headerStyle: {
 			backgroundColor:'#5daedb'
@@ -59,7 +81,7 @@ export default class ProjectInfo extends Component {
         <View style={styles.container}>
                 <FlatList
                   style={styles.textLarge}
-                  data={this.state.dataSource}
+                  data={this.state.ticketList}
                   renderItem={({item}) => <TouchableOpacity
                  onPress={() =>{const { navigate } = this.props.navigation;
                  navigate("Sixth", { name: "GetMessage" })} }
