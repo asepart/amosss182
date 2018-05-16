@@ -6,7 +6,7 @@ import {
   } from 'react-navigation';
 import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
-import {key, getProjectName} from './keyValid';
+import {key} from './keyValid';
 
 export default class ProjectInfo extends Component {
 
