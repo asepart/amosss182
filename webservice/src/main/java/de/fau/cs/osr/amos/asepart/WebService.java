@@ -169,25 +169,6 @@ public class WebService
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @Path("/projects/{name}/users/{username}")
-    @POST
-    @RolesAllowed({"Admin"})
-    public Response addUserToProject(@Context SecurityContext sc, @PathParam("name") String name, @PathParam("username") String username)
-    {
-        try (Session session = Database.openSession())
-        {
-            session.beginTransaction();
-            Database.addUserToProject(session, sc.getUserPrincipal().getName(), username, name);
-            session.getTransaction().commit();
-        }
-
-        catch (WebApplicationException e)
-        {
-            return e.getResponse();
-        }
-
-        return Response.ok(String.format("Added user %s to project %s.", username, name)).build();
-    }
 
     @Path("/projects/{name}/users")
     @OPTIONS
@@ -232,10 +213,11 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            String name = Database.joinProject(session, sc.getUserPrincipal().getName(), entryKey);
+            Database.joinProject(session, sc.getUserPrincipal().getName(), entryKey);
+            String projectName = Database.getProject(session, entryKey).getProjectName();
             session.getTransaction().commit();
 
-            return Response.ok(String.format("You joined project %s.", name)).build();
+            return Response.ok(String.format("You joined project %s.", projectName)).build();
         }
 
         catch (WebApplicationException e)
@@ -254,8 +236,8 @@ public class WebService
         {
             session.beginTransaction();
 
-            Project project = Database.getProjectByKey(session, entryKey);
-            boolean authorized = Database.isAccountPartOfProject(session, ProjectUser.class, sc.getUserPrincipal().getName(), project.getProjectName());
+            Project project = Database.getProject(session, entryKey);
+            boolean authorized = Database.isUserMemberOfProject(session, entryKey, sc.getUserPrincipal().getName());
 
             session.getTransaction().commit();
 
