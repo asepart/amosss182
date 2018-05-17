@@ -143,7 +143,7 @@ The following REST operations are available:
 - Send a message in a ticket group chat
 
   HTTP operation: POST
-  Path:           /messages/{ticketid}
+  Path:           /messages/{ticket}
   Roles:          Admin, User
   Request Body:   The chat message as ASCII text.
   Status code:    [200 OK]           in case of success.
@@ -154,7 +154,7 @@ The following REST operations are available:
 - Lists messages of a ticket group chat
 
   HTTP operation: GET
-  Path:           /messages/{ticketid}
+  Path:           /messages/{ticket}
   Roles:          Admin, User
   Returns:        JSON array of chat messages.
   Status code:    [200 OK]           in case of success.

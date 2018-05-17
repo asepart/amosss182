@@ -187,7 +187,7 @@ public class Database
         return users;
     }
 
-    static boolean isUserMemberOfProject(Session session, String projectKey, String userName)
+    static boolean isUserMemberOfProject(Session session, String userName, String projectKey)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
@@ -211,7 +211,7 @@ public class Database
         if (!isProject(session, entryKey))
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project does not exist.").build());
 
-        if (isUserMemberOfProject(session, entryKey, userName))
+        if (isUserMemberOfProject(session, userName, entryKey))
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User already member of project.").build());
 
         Membership m = new Membership();
@@ -268,7 +268,7 @@ public class Database
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
         }
 
-        else if (role.equals("User") && !isUserMemberOfProject(session, projectKey, loginName))
+        else if (role.equals("User") && !isUserMemberOfProject(session, loginName, projectKey))
         {
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You have not joined that project.").build());
         }
@@ -298,7 +298,7 @@ public class Database
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
         }
 
-        else if (!isUserMemberOfProject(session, ticket.getProjectKey(), sender))
+        else if (!isUserMemberOfProject(session, sender, ticket.getProjectKey()))
         {
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You have not joined that project.").build());
         }
@@ -321,7 +321,7 @@ public class Database
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
         }
 
-        else if (!isUserMemberOfProject(session, ticket.getProjectKey(), receiver))
+        else if (!isUserMemberOfProject(session, receiver, ticket.getProjectKey()))
         {
             throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You have not joined that project.").build());
         }
