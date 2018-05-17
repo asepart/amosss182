@@ -20,8 +20,7 @@ export default class ProjectInfo extends Component {
 	}
   
   componentDidMount() {
-    
-        fetch('https://asepartback-dev.herokuapp.com/join?key=' + key, 
+        fetch(URL + '/join?key=' + key, 
               {method:'GET', headers: 
                  {'X-ASEPART-Role': 'User',
                   'Authorization': 'Basic ' + btoa(username + ":" + psw)
@@ -37,9 +36,7 @@ export default class ProjectInfo extends Component {
 				projectName: responseText,
 			}, function() {});
             
-            var url = URL;
-            url += '/projects/' + this.state.projectName + '/tickets';
-            return fetch(url, {method:'GET', headers: getAuth()})
+            fetch(URL + '/projects/' + this.state.projectName + '/tickets', {method:'GET', headers: getAuth()})
               .then((response) => response.json())
               .then((responseJson) => {
                 this.setState({
