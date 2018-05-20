@@ -12,7 +12,7 @@ export function setMsg(mes) {
 
 
 export async function sendMessage() {
-     fetch(URL + '/messages/3', {
+     fetch(URL + '/messages/1', {
             method: 'POST',
             headers: getAuth(),
             body:  msg

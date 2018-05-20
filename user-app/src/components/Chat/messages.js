@@ -36,12 +36,12 @@ export default class GetMessages extends Component {
    // this.setState({error: "message empty"});
   // }
     sendMessage();
-    makeApiCall();
+    this.makeApiCall();
 
 }
 
-makeApiCall() {
-  return fetch(URL + '/messages/3' , {method:'GET', headers: getAuth()})
+async makeApiCall() {
+  return fetch(URL + '/messages/1' , {method:'GET', headers: getAuth()})
   .then((response) => response.json())
   .then((responseJson) => {
 
@@ -58,8 +58,6 @@ makeApiCall() {
   });
 
 }
-
-
 
   componentDidMount(){
     this.makeApiCall();
