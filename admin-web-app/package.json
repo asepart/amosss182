@@ -10,7 +10,8 @@
     "react-navigation": "^1.5.11",
     "react-scripts": "1.1.4",
     "react-table": "^6.8.2",
-    "universal-cookie": "^2.1.2"
+    "universal-cookie": "^2.1.2",
+    "react-router-dom": "^4.2.2"
   },
   "scripts": {
     "start": "react-scripts start",
