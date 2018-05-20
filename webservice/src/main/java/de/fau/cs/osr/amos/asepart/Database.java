@@ -2,6 +2,8 @@ package de.fau.cs.osr.amos.asepart;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -114,10 +116,55 @@ public class Database
 
     static void putProject(Session session, Project project)
     {
+        if (isProject(session, project.getEntryKey()))
+        {
+            Project oldProject = getProject(session, project.getEntryKey());
+
+            // detect owner change
+            if (!oldProject.getOwner().equals(project.getOwner()))
+            {
+                throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
+            }
+        }
+
         session.save(project);
     }
 
-    private static boolean isProject(Session session, String key)
+    static void deleteProject(Session session, String key, String owner)
+    {
+        Project project = getProject(session, key);
+
+        if (!project.getOwner().equals(owner))
+        {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
+        }
+
+        Query ticketQuery = session.createQuery("select id from Ticket where projectKey = :projectKey");
+        ticketQuery.setParameter("projectKey", key);
+        List<Integer> ticketIds = ticketQuery.getResultList();
+
+        for (Integer id : ticketIds)
+        {
+            deleteTicket(session, id, owner);
+        }
+
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
+
+        Root<Membership> columns = criteria.from(Membership.class);
+        criteria.where(builder.equal(columns.get("projectKey"), key));
+        List<Membership> resultList = session.createQuery(criteria).getResultList();
+
+        for (Membership member : resultList)
+        {
+            session.delete(member);
+        }
+
+        session.delete(project);
+    }
+
+    static boolean isProject(Session session, String key)
     {
         Project project = session.get(Project.class, key);
         return project != null;
@@ -221,6 +268,33 @@ public class Database
         session.save(m);
     }
 
+    static void leaveProject(Session session, String userName, String entryKey)
+    {
+        if (!isUser(session, userName))
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("User does not exist.").build());
+
+        if (!isProject(session, entryKey))
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project does not exist.").build());
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
+        Root<Membership> columns = criteria.from(Membership.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("projectKey"), entryKey));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Membership> resultList = session.createQuery(criteria).getResultList();
+
+        if (resultList.size() == 0)
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User not member of project.").build());
+
+        for (Membership member : resultList)
+        {
+            session.delete(member);
+        }
+    }
 
     static Integer putTicket(Session session, String adminName, String projectKey, String ticketName, String ticketSummary, String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
     {
@@ -243,7 +317,22 @@ public class Database
         return (Integer) session.save(ticket);
     }
 
-    private static boolean isTicket(Session session, Integer ticketId)
+    static void deleteTicket(Session session, Integer ticketId, String owner)
+    {
+        Ticket oldTicket = getTicket(session, ticketId);
+        Project project = getProject(session, oldTicket.getProjectKey());
+
+        if (!project.getOwner().equals(owner))
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of the associated project.").build());
+
+        Query msgQuery = session.createQuery("delete from Message where ticketId = :ticketId");
+        msgQuery.setParameter("ticketId", ticketId);
+        msgQuery.executeUpdate();
+
+        session.delete(oldTicket);
+    }
+
+    static boolean isTicket(Session session, Integer ticketId)
     {
         Ticket ticket = session.get(Ticket.class, ticketId);
         return ticket != null;
@@ -423,7 +512,7 @@ public class Database
         session.save(admin);
     }
 
-    public static Admin getAdmin(Session session, String loginName)
+    static Admin getAdmin(Session session, String loginName)
     {
         if (!isAdmin(session, loginName))
         {

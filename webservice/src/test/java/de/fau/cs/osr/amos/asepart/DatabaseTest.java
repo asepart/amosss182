@@ -5,13 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.ws.rs.WebApplicationException;
-
 import org.hibernate.Session;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
 
-public class WebServiceTest
+public class DatabaseTest
 {
     @BeforeAll
     public static void createAccounts()
@@ -45,6 +43,40 @@ public class WebServiceTest
 
             assertEquals("00000000000", u.getPhone());
             assertEquals("testkey", p.getEntryKey());
+        }
+    }
+
+    @Test
+    public void testCreateDelete()
+    {
+        Integer ticketId;
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.putProject(session, "tempkey", "tempproject", "testadmin");
+            Project p = Database.getProject(session, "tempkey");
+
+            ticketId = Database.putTicket(session, "testadmin", "tempkey", "Temp Ticket",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.BEHAVIOR,
+                    42);
+
+            session.getTransaction().commit();
+        }
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.deleteProject(session, "tempkey", "testadmin");
+
+            assertFalse(Database.isProject(session, "tempkey"));
+            assertFalse(Database.isTicket(session, ticketId));
+
+            session.getTransaction().commit();
         }
     }
 

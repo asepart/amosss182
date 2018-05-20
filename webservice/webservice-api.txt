@@ -53,12 +53,12 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project did not exist before request.
 
-- Create new ticket in project
+- Create new ticket or change existing ticket.
 
   HTTP operation: POST
   Path:           /projects/{key}/tickets
   Roles:          Admin
-  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null).
+  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null, id optional).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
@@ -75,23 +75,13 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project does not exist.
 
-- Edit existing ticket.
-
-  HTTP operation: PUT
-  Path:           /projects/{key}/tickets/{id}
-  Roles:          Admin
-  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null).
-  Status code:    [200 OK]           in case of success.
-                  [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project does not exist.
-
 - Delete ticket from project.
 
   HTTP operation: DELETE
   Path:           /projects/{key}/tickets/{id}
   Roles:          Admin
   Status code:    [200 OK]           in case of success
+                  [400 Bad Request]  if ticket is not part of project.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project or ticket did not exist before request.
@@ -113,6 +103,7 @@ The following REST operations are available:
   Path:           /projects/{key}/users/{username}
   Roles:          Admin
   Status code:    [200 OK]           in case of success
+                  [400 Bad Request]  if user has not joined.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project does not exist or user was not member of project.

@@ -7,16 +7,7 @@ import java.security.Principal;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -85,7 +76,7 @@ public class WebService
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response createProject(@Context SecurityContext sc, Project project)
+    public Response writeProject(@Context SecurityContext sc, Project project)
     {
         if (!project.getOwner().equals(sc.getUserPrincipal().getName()))
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -113,7 +104,25 @@ public class WebService
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    // TODO DELETE
+    @Path("/projects/{key}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response deleteProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.deleteProject(session, entryKey, sc.getUserPrincipal().getName());
+            session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+
+        return Response.ok("Project deleted.").build();
+    }
 
     @Path("/projects/{key}/tickets/")
     @OPTIONS
@@ -127,7 +136,7 @@ public class WebService
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response createTicket(@Context SecurityContext sc, @PathParam("key") String projectKey, Ticket ticket)
+    public Response writeTicket(@Context SecurityContext sc, @PathParam("key") String projectKey, Ticket ticket)
     {
         try (Session session = Database.openSession())
         {
@@ -136,7 +145,7 @@ public class WebService
             String projectName = Database.getProject(session, projectKey).getProjectName();
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added ticket %s to project %s.", ticket.getTicketName(), projectName)).build();
+            return Response.ok(String.format("Added/modified ticket %s of project %s.", ticket.getTicketName(), projectName)).build();
         }
 
         catch (WebApplicationException e)
@@ -166,7 +175,38 @@ public class WebService
         }
     }
 
-    // TODO edit ticket + delete + delete user from project
+    @Path("/projects/{key}/tickets/{id}")
+    @OPTIONS
+    @PermitAll
+    public Response ticket()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response deleteTicket(@Context SecurityContext sc, @PathParam("key") String projectKey, @PathParam("id") Integer ticketId)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Ticket oldTicket = session.get(Ticket.class, ticketId);
+            if (!oldTicket.getProjectKey().equals(projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            Database.deleteTicket(session, ticketId, sc.getUserPrincipal().getName());
+            session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+
+        return Response.ok("Ticket deleted.").build();
+    }
 
     @Path("/projects/{key}/users")
     @OPTIONS
@@ -192,6 +232,34 @@ public class WebService
         {
             return e.getResponse();
         }
+    }
+
+    @Path("/projects/{key}/users/{username}")
+    @OPTIONS
+    @PermitAll
+    public Response removeUserFromProject()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{key}/users/{username}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String projectKey, @PathParam("username") String user)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+            Database.leaveProject(session, user, projectKey);
+            session.getTransaction().commit();
+        }
+
+        catch (WebApplicationException e)
+        {
+            return e.getResponse();
+        }
+
+        return Response.ok("User removed from project.").build();
     }
 
     @Path("/join")
