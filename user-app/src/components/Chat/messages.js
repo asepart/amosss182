@@ -4,6 +4,7 @@ import {URL} from '../Login/const';
 import {getAuth} from '../Login/auth';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
+import {ProjectInfo} from '../Projects/projectInfo';
 import {sendMessage, setMsg} from './sendMessages';
 import {
 	StackNavigator,
@@ -23,7 +24,7 @@ export default class GetMessages extends Component {
 
   constructor(props){
     super(props);
-    this.state ={ isLoading: true, message: "", error: ""
+    this.state ={ isLoading: true, message: "", error: "", ticketID:[]
     }
   }
 
@@ -35,24 +36,33 @@ export default class GetMessages extends Component {
    // this.setState({error: "message empty"});
   // }
     sendMessage();
+    makeApiCall();
+
 }
 
+makeApiCall() {
+  return fetch(URL + '/messages/3' , {method:'GET', headers: getAuth()})
+  .then((response) => response.json())
+  .then((responseJson) => {
+
+    this.setState({
+      isLoading: false,
+      dataSource: responseJson,
+    }, function(){
+
+    });
+
+  })
+  .catch((error) =>{
+    console.error(error);
+  });
+
+}
+
+
+
   componentDidMount(){
-    return fetch(URL + '/messages/3', {method:'GET', headers: getAuth()})
-      .then((response) => response.json())
-      .then((responseJson) => {
-
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson,
-        }, function(){
-
-        });
-
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
+    this.makeApiCall();
   }
 
 
