@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View} from 'react-native';
+import {Button,TextInput,ActivityIndicator,View, Picker} from 'react-native';
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
@@ -9,11 +9,11 @@ export default class TicketCreate extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			ticketName: "Useless Name",
-			ticketSummary: "Useless Summary",
-			ticketDescription: "Useless Description",
-			ticketCategory: "ONE_TIME_ERROR",
-			requiredObservations: "5"
+			ticketName: "",
+			ticketSummary: "",
+			ticketDescription: "",
+			ticketCategory: "",
+			requiredObservations: ""
 		};
 	}
 
@@ -75,26 +75,35 @@ export default class TicketCreate extends Component {
 		return(
 				<View>
 					<TextInput
+						placeholder="Name"
 						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({ticketName: text})}
 						value = {this.state.ticketName}
 					/>
 					<TextInput
+						placeholder="Summary"
 						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({ticketSummary: text})}
 						value = {this.state.ticketSummary}
 					/>
 					<TextInput
+						placeholder="Description"
 						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({ticketDescription: text})}
 						value = {this.state.ticketDescription}
 					/>
+					<Picker
+						style = {{height: 40, width: '22em', backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1}}
+						onValueChange = {(text) => this.setState({ticketCategory: text})}
+						selectedValue = {this.state.ticketCategory}
+					>
+						<Picker.Item label = "Category" value = "" />
+						<Picker.Item label = "ONE_TIME_ERROR" value = "ONE_TIME_ERROR" />
+						<Picker.Item label = "TRACE" value = "TRACE" />
+						<Picker.Item label = "BEHAVIOR" value = "BEHAVIOR" />
+					</Picker>
 					<TextInput
-						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
-						onChangeText = {(text) => this.setState({ticketCategory: text})}
-						value = {this.state.ticketCategory}
-					/>
-					<TextInput
+						placeholder="Required Observations"
 						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {this.state.requiredObservations}
