@@ -102,6 +102,11 @@ export default styles=StyleSheet.create({
     text: {
       color: '#FFF',
       fontSize: 15
+    },
+
+    icon: {
+      width:200,
+      height:100
     }
    
   });
