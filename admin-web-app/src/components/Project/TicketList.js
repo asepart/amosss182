@@ -35,7 +35,8 @@ export default class TicketList extends Component {
 		setState({
 			isAuth: true,
 			show: 'listUsers',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
 	
@@ -43,7 +44,8 @@ export default class TicketList extends Component {
 		setState({
 			isAuth: true,
 			show: 'createTicket',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
 
@@ -80,6 +82,10 @@ export default class TicketList extends Component {
 
 		return (
 			<View>
+				<Button
+					disabled = "true"
+					title = {"Tickets of " + this.props.name}
+				/>
 				<Button
 					onPress = { this.showCreateTicket.bind(this) }
 					title = "Create Ticket"

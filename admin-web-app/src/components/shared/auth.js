@@ -1,7 +1,7 @@
 import {URL, cki} from '../shared/const';
 
 var auth=false;
-var username='';
+export var username='';
 var psw='';
 
 export function setPSW(lpsw) {
