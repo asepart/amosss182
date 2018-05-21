@@ -43,8 +43,7 @@ export default class UserList extends Component {
 	showAddUser () {
 		setState({
 			isAuth: true,
-			show: 'addUser',
-			param: this.props.project
+			show: 'addUser'
 		});
 	}
 	
@@ -52,7 +51,8 @@ export default class UserList extends Component {
 		setState({
 			isAuth: true,
 			show: 'createTicket',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
 	
@@ -60,7 +60,8 @@ export default class UserList extends Component {
 		setState({
 			isAuth: true,
 			show: 'showTickets',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
 	
@@ -101,9 +102,8 @@ export default class UserList extends Component {
 		return (
 			<View>
 				<Button
-					onPress = { this.showAddUser.bind(this) }
-					title = "Add User"
-					color = "#0c3868"
+					disabled = "true"
+					title = {"Users of " + this.props.name}
 				/>
 				<Button
 					onPress = { this.showCreateTicket.bind(this) }
@@ -124,7 +124,11 @@ export default class UserList extends Component {
 			</View>
 		);
 		}
-		return( <View>
+		return(<View>
+			<Button
+				disabled = "true"
+				title = {"Users"}
+			/>
 			<Button
 				onPress = { this.showAddUser.bind(this) }
 				title = "Add User"

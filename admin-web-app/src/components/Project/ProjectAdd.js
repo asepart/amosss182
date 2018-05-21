@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button,TextInput,ActivityIndicator,View} from 'react-native';
-import {getAuth} from '../shared/auth';
+import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
@@ -10,7 +10,8 @@ export default class ProjectAdd extends Component {
 		super(props);
 		this.state = {
 			projectName: 'Useless Project',
-			entryKey: '7C2310F49B45203BF5E4DDC2A12C94DA'
+			entryKey: '7C2310F49B45203BF5E4DDC2A12C94DA',
+			owner: username
 		};
 	}
 
@@ -23,17 +24,18 @@ export default class ProjectAdd extends Component {
 	}
 
 	async putProject() {
-		let auth = getAuth();
-		await fetch(URL + '/projects/' + this.state.projectName, {
-				method: 'PUT',
+		let auth = getAuthForPost();
+		await fetch(URL + '/projects', {
+				method: 'POST',
 				headers: auth,
-				body: this.state.entryKey
+				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: this.state.owner})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
 				this.setState({
 					projectName: "",
-					entryKey: ""
+					entryKey: "",
+					owner: ""
 				}, function() {});
 			})
 			.catch((error) => {

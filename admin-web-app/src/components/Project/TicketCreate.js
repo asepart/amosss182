@@ -29,7 +29,8 @@ export default class TicketCreate extends Component {
 		setState({
 			isAuth: true,
 			show: 'listUsers',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
 	
@@ -37,7 +38,8 @@ export default class TicketCreate extends Component {
 		setState({
 			isAuth: true,
 			show: 'showTickets',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
 

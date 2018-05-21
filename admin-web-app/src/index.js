@@ -17,7 +17,8 @@ class Page extends Component{
 		this.setState ({
 			isAuth: getState().isAuth,
 			show: getState().show,
-			param: getState().param
+			param: getState().param,
+			name: getState().name
 		});
 	}
 
@@ -44,13 +45,13 @@ class Page extends Component{
 			case 'addProject':
 				return (<ProjectAdd/>);
 			case 'listUsers':
-				return (<UserList project={this.state.param}/>);
+				return (<UserList project={this.state.param} name={this.state.name}/>);
 			case 'addUser':
 				return (<UserAdd project={this.state.param}/>);
 			case 'createTicket':
-				return (<TicketCreate project={this.state.param}/>);
+				return (<TicketCreate project={this.state.param} name={this.state.name}/>);
 			case 'showTickets':
-				return (<TicketList project={this.state.param}/>);
+				return (<TicketList project={this.state.param} name={this.state.name}/>);
 			default:
 				return (<ProjectList/>);
 		}
