@@ -10,8 +10,6 @@ matrix:
 
     - language: node_js
       node_js: 8
-      install:
-        - npm install -g codecov
       script:
         - cd user-app && npm install && npm test -- --coverage
         - cd ../admin-web-app && npm install && npm test -- --coverage
