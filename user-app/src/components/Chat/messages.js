@@ -4,34 +4,39 @@ import {URL} from '../Login/const';
 import {getAuth} from '../Login/auth';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
+import {setMsg, sendMessage} from './sendMessages'
 import {ProjectInfo} from '../Projects/projectInfo';
-import {sendMessage, setMsg} from './sendMessages';
 import {
 	StackNavigator,
   } from 'react-navigation';
 
 export default class GetMessages extends Component {
-
-    static navigationOptions= {
-		title: 'Chat',
+  
+    static navigationOptions= ({navigation}) => ({
+      title: 'Chat',
+    ticketID: navigation.state.params.id,
+    // headerRight:<TouchableOpacity onPress={() => navigation.navigate("Home")}
 		headerStyle: {
 			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
 		}
-    } 
+    }
+    ) 
+    
+     
 
   constructor(props){
     super(props);
-    this.state ={ isLoading: true, message: "", error: "", ticketID:[]
+    this.state ={ isLoading: true, message: "", error: ""
     }
   }
 
   async onSendPressed() {
    
 
-   setMsg(this.state.message);
+  setMsg(this.state.message);
    //if (message === '') {
    // this.setState({error: "message empty"});
   // }
@@ -40,8 +45,12 @@ export default class GetMessages extends Component {
 
 }
 
+
+
 async makeApiCall() {
-  return fetch(URL + '/messages/1' , {method:'GET', headers: getAuth()})
+  
+     let ticketID = this.props.navigation.state.params.id;
+  return fetch(URL + '/messages/'+ ticketID,   {method:'GET', headers: getAuth()})
   .then((response) => response.json())
   .then((responseJson) => {
 

@@ -11,6 +11,7 @@ import {key} from './keyValid';
 window.btoa = require('Base64').btoa;
 
 
+
 export default class ProjectInfo extends Component {
 
   constructor(props) {
@@ -18,6 +19,7 @@ export default class ProjectInfo extends Component {
 		this.state = {
 			isLoading: true,
             ticketList: [],
+           
 		};
 	}
 	
@@ -29,7 +31,7 @@ export default class ProjectInfo extends Component {
               .then((responseJson) => {
                 this.setState({
                     isLoading: false,
-                    ticketList: responseJson
+                    ticketList: responseJson,
                 }, function() {});
               }).catch((error) => {
                 console.error(error);
@@ -47,9 +49,15 @@ export default class ProjectInfo extends Component {
 		}
     } 
 
+    onPressItem = (id) => {
+      navigate("Sixth", { name: "GetMessage" }
+      , {id:item.id}
+      )
+    }
 
     render() {
       var {params} = this.props.navigation.state;
+      const { navigate } = this.props.navigation;
       
       if (this.state.isLoading) {
 			return (
@@ -64,9 +72,9 @@ export default class ProjectInfo extends Component {
                 <FlatList
                   style={styles.textLarge}
                   data={this.state.ticketList}
-                  renderItem={({item}) => <TouchableOpacity
-                 onPress={() =>{const { navigate } = this.props.navigation;
-                 navigate("Sixth", { name: "GetMessage" })} }
+                  renderItem={({item}) =>
+                  <TouchableOpacity
+                 onPress={()=>{this.onPressItem(item)}}
                    style={styles.buttonContainer}>
                    <Text style={styles.buttonText}>
             {item.id}, {item.ticketSummary}, {item.ticketCategory}
@@ -74,7 +82,9 @@ export default class ProjectInfo extends Component {
             </TouchableOpacity>}
                   keyExtractor={(item, index) => index}
                 />
+
         </View>
+        
       );
     }
   }

@@ -1,5 +1,6 @@
 import {URL} from '../Login/const';
 import {getAuth} from '../Login/auth';
+import {ProjectInfo} from '../Projects/projectInfo';
 
 export var msg = "";
 
@@ -12,7 +13,7 @@ export function setMsg(mes) {
 
 
 export async function sendMessage() {
-     fetch(URL + '/messages/1', {
+     fetch(URL + '/messages/1' ,{
             method: 'POST',
             headers: getAuth(),
             body:  msg
