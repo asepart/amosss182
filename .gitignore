@@ -3,3 +3,5 @@
 webservice/target
 
 **/.DS_Store
+
+.vscode/

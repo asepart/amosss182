@@ -11,6 +11,8 @@ import UserAdd from './components/Project/UserAdd';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 import {isAuth} from './components/shared/auth';
+import { BrowserRouter } from 'react-router-dom'
+
 
 class Page extends Component{
 	handleGlobalState (){
@@ -57,5 +59,9 @@ class Page extends Component{
 	}
 }
 
-ReactDOM.render(<Page />, document.getElementById('root'));
+ReactDOM.render((
+	<BrowserRouter>
+		<Page />
+	</BrowserRouter>
+), document.getElementById('root'));
 registerServiceWorker();
