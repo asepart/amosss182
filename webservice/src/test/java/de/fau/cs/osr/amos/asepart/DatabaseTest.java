@@ -58,7 +58,7 @@ public class DatabaseTest
             Database.putProject(session, "tempkey", "tempproject", "testadmin");
             Project p = Database.getProject(session, "tempkey");
 
-            ticketId = Database.putTicket(session, "testadmin", "tempkey", "Temp Ticket",
+            ticketId = Database.putTicket(session,  "tempkey", "Temp Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.BEHAVIOR,
@@ -89,7 +89,7 @@ public class DatabaseTest
 
             Database.putProject(session, "myTestKey", "myTestName", "testadmin");
 
-            Integer id = Database.putTicket(session, "testadmin", "myTestKey", "Demo Ticket",
+            Integer id = Database.putTicket(session, "myTestKey", "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
@@ -115,25 +115,25 @@ public class DatabaseTest
             Database.putProject(session, "key1", "name1", "testadmin");
             Database.putProject(session, "key2", "name2", "testadmin");
 
-            Integer id1 = Database.putTicket(session, "testadmin", "key1", "Demo Ticket 1",
+            Integer id1 = Database.putTicket(session, "key1", "Demo Ticket 1",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Integer id2 = Database.putTicket(session, "testadmin", "key1", "Demo Ticket 2",
+            Integer id2 = Database.putTicket(session, "key1", "Demo Ticket 2",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Integer id3 = Database.putTicket(session, "testadmin", "key1", "Demo Ticket 3",
+            Integer id3 = Database.putTicket(session, "key1", "Demo Ticket 3",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Integer id4 = Database.putTicket(session, "testadmin", "key2", "Demo Ticket 4",
+            Integer id4 = Database.putTicket(session, "key2", "Demo Ticket 4",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
@@ -196,7 +196,7 @@ public class DatabaseTest
 
             Database.putProject(session, "chatwithme", "chattest", "testadmin");
 
-            Integer ticketId = Database.putTicket(session, "testadmin", "chatwithme", "Chat Ticket",
+            Integer ticketId = Database.putTicket(session, "chatwithme", "Chat Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
