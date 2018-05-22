@@ -43,7 +43,7 @@ class Page extends Component{
 		}
 		switch (this.state.show){
 			case 'addProject':
-				return (<ProjectAdd/>);
+				return (<ProjectAdd project={this.state.param} name={this.state.name}/>);
 			case 'listUsers':
 				return (<UserList project={this.state.param} name={this.state.name}/>);
 			case 'addUser':
