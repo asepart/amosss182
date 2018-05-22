@@ -83,26 +83,6 @@ export default class UserList extends Component {
 			)
 		}
 
-		const columns = [
-			{
-				Header: 'Given Name',
-				accessor: 'firstName'
-			}, {
-				Header: 'Surname',
-				accessor: 'lastName'
-			}, {
-				Header: 'Login Name',
-				accessor: 'loginName'
-			}, {
-				Header: 'Phone Number',
-				accessor: 'phone' // String-based value accessors!
-			}, {
-				Header: '',
-				accessor: '',
-				Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project}/>
-			}
-		]
-
 		if (this.props.project !== '') {
 		return (
 			<View>
@@ -125,7 +105,25 @@ export default class UserList extends Component {
 					title = "Back"
 					color = "#0e4a80"
 				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
+				<ReactTable data={this.state.dataSource} columns={ [
+					{
+						Header: 'Given Name',
+						accessor: 'firstName'
+					}, {
+						Header: 'Surname',
+						accessor: 'lastName'
+					}, {
+						Header: 'Login Name',
+						accessor: 'loginName'
+					}, {
+						Header: 'Phone Number',
+						accessor: 'phone' // String-based value accessors!
+					}, {
+						Header: '',
+						accessor: '',
+						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project}/>
+					}
+				] }/>
 			</View>
 		);
 		}
@@ -144,7 +142,21 @@ export default class UserList extends Component {
 				title = "Back"
 				color = "#0e4a80"
 			/>
-			<ReactTable data={this.state.dataSource} columns={columns}/>
+			<ReactTable data={this.state.dataSource} columns={ [
+				{
+					Header: 'Given Name',
+					accessor: 'firstName'
+				}, {
+					Header: 'Surname',
+					accessor: 'lastName'
+				}, {
+					Header: 'Login Name',
+					accessor: 'loginName'
+				}, {
+					Header: 'Phone Number',
+					accessor: 'phone' // String-based value accessors!
+				}
+			] }/>
 		</View>
 		);
 	}
