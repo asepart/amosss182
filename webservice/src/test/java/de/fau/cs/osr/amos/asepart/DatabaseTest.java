@@ -71,7 +71,7 @@ public class DatabaseTest
         {
             session.beginTransaction();
 
-            Database.deleteProject(session, "tempkey", "testadmin");
+            Database.deleteProject(session, "tempkey");
 
             assertFalse(Database.isProject(session, "tempkey"));
             assertFalse(Database.isTicket(session, ticketId));
@@ -175,8 +175,8 @@ public class DatabaseTest
             Database.joinProject(session, "testbb", "join2");
 
             User[] expected = new User[]{Database.getUser(session, "testaa"), Database.getUser(session, "testbb")};
-            User[] actual1 = Database.getUsersOfProject(session, "testadmin", "join1");
-            User[] actual2 = Database.getUsersOfProject(session, "testadmin", "join2");
+            User[] actual1 = Database.getUsersOfProject(session, "join1");
+            User[] actual2 = Database.getUsersOfProject(session, "join2");
 
             session.getTransaction().commit();
 

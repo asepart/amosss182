@@ -3,7 +3,6 @@ package de.fau.cs.osr.amos.asepart;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Query;
-import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -116,28 +115,12 @@ public class Database
 
     static void putProject(Session session, Project project)
     {
-        if (isProject(session, project.getEntryKey()))
-        {
-            Project oldProject = getProject(session, project.getEntryKey());
-
-            // detect owner change
-            if (!oldProject.getOwner().equals(project.getOwner()))
-            {
-                throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
-            }
-        }
-
         session.save(project);
     }
 
-    static void deleteProject(Session session, String key, String owner)
+    static void deleteProject(Session session, String key)
     {
         Project project = getProject(session, key);
-
-        if (!project.getOwner().equals(owner))
-        {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
-        }
 
         Query ticketQuery = session.createQuery("select id from Ticket where projectKey = :projectKey");
         ticketQuery.setParameter("projectKey", key);
@@ -145,9 +128,8 @@ public class Database
 
         for (Integer id : ticketIds)
         {
-            deleteTicket(session, id, owner);
+            deleteTicket(session, id);
         }
-
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
@@ -172,22 +154,7 @@ public class Database
 
     static Project getProject(Session session, String key)
     {
-        if (!isProject(session, key))
-        {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project not found.").build());
-        }
-
         return session.get(Project.class, key);
-    }
-
-    static Project getProject(Session session, String key, String owner)
-    {
-        Project project = getProject(session, key);
-
-        if (!project.getOwner().equals(owner))
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
-
-        return project;
     }
 
     static Project[] listProjects(Session session, String owner)
@@ -211,10 +178,8 @@ public class Database
         return projects;
     }
 
-    static User[] getUsersOfProject(Session session, String owner, String projectKey)
+    static User[] getUsersOfProject(Session session, String projectKey)
     {
-        Project project = getProject(session, projectKey, owner);
-
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
 
@@ -248,6 +213,12 @@ public class Database
         List<Membership> resultList = session.createQuery(criteria).getResultList();
 
         return resultList.size() != 0;
+    }
+
+    static boolean isAdminOfProject(Session session, String adminName, String projectKey)
+    {
+        Project project = getProject(session, projectKey);
+        return project != null && project.getOwner().equals(adminName);
     }
 
     static void joinProject(Session session, String userName, String entryKey)
@@ -306,24 +277,17 @@ public class Database
         ticket.setRequiredObservations(requiredObservations);
         ticket.setProjectKey(projectKey);
 
-        return putTicket(session, adminName, projectKey, ticket);
+        return putTicket(session, adminName, ticket);
     }
 
-    static Integer putTicket(Session session, String adminName, String projectKey, Ticket ticket)
+    static Integer putTicket(Session session, String adminName, Ticket ticket)
     {
-        getProject(session, projectKey, adminName); // triggers exception if project not found or insufficient permissions
-
-        ticket.setProjectKey(projectKey);
         return (Integer) session.save(ticket);
     }
 
-    static void deleteTicket(Session session, Integer ticketId, String owner)
+    static void deleteTicket(Session session, Integer ticketId)
     {
         Ticket oldTicket = getTicket(session, ticketId);
-        Project project = getProject(session, oldTicket.getProjectKey());
-
-        if (!project.getOwner().equals(owner))
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of the associated project.").build());
 
         Query msgQuery = session.createQuery("delete from Message where ticketId = :ticketId");
         msgQuery.setParameter("ticketId", ticketId);
@@ -354,12 +318,12 @@ public class Database
 
         if (role.equals("Admin") && !project.getOwner().equals(loginName))
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
+            throw new WebApplicationException("You are not the admin of this project.");
         }
 
         else if (role.equals("User") && !isUserMemberOfProject(session, loginName, projectKey))
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You have not joined that project.").build());
+            throw new WebApplicationException("You have not joined that project.");
         }
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -384,12 +348,12 @@ public class Database
 
         if (role.equals("Admin") && !project.getOwner().equals(sender))
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
+            throw new WebApplicationException("You are not the admin of this project.");
         }
 
         else if (!isUserMemberOfProject(session, sender, ticket.getProjectKey()))
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You have not joined that project.").build());
+            throw new WebApplicationException("You have not joined that project.");
         }
 
         Message m = new Message();
@@ -407,12 +371,12 @@ public class Database
 
         if (role.equals("Admin") && !project.getOwner().equals(receiver))
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You are not the admin of this project.").build());
+            throw new WebApplicationException("You are not the admin of this project.");
         }
 
         else if (!isUserMemberOfProject(session, receiver, ticket.getProjectKey()))
         {
-            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity("You have not joined that project.").build());
+            throw new WebApplicationException("You have not joined that project.");
         }
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -445,7 +409,7 @@ public class Database
     static void putUser(Session session, User user)
     {
         if (isAdmin(session, user.getLoginName()))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Admin with same login name already exists.").build());
+            throw new WebApplicationException("Admin with same login name already exists.");
 
         String password = user.getPassword();
         user.setPassword(hashPassword(password));
@@ -455,11 +419,6 @@ public class Database
 
     static User getUser(Session session, String loginName)
     {
-        if (!isUser(session, loginName))
-        {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("User not found.").build());
-        }
-
         User user = session.get(User.class, loginName);
         user.setPassword(null);
 
@@ -504,7 +463,7 @@ public class Database
     static void putAdmin(Session session, Admin admin)
     {
         if (isUser(session, admin.getLoginName()))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User with same login name already exists.").build());
+            throw new WebApplicationException("User with same login name already exists.");
 
         String password = admin.getPassword();
         admin.setPassword(hashPassword(password));
@@ -514,11 +473,6 @@ public class Database
 
     static Admin getAdmin(Session session, String loginName)
     {
-        if (!isAdmin(session, loginName))
-        {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Admin not found.").build());
-        }
-
         Admin admin = session.get(Admin.class, loginName);
         admin.setPassword(null);
 
