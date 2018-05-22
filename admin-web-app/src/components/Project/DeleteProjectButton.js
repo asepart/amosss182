@@ -6,17 +6,19 @@ import {URL} from '../shared/const';
 
 export default class DeleteProjectButton extends Component {
 
-	deleteProject() {
-    var url = URL;
-		url += '/projects/' + this.props.proj.row.entryKey;
-    fetch(url, {method:'DELETE', headers: getAuth()})
-      .then(response => response.json());
+  showDeleteProjectConfirm() {
+		setState({
+			isAuth: true,
+			show: 'deleteProject',
+			param: this.props.proj.row.entryKey,
+			name: this.props.proj.row.projectName
+		});
 	}
 
 	render() {
 		return (	// TODO: add edit icon instead of text here
 			<Text
-				onPress = { this.deleteProject.bind(this) }
+				onPress = { this.showDeleteProjectConfirm.bind(this) }
 				style={{color: '#5daedb'}}
 			>
 				DELETE
