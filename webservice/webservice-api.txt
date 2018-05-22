@@ -24,7 +24,7 @@ The following REST operations are available:
   Status code:    [200 OK]           if credentials are valid.
                   [401 Unauthorized] if credentials are not valid.
 
-- List existing projects the admin is able to view
+- List existing projects the admin is able to view.
 
   HTTP operation: GET
   Path:           /projects
@@ -33,59 +33,80 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
 
-- Create new ticket in project
+- Create new project or change existing project.
 
   HTTP operation: POST
-  Path:           /projects/{name}/tickets
+  Path:           /projects
   Roles:          Admin
-  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null).
+  Request-Body:   Project information as JSON object (project name, owner and entry key).
   Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if project does not exist.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin.
+                  [403 Forbidden]    if the permissions are not sufficient (e.g. you are not an admin/do not own the project).
+
+- Delete project
+
+  HTTP operation: DELETE
+  Path:           /projects/{key}
+  Roles:          Admin
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not found]    if project did not exist before request.
+
+- Create new ticket or change existing ticket.
+
+  HTTP operation: POST
+  Path:           /projects/{key}/tickets
+  Roles:          Admin
+  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null, id optional).
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not found]    if project does not exist.
 
 - List tickets of project
 
   HTTP operation: GET
-  Path:           /projects/{name}/tickets
+  Path:           /projects/{key}/tickets
   Roles:          Admin, User
   Returns:        JSON array of tickets.
   Status code:    [200 OK]           in case of success
-                  [401 Unauthorized] if the provided username or password is invalid,
-                  [403 Forbidden]    if the authorized user is not an admin for the project.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project does not exist.
 
-- Create new project with an entry key
+- Delete ticket from project.
 
-  HTTP operation: PUT
-  Path:           /projects/{name}
+  HTTP operation: DELETE
+  Path:           /projects/{key}/tickets/{id}
   Roles:          Admin
-  Request-Body:   Entry key as ASCII string.
-  Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if project already exists.
+  Status code:    [200 OK]           in case of success
+                  [400 Bad Request]  if ticket is not part of project.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the specified user is not an admin.
-
-- Add user to project
-
-  HTTP operation: POST
-  Path:           /projects/{name}/users/{username}
-  Roles:          Admin
-  Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if user is already member of project or user/project does not exist.
-                  [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin for the project.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not found]    if project or ticket did not exist before request.
 
 - List users of project
 
   HTTP operation: GET
-  Path:           /projects/{name}/users
+  Path:           /projects/{key}/users
   Roles:          Admin
   Returns:        JSON array of users.
   Status code:    [200 OK]           in case of success
-                  [401 Unauthorized] if the provided username or password is invalid,
-                  [403 Forbidden]    if the authorized user is not an admin for the project.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project does not exist.
+
+- Delete user from project
+
+  HTTP operation: DELETE
+  Path:           /projects/{key}/users/{username}
+  Roles:          Admin
+  Status code:    [200 OK]           in case of success
+                  [400 Bad Request]  if user has not joined.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not found]    if project does not exist or user was not member of project.
 
 - Join project as user
 
@@ -96,7 +117,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user has already joined.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not a member of the project.
+                  [403 Forbidden]    if the authorized account is not an user account.
                   [404 Not found]    if entry key is invalid.
 
 - Get name of the project the user got an entry key for
@@ -107,7 +128,7 @@ The following REST operations are available:
   Returns:        Name of project as an ASCII string.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not a member of the project.
+                  [403 Forbidden]    if the authorized account is not an user account.
                   [404 Not found]    if entry key is invalid.
 
 - Send a message in a ticket group chat
@@ -118,7 +139,7 @@ The following REST operations are available:
   Request Body:   The chat message as ASCII text.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not a member of the associated project.
+                  [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not found]    if ticket does not exist.
 
 - Lists messages of a ticket group chat
@@ -129,19 +150,19 @@ The following REST operations are available:
   Returns:        JSON array of chat messages.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not a member of the associated project.
+                  [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not found]    if ticket does not exist.
 
-- Create user
+- Create or edit user
 
   HTTP operation: POST
   Path:           /users
   Roles:          Admin
-  Request-Body:   User information as JSON object (firstName and lastName not to be null).
+  Request-Body:   User information as JSON object (firstName, lastName and phone not to be null).
   Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if user already exists or user information is invalid.
+                  [400 Bad Request]  if admin with same name exists.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin.
+                  [403 Forbidden]    if the authorized account is not an admin account.
 
 - List users
 
@@ -151,18 +172,18 @@ The following REST operations are available:
   Returns:        JSON array of users.
                   [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin.
+                  [403 Forbidden]    if the authorized account is not an admin account.
 
-- Create admin
+- Create or edit admin
 
   HTTP operation: POST
   Path:           /admins
   Roles:          Admin
   Request-Body:   Admin information as JSON object (firstName and lastName not to be null).
   Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if admin already exists or admin information is invalid.
+                  [400 Bad Request]  if user with same name exists.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin.
+                  [403 Forbidden]    if the authorized account is not an admin account.
 
 - List admins
 
@@ -172,4 +193,4 @@ The following REST operations are available:
   Returns:        JSON array of admins.
                   [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized user is not an admin.
+                  [403 Forbidden]    if the authorized account is not an admin account.

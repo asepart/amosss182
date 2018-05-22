@@ -20,36 +20,16 @@ export default class ProjectInfo extends Component {
 	}
   
   componentDidMount() {
-        fetch(URL + '/join?key=' + key, 
-              {method:'GET', headers: 
-                 {'X-ASEPART-Role': 'User',
-                  'Authorization': 'Basic ' + btoa(username + ":" + psw)
-                 }
-              }
-        )
-        .then(response => {
-          return response.text();
-        }).then(responseText => {
-          if(responseText !== '') {
+        fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
+          .then((response) => response.json())
+          .then((responseJson) => {
             this.setState({
-				isLoading: false,
-				projectName: responseText,
-			}, function() {});
-            
-            fetch(URL + '/projects/' + this.state.projectName + '/tickets', {method:'GET', headers: getAuth()})
-              .then((response) => response.json())
-              .then((responseJson) => {
-                this.setState({
-                    isLoading: false,
-                    ticketList: responseJson
-                }, function() {});
-              }).catch((error) => {
-                console.error(error);
-              }); 
-          }
-		}).catch((error) => {
-			console.error(error);
-		});
+              isLoading: false,
+              ticketList: responseJson
+            }, function() {});
+          }).catch((error) => {
+             console.error(error);
+          }); 
 	}
   
     static navigationOptions= {

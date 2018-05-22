@@ -5,13 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.ws.rs.WebApplicationException;
-
 import org.hibernate.Session;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
 
-public class WebServiceTest
+public class DatabaseTest
 {
     @BeforeAll
     public static void createAccounts()
@@ -38,13 +36,47 @@ public class WebServiceTest
                     "Jon", "Snow", "00000000000");
             User u = Database.getUser(session, "knowsnothing");
 
-            Database.putProject(session, "testadmin", "test0", "1234");
-            Project p = Database.getProject(session, "testadmin", "test0");
+            Database.putProject(session, "testkey", "testproject", "testadmin");
+            Project p = Database.getProject(session, "testkey");
 
             session.getTransaction().commit();
 
             assertEquals("00000000000", u.getPhone());
-            assertEquals("1234", p.getEntryKey());
+            assertEquals("testkey", p.getEntryKey());
+        }
+    }
+
+    @Test
+    public void testCreateDelete()
+    {
+        Integer ticketId;
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.putProject(session, "tempkey", "tempproject", "testadmin");
+            Project p = Database.getProject(session, "tempkey");
+
+            ticketId = Database.putTicket(session, "testadmin", "tempkey", "Temp Ticket",
+                    "This is the ticket summary",
+                    "Here is the description",
+                    TicketCategory.BEHAVIOR,
+                    42);
+
+            session.getTransaction().commit();
+        }
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            Database.deleteProject(session, "tempkey");
+
+            assertFalse(Database.isProject(session, "tempkey"));
+            assertFalse(Database.isTicket(session, ticketId));
+
+            session.getTransaction().commit();
         }
     }
 
@@ -55,9 +87,9 @@ public class WebServiceTest
         {
             session.beginTransaction();
 
-            Database.putProject(session, "testadmin", "test", "12345");
+            Database.putProject(session, "myTestKey", "myTestName", "testadmin");
 
-            Integer id = Database.putTicket(session, "testadmin", "test", "Demo Ticket",
+            Integer id = Database.putTicket(session, "testadmin", "myTestKey", "Demo Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
@@ -80,45 +112,45 @@ public class WebServiceTest
         {
             session.beginTransaction();
 
-            Database.putProject(session, "testadmin", "test1", "123456");
-            Database.putProject(session, "testadmin", "test2", "1234567");
+            Database.putProject(session, "key1", "name1", "testadmin");
+            Database.putProject(session, "key2", "name2", "testadmin");
 
-            Integer id = Database.putTicket(session, "testadmin", "test1", "Demo Ticket 1",
+            Integer id1 = Database.putTicket(session, "testadmin", "key1", "Demo Ticket 1",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Integer id2 = Database.putTicket(session, "testadmin", "test1", "Demo Ticket 2",
+            Integer id2 = Database.putTicket(session, "testadmin", "key1", "Demo Ticket 2",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Integer id3 = Database.putTicket(session, "testadmin", "test1", "Demo Ticket 3",
+            Integer id3 = Database.putTicket(session, "testadmin", "key1", "Demo Ticket 3",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Integer id4 = Database.putTicket(session, "testadmin", "test2", "Demo Ticket 4",
+            Integer id4 = Database.putTicket(session, "testadmin", "key2", "Demo Ticket 4",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
                     13);
 
-            Ticket t = Database.getTicket(session, id);
-            Ticket[] ts = Database.getTicketsOfProject(session, "testadmin", "Admin", "test1");
-            Ticket[] ts2 = Database.getTicketsOfProject(session, "testadmin", "Admin", "test2");
+            Ticket t = Database.getTicket(session, id1);
+            Ticket[] ts1 = Database.getTicketsOfProject(session, "testadmin", "Admin", "key1");
+            Ticket[] ts2 = Database.getTicketsOfProject(session, "testadmin", "Admin", "key2");
 
             session.getTransaction().commit();
 
             assertEquals(t.getTicketSummary(), "This is the ticket summary");
-            assertEquals(ts[0].getTicketName(), "Demo Ticket 1");
-            assertEquals(ts[1].getTicketName(), "Demo Ticket 2");
-            assertEquals(ts[2].getTicketName(), "Demo Ticket 3");
+            assertEquals(ts1[0].getTicketName(), "Demo Ticket 1");
+            assertEquals(ts1[1].getTicketName(), "Demo Ticket 2");
+            assertEquals(ts1[2].getTicketName(), "Demo Ticket 3");
             assertEquals(ts2[0].getTicketName(), "Demo Ticket 4");
-            assertNotEquals(ts[0], ts[1]);
+            assertNotEquals(ts1[0], ts1[1]);
         }
     }
 
@@ -134,17 +166,17 @@ public class WebServiceTest
             Database.putUser(session, "testbb", "supergeheim",
                     "TestFirstNameP2", "TestLastNameP2", "01702222222");
 
-            Database.putProject(session, "testadmin", "Test1", "foo");
-            Database.putProject(session, "testadmin", "Test2", "bar");
+            Database.putProject(session, "join1", "Test1", "testadmin");
+            Database.putProject(session, "join2", "Test2", "testadmin");
 
-            Database.addUserToProject(session, "testadmin", "testaa", "Test1");
-            Database.addUserToProject(session, "testadmin", "testbb", "Test1");
-            Database.addUserToProject(session, "testadmin", "testaa", "Test2");
-            Database.addUserToProject(session, "testadmin", "testbb", "Test2");
+            Database.joinProject(session, "testaa", "join1");
+            Database.joinProject(session, "testaa", "join2");
+            Database.joinProject(session, "testbb", "join1");
+            Database.joinProject(session, "testbb", "join2");
 
             User[] expected = new User[]{Database.getUser(session, "testaa"), Database.getUser(session, "testbb")};
-            User[] actual1 = Database.getUsersOfProject(session, "testadmin", "Test1");
-            User[] actual2 = Database.getUsersOfProject(session, "testadmin", "Test2");
+            User[] actual1 = Database.getUsersOfProject(session, "join1");
+            User[] actual2 = Database.getUsersOfProject(session, "join2");
 
             session.getTransaction().commit();
 
@@ -162,9 +194,9 @@ public class WebServiceTest
         {
             session.beginTransaction();
 
-            Database.putProject(session, "testadmin", "chattest", "32423");
+            Database.putProject(session, "chatwithme", "chattest", "testadmin");
 
-            Integer ticketId = Database.putTicket(session, "testadmin", "chattest", "Chat Ticket",
+            Integer ticketId = Database.putTicket(session, "testadmin", "chatwithme", "Chat Ticket",
                     "This is the ticket summary",
                     "Here is the description",
                     TicketCategory.ONE_TIME_ERROR,
@@ -173,7 +205,7 @@ public class WebServiceTest
             Database.putUser(session, "chatuser", "lolrofl",
                     "Chat", "User", "3242342323");
 
-            Database.addUserToProject(session, "testadmin", "chatuser", "chattest");
+            Database.joinProject(session, "chatuser", "chatwithme");
 
             String message = "Hello, World!";
 

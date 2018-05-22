@@ -32,8 +32,8 @@ public class Ticket
     @Column(name = "required_observations", nullable = false)
     private Integer requiredObservations;
     
-    @Column(name = "project_name")
-    private String projectName;
+    @Column(name = "project_key")
+    private String projectKey;
     
     public Integer getId()
     {
@@ -94,14 +94,14 @@ public class Ticket
     {
         this.requiredObservations = requiredObservations;
     }
-    
-    public String getProjectName()
+
+    public String getProjectKey()
     {
-        return projectName;
+        return projectKey;
     }
 
-    public void setProjectName(String projectName)
+    public void setProjectKey(String projectKey)
     {
-        this.projectName = projectName;
+        this.projectKey = projectKey;
     }
 }
