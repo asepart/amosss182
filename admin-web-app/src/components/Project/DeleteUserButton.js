@@ -6,17 +6,20 @@ import {URL} from '../shared/const';
 
 export default class DeleteUserButton extends Component {
 
-	deleteTicket() {
-    var url = URL;
-		url += '/projects/' + this.props.keyFromParent + '/users/' + this.props.proj.row.loginName;
-    fetch(url, {method:'DELETE', headers: getAuth()})
-      .then(response => response.json());
+  showDeleteUserConfirm() {
+		setState({
+			isAuth: true,
+			show: 'deleteUser',
+			param: this.props.keyFromParent,
+      name: this.props.nameFromParent,
+      id: this.props.proj.row.loginName
+		});
 	}
 
 	render() {
 		return (	// TODO: add edit icon instead of text here
 			<Text
-				onPress = { this.deleteTicket.bind(this) }
+				onPress = { this.showDeleteUserConfirm.bind(this) }
 				style={{color: '#5daedb'}}
 			>
 				DELETE
