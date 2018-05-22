@@ -49,15 +49,10 @@ export default class ProjectInfo extends Component {
 		}
     } 
 
-    onPressItem = (id) => {
-      navigate("Sixth", { name: "GetMessage" }
-      , {id:item.id}
-      )
-    }
 
     render() {
-      var {params} = this.props.navigation.state;
-      const { navigate } = this.props.navigation;
+    //  var {params} = this.props.navigation.state;
+     // const { navigate } = this.props.navigation;
       
       if (this.state.isLoading) {
 			return (
@@ -74,13 +69,15 @@ export default class ProjectInfo extends Component {
                   data={this.state.ticketList}
                   renderItem={({item}) =>
                   <TouchableOpacity
-                 onPress={()=>{this.onPressItem(item)}}
+                 onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id})
+                }
                    style={styles.buttonContainer}>
                    <Text style={styles.buttonText}>
             {item.id}, {item.ticketSummary}, {item.ticketCategory}
             </Text>
             </TouchableOpacity>}
-                  keyExtractor={(item, index) => index}
+                 keyExtractor={(item, index) => index}
+                  //keyExtractor={item => item.id}
                 />
 
         </View>

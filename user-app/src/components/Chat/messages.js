@@ -11,22 +11,20 @@ import {
   } from 'react-navigation';
 
 export default class GetMessages extends Component {
-  
-    static navigationOptions= ({navigation}) => ({
-      title: 'Chat',
-    ticketID: navigation.state.params.id,
-    // headerRight:<TouchableOpacity onPress={() => navigation.navigate("Home")}
-		headerStyle: {
-			backgroundColor:'#5daedb'
-		},
-		headerTitleStyle: {
-			color:'#FFF'
-		}
-    }
-    ) 
-    
-     
 
+  //static navigationOptions= {
+	//	title: 'Chat',
+	//	headerStyle: {
+      // headerRight:<TouchableOpacity onPress={() => navigation.navigate("Home")}
+	//		backgroundColor:'#5daedb'
+  //  },
+//		headerTitleStyle: {
+//			color:'#FFF'
+//		}
+//  }
+
+ 
+  
   constructor(props){
     super(props);
     this.state ={ isLoading: true, message: "", error: ""
@@ -49,8 +47,8 @@ export default class GetMessages extends Component {
 
 async makeApiCall() {
   
-     let ticketID = this.props.navigation.state.params.id;
-  return fetch(URL + '/messages/'+ ticketID,   {method:'GET', headers: getAuth()})
+  let ticketID = this.props.navigation.state.params.id;  
+  return fetch(URL + '/messages/' + ticketID ,   {method:'GET', headers: getAuth()})
   .then((response) => response.json())
   .then((responseJson) => {
 
@@ -69,6 +67,7 @@ async makeApiCall() {
 }
 
   componentDidMount(){
+  
     this.makeApiCall();
   }
 
@@ -89,7 +88,7 @@ async makeApiCall() {
         <FlatList
           data={this.state.dataSource}
           renderItem={({item}) => <Text style={styles.text}>{item.sender} : {item.content} </Text> }
-          keyExtractor={(item, id) => id}
+          keyExtractor={(item, index) => index}
         />
 
         <TextInput onChangeText={(text) => this.setState({message: text})} placeholder="Message" underlineColorAndroid="transparent" style={styles.inputLong} />

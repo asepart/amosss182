@@ -13,7 +13,16 @@ const AppNavigation = StackNavigator({
   First: { screen: Login },
   Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
-  Sixth: {screen: GetMessages}
+  Sixth: {screen: GetMessages, 
+     navigationOptions: ({navigation}) => ({
+    id: navigation.state.params.id,
+    headerStyle: {
+      backgroundColor:'#5daedb'
+  },
+	headerTitleStyle: {
+		color:'#FFF'
+	}
+  })}
  
 
 }); 
