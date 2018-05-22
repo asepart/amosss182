@@ -4,6 +4,7 @@ import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
+import DeleteTicketButton from './DeleteTicketButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 
@@ -39,7 +40,7 @@ export default class TicketList extends Component {
 			name: this.props.name
 		});
 	}
-	
+
 	showCreateTicket () {
 		setState({
 			isAuth: true,
@@ -70,13 +71,17 @@ export default class TicketList extends Component {
 				accessor: 'ticketSummary',
 			}, {
 				Header: 'Description',
-				accessor: 'ticketDescription' 
+				accessor: 'ticketDescription'
 			}, {
 				Header: 'Category',
 				accessor: 'ticketCategory'
 			}, {
 				Header: 'Required observations',
 				accessor: 'requiredObservations' // String-based value accessors!
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.props.project}/>
 			}
 		]
 
