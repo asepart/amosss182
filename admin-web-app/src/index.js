@@ -22,6 +22,12 @@ class Page extends Component{
 			show: getState().show,
 			param: getState().param,
 			name: getState().name,
+			tName: getState().tName,
+			tSummary: getState().tSummary,
+			tDescription: getState().tDescription,
+			tCategory: getState().tCategory,
+			tRequiredObservations: getState().tRequiredObservations,
+			tId: getState().tId,
 			id: getState().id
 		});
 	}
@@ -59,9 +65,21 @@ class Page extends Component{
 			case 'addUser':
 				return (<UserAdd project={this.state.param}/>);
 			case 'createTicket':
-				return (<TicketCreate project={this.state.param} name={this.state.name}/>);
+				return (<TicketCreate project={this.state.param} name={this.state.name}
+						tName = {this.state.tName}
+						tSummary = {this.state.tSummary}
+						tDescription = {this.state.tDescription}
+						tCategory = {this.state.tCategory}
+						tRequiredObservations = {this.state.tRequiredObservations}
+						tId = {this.state.tId}/>);
 			case 'showTickets':
-				return (<TicketList project={this.state.param} name={this.state.name}/>);
+				return (<TicketList project={this.state.param} name={this.state.name}
+				tName = {this.state.tName}
+				tSummary = {this.state.tSummary}
+				tDescription = {this.state.tDescription}
+				tCategory = {this.state.tCategory}
+				tRequiredObservations = {this.state.tRequiredObservations}
+				tId = {this.state.tId}/>);
 			default:
 				return (<ProjectList/>);
 		}

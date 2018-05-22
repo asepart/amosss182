@@ -3,13 +3,13 @@ import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
-import ProjectButton from './ProjectButton';
 import { setState } from '../shared/GlobalState';
 import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
 
+var pickerPlaceholder = "Category";
 
 export default class UserList extends Component {
 	constructor(props) {
@@ -53,7 +53,13 @@ export default class UserList extends Component {
 			isAuth: true,
 			show: 'createTicket',
 			param: this.props.project,
-			name: this.props.name
+			name: this.props.name,
+			tName: '',
+			tSummary: '',
+			tDescription: '',
+			tCategory: pickerPlaceholder,
+			tRequiredObservations: '',
+			tId: '0'
 		});
 	}
 
@@ -62,15 +68,20 @@ export default class UserList extends Component {
 			isAuth: true,
 			show: 'showTickets',
 			param: this.props.project,
-			name: this.props.name
+			name: this.props.name,
+			tName: '',
+			tSummary: '',
+			tDescription: '',
+			tCategory: pickerPlaceholder,
+			tRequiredObservations: '',
+			tId: '0'
 		});
 	}
 
 	showProjectList () {
 		setState({
 			isAuth: true,
-			show: '',
-			param: this.props.project
+			show: ''
 		});
 	}
 
@@ -87,7 +98,7 @@ export default class UserList extends Component {
 		return (
 			<View>
 				<Button
-					disabled = "true"
+					disabled = {true}
 					title = {"Users of " + this.props.name}
 				/>
 				<Button
@@ -129,7 +140,7 @@ export default class UserList extends Component {
 		}
 		return(<View>
 			<Button
-				disabled = "true"
+				disabled = {true}
 				title = {"Users"}
 			/>
 			<Button

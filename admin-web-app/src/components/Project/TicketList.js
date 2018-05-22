@@ -3,11 +3,13 @@ import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
+import UpdateTicketButton from './UpdateTicketButton';
 import { setState } from '../shared/GlobalState';
 import DeleteTicketButton from './DeleteTicketButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 
+var pickerPlaceholder = "Category";
 
 export default class TicketList extends Component {
 	constructor(props) {
@@ -46,7 +48,13 @@ export default class TicketList extends Component {
 			isAuth: true,
 			show: 'createTicket',
 			param: this.props.project,
-			name: this.props.name
+			name: this.props.name,
+			tName: '',
+			tSummary: '',
+			tDescription: '',
+			tCategory: pickerPlaceholder,
+			tRequiredObservations: '',
+			tId: '0'
 		});
 	}
 
@@ -81,6 +89,10 @@ export default class TicketList extends Component {
 			}, {
 				Header: '',
 				accessor: '',
+				Cell: props => <UpdateTicketButton tick={props} project={this.props.project} name={this.props.name}/>
+			}, {
+				Header: '',
+				accessor: '',
 				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.props.project}/>
 			}
 		]
@@ -88,7 +100,7 @@ export default class TicketList extends Component {
 		return (
 			<View>
 				<Button
-					disabled = "true"
+					disabled = {true}
 					title = {"Tickets of " + this.props.name}
 				/>
 				<Button
