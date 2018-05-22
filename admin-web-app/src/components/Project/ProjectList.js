@@ -77,7 +77,7 @@ export default class ProjectList extends Component {
 		return (
 			<View>
 				<Button
-					disabled = "true"
+					disabled = {true}
 					title = {"Projects"}
 				/>
 				<Button
