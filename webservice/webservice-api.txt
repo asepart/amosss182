@@ -29,7 +29,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /projects
   Roles:          Admin
-  Returns:        JSON array of projects.
+  Returns:        JSON array of projects (see Project class).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
 
@@ -38,7 +38,7 @@ The following REST operations are available:
   HTTP operation: POST
   Path:           /projects
   Roles:          Admin
-  Request-Body:   Project information as JSON object (project name, owner and entry key).
+  Request-Body:   Project information as JSON object (see Project class).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient (e.g. you are not an admin/do not own the project).
@@ -53,12 +53,12 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project did not exist before request.
 
-- Create new ticket or change existing ticket.
+- Create new ticket or change existing ticket (set id=0 to create new ticket).
 
   HTTP operation: POST
   Path:           /projects/{key}/tickets
   Roles:          Admin
-  Request-Body:   Ticket information as JSON object (ticketName, ticketSummary, ticketDescription, ticketCategory and requiredObservations not to be null, id optional).
+  Request-Body:   Ticket information as JSON object (see Ticket class).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
@@ -69,7 +69,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /projects/{key}/tickets
   Roles:          Admin, User
-  Returns:        JSON array of tickets.
+  Returns:        JSON array of tickets (see Ticket class).
   Status code:    [200 OK]           in case of success
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
@@ -91,7 +91,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /projects/{key}/users
   Roles:          Admin
-  Returns:        JSON array of users.
+  Returns:        JSON array of users (see User class).
   Status code:    [200 OK]           in case of success
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
@@ -147,18 +147,18 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /messages/{ticket}
   Roles:          Admin, User
-  Returns:        JSON array of chat messages.
+  Returns:        JSON array of chat messages (see Message class).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not found]    if ticket does not exist.
 
-- Create or edit user
+- Create or edit user. Set id=0 to create new user.
 
   HTTP operation: POST
   Path:           /users
   Roles:          Admin
-  Request-Body:   User information as JSON object (firstName, lastName and phone not to be null).
+  Request-Body:   User information as JSON object (see User class).
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if admin with same name exists.
                   [401 Unauthorized] if the provided username or password is invalid.
@@ -169,17 +169,17 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /users
   Roles:          Admin
-  Returns:        JSON array of users.
+  Returns:        JSON array of users (see User class).
                   [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
-- Create or edit admin
+- Create or edit admin. Set id=0 to create new user.
 
   HTTP operation: POST
   Path:           /admins
   Roles:          Admin
-  Request-Body:   Admin information as JSON object (firstName and lastName not to be null).
+  Request-Body:   Admin information as JSON object (see Admin class).
   Status code:    [200 OK]           in case of success.
                   [400 Bad Request]  if user with same name exists.
                   [401 Unauthorized] if the provided username or password is invalid.
@@ -190,7 +190,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /admins
   Roles:          Admin
-  Returns:        JSON array of admins.
+  Returns:        JSON array of admins (see Admin class).
                   [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.

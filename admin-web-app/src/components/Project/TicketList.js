@@ -5,6 +5,7 @@ import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import UpdateTicketButton from './UpdateTicketButton';
 import { setState } from '../shared/GlobalState';
+import DeleteTicketButton from './DeleteTicketButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 
@@ -41,7 +42,7 @@ export default class TicketList extends Component {
 			name: this.props.name
 		});
 	}
-	
+
 	showCreateTicket () {
 		setState({
 			isAuth: true,
@@ -78,7 +79,7 @@ export default class TicketList extends Component {
 				accessor: 'ticketSummary',
 			}, {
 				Header: 'Description',
-				accessor: 'ticketDescription' 
+				accessor: 'ticketDescription'
 			}, {
 				Header: 'Category',
 				accessor: 'ticketCategory'
@@ -89,11 +90,11 @@ export default class TicketList extends Component {
 				Header: '',
 				accessor: '',
 				Cell: props => <UpdateTicketButton tick={props} project={this.props.project} name={this.props.name}/>
-			}/*, {	//TODO:
+			}, {
 				Header: '',
 				accessor: '',
-				Cell: props => <DeleteTicketButton tick={props}/>
-			}*/
+				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.props.project}/>
+			}
 		]
 
 		return (

@@ -171,7 +171,7 @@ public class WebService
 
             else target = ticket;
 
-            Database.putTicket(session, sc.getUserPrincipal().getName(), target);
+            Database.putTicket(session, target);
             String projectName = Database.getProject(session, projectKey).getProjectName();
             session.getTransaction().commit();
 

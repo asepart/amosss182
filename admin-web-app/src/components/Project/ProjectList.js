@@ -5,6 +5,7 @@ import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
 import UpdateProjectButton from './UpdateProjectButton';
+import DeleteProjectButton from './DeleteProjectButton';
 import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
@@ -67,11 +68,11 @@ export default class ProjectList extends Component {
 				Header: '',
 				accessor: '',
 				Cell: props => <UpdateProjectButton proj={props}/>
-			}/*, {	//TODO:
+			}, {
 				Header: '',
 				accessor: '',
 				Cell: props => <DeleteProjectButton proj={props}/>
-			}*/
+			}
 		]
 
 		return (

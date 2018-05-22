@@ -58,7 +58,7 @@ public class Database
 
                 Database.putProject(session, "pizza", "testproject", "admin");
                 
-                Database.putTicket(session, "admin", "pizza", "Name",
+                Database.putTicket(session, "pizza", "Name",
                         "Summary",
                         "Description",
                         TicketCategory.ONE_TIME_ERROR,
@@ -267,7 +267,7 @@ public class Database
         }
     }
 
-    static Integer putTicket(Session session, String adminName, String projectKey, String ticketName, String ticketSummary, String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
+    static Integer putTicket(Session session, String projectKey, String ticketName, String ticketSummary, String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
     {
         Ticket ticket = new Ticket();
         ticket.setTicketName(ticketName);
@@ -277,10 +277,10 @@ public class Database
         ticket.setRequiredObservations(requiredObservations);
         ticket.setProjectKey(projectKey);
 
-        return putTicket(session, adminName, ticket);
+        return putTicket(session, ticket);
     }
 
-    static Integer putTicket(Session session, String adminName, Ticket ticket)
+    static Integer putTicket(Session session, Ticket ticket)
     {
         return (Integer) session.save(ticket);
     }
