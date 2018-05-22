@@ -121,7 +121,7 @@ export default class UserList extends Component {
 					}, {
 						Header: '',
 						accessor: '',
-						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project}/>
+						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
 					}
 				] }/>
 			</View>
