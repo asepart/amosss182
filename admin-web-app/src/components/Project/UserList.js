@@ -5,6 +5,7 @@ import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
 import { setState } from '../shared/GlobalState';
+import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
@@ -46,7 +47,7 @@ export default class UserList extends Component {
 			show: 'addUser'
 		});
 	}
-	
+
 	showCreateTicket () {
 		setState({
 			isAuth: true,
@@ -55,7 +56,7 @@ export default class UserList extends Component {
 			name: this.props.name
 		});
 	}
-	
+
 	showTicketList () {
 		setState({
 			isAuth: true,
@@ -64,7 +65,7 @@ export default class UserList extends Component {
 			name: this.props.name
 		});
 	}
-	
+
 	showProjectList () {
 		setState({
 			isAuth: true,
@@ -81,22 +82,6 @@ export default class UserList extends Component {
 				</View>
 			)
 		}
-
-		const columns = [
-			{
-				Header: 'Given Name',
-				accessor: 'firstName'
-			}, {
-				Header: 'Surname',
-				accessor: 'lastName'
-			}, {
-				Header: 'Login Name',
-				accessor: 'loginName'
-			}, {
-				Header: 'Phone Number',
-				accessor: 'phone' // String-based value accessors!
-			}
-		]
 
 		if (this.props.project !== '') {
 		return (
@@ -120,7 +105,25 @@ export default class UserList extends Component {
 					title = "Back"
 					color = "#0e4a80"
 				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
+				<ReactTable data={this.state.dataSource} columns={ [
+					{
+						Header: 'Given Name',
+						accessor: 'firstName'
+					}, {
+						Header: 'Surname',
+						accessor: 'lastName'
+					}, {
+						Header: 'Login Name',
+						accessor: 'loginName'
+					}, {
+						Header: 'Phone Number',
+						accessor: 'phone' // String-based value accessors!
+					}, {
+						Header: '',
+						accessor: '',
+						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
+					}
+				] }/>
 			</View>
 		);
 		}
@@ -139,7 +142,21 @@ export default class UserList extends Component {
 				title = "Back"
 				color = "#0e4a80"
 			/>
-			<ReactTable data={this.state.dataSource} columns={columns}/>
+			<ReactTable data={this.state.dataSource} columns={ [
+				{
+					Header: 'Given Name',
+					accessor: 'firstName'
+				}, {
+					Header: 'Surname',
+					accessor: 'lastName'
+				}, {
+					Header: 'Login Name',
+					accessor: 'loginName'
+				}, {
+					Header: 'Phone Number',
+					accessor: 'phone' // String-based value accessors!
+				}
+			] }/>
 		</View>
 		);
 	}

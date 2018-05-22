@@ -4,8 +4,11 @@ import './index.css';
 import Login from './components/Login/login';
 import ProjectList from './components/Project/ProjectList';
 import ProjectAdd from './components/Project/ProjectAdd';
+import DeleteProjectConfirm from './components/Project/DeleteProjectConfirm';
+import DeleteTicketConfirm from './components/Project/DeleteTicketConfirm';
 import TicketCreate from './components/Project/TicketCreate';
 import TicketList from './components/Project/TicketList';
+import DeleteUserConfirm from './components/Project/DeleteUserConfirm';
 import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
 import registerServiceWorker from './registerServiceWorker';
@@ -18,7 +21,8 @@ class Page extends Component{
 			isAuth: getState().isAuth,
 			show: getState().show,
 			param: getState().param,
-			name: getState().name
+			name: getState().name,
+			id: getState().id
 		});
 	}
 
@@ -44,6 +48,12 @@ class Page extends Component{
 		switch (this.state.show){
 			case 'addProject':
 				return (<ProjectAdd project={this.state.param} name={this.state.name}/>);
+			case 'deleteProject':
+				return (<DeleteProjectConfirm project={this.state.param} name={this.state.name}/>);
+			case 'deleteTicket':
+				return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id}/>);
+			case 'deleteUser':
+					return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id}/>);
 			case 'listUsers':
 				return (<UserList project={this.state.param} name={this.state.name}/>);
 			case 'addUser':
