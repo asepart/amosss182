@@ -5,6 +5,7 @@ import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
 import { setState } from '../shared/GlobalState';
+import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
@@ -46,7 +47,7 @@ export default class UserList extends Component {
 			show: 'addUser'
 		});
 	}
-	
+
 	showCreateTicket () {
 		setState({
 			isAuth: true,
@@ -55,7 +56,7 @@ export default class UserList extends Component {
 			name: this.props.name
 		});
 	}
-	
+
 	showTicketList () {
 		setState({
 			isAuth: true,
@@ -64,7 +65,7 @@ export default class UserList extends Component {
 			name: this.props.name
 		});
 	}
-	
+
 	showProjectList () {
 		setState({
 			isAuth: true,
@@ -95,6 +96,10 @@ export default class UserList extends Component {
 			}, {
 				Header: 'Phone Number',
 				accessor: 'phone' // String-based value accessors!
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project}/>
 			}
 		]
 
