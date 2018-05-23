@@ -6,7 +6,6 @@ import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ProjectInfo} from '../Projects/projectInfo';
-import { Icon } from 'react-native-vector-icons';
 import {
 	StackNavigator,
   } from 'react-navigation';
@@ -88,11 +87,13 @@ async makeApiCall() {
        
         </TextInput>
         
-        <Icon
-            name='send'
-           color='#FFF' 
-           onPress={this.onSendPressed.bind(this)}
-           />
+        <TouchableOpacity 
+           onPress={this.onSendPressed.bind(this)} 
+            style={styles.buttonLargeContainer}>
+			
+				<Text style={styles.buttonText}>SEND</Text>
+          
+			</TouchableOpacity>
        
             <Text style={styles.error}>
                     {this.state.error}
