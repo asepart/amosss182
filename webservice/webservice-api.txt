@@ -6,9 +6,9 @@ Please notice: All API calls require an HTTP Authorization header. The header is
 
   Authorization: Basic <string>
 
-where <string> is a base64-econded string in the format <username>:<password>.
+where <string> is a base64-encoded string in the format <username>:<password>.
 
-Additionaly, to distinguish between different account roles, the client must provide a special header like this:
+Additionally, to distinguish between different account roles, the client must provide a special header like this:
 
   X-ASEPART-Role: <role>
 

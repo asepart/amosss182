@@ -362,7 +362,7 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putMessage(session, ticketId, message, principal.getName(), role );
+            Database.putMessage(session, ticketId, message, principal.getName(), role);
             session.getTransaction().commit();
         }
 
