@@ -6,6 +6,7 @@ import {URL} from '../shared/const';
 import UpdateTicketButton from './UpdateTicketButton';
 import { setState } from '../shared/GlobalState';
 import DeleteTicketButton from './DeleteTicketButton';
+import TicketChatButton from '../Chat/TicketChatButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 
@@ -86,6 +87,10 @@ export default class TicketList extends Component {
 			}, {
 				Header: 'Required observations',
 				accessor: 'requiredObservations' // String-based value accessors!
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <TicketChatButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
 			}, {
 				Header: '',
 				accessor: '',
