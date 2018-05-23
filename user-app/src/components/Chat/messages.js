@@ -4,30 +4,19 @@ import {URL} from '../Login/const';
 import {getAuth} from '../Login/auth';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
-import {setMsg, sendMessage} from './sendMessages'
+import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ProjectInfo} from '../Projects/projectInfo';
+import { Icon } from 'react-native-elements';
 import {
 	StackNavigator,
   } from 'react-navigation';
 
 export default class GetMessages extends Component {
 
-  //static navigationOptions= {
-	//	title: 'Chat',
-	//	headerStyle: {
-      // headerRight:<TouchableOpacity onPress={() => navigation.navigate("Home")}
-	//		backgroundColor:'#5daedb'
-  //  },
-//		headerTitleStyle: {
-//			color:'#FFF'
-//		}
-//  }
-
- 
   
   constructor(props){
     super(props);
-    this.state ={ isLoading: true, message: "", error: ""
+    this.state ={ isLoading: true, message: "", error: "", idTicket: ""
     }
   }
 
@@ -35,6 +24,7 @@ export default class GetMessages extends Component {
    
 
   setMsg(this.state.message);
+  setTicketID(this.state.idTicket);
    //if (message === '') {
    // this.setState({error: "message empty"});
   // }
@@ -48,6 +38,9 @@ export default class GetMessages extends Component {
 async makeApiCall() {
   
   let ticketID = this.props.navigation.state.params.id;  
+  this.setState({
+    idTicket: ticketID
+  })
   return fetch(URL + '/messages/' + ticketID ,   {method:'GET', headers: getAuth()})
   .then((response) => response.json())
   .then((responseJson) => {
@@ -91,14 +84,16 @@ async makeApiCall() {
           keyExtractor={(item, index) => index}
         />
 
-        <TextInput onChangeText={(text) => this.setState({message: text})} placeholder="Message" underlineColorAndroid="transparent" style={styles.inputLong} />
-            <TouchableOpacity
-            onPress={this.onSendPressed.bind(this)} 
-             style={styles.buttonLargeContainer}>
-			
-				<Text style={styles.buttonText}>SEND</Text>
-
-			</TouchableOpacity>
+        <TextInput  onChangeText={(text) => this.setState({message: text})} placeholder="Message" underlineColorAndroid="transparent" style={styles.inputLong}>
+       
+        </TextInput>
+        
+        <Icon
+            name='send'
+           color='#FFF' 
+           onPress={this.onSendPressed.bind(this)}
+           />
+       
             <Text style={styles.error}>
                     {this.state.error}
                    
