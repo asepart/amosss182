@@ -3,10 +3,13 @@ import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
+import UpdateTicketButton from './UpdateTicketButton';
 import { setState } from '../shared/GlobalState';
+import DeleteTicketButton from './DeleteTicketButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 
+var pickerPlaceholder = "Category";
 
 export default class TicketList extends Component {
 	constructor(props) {
@@ -35,15 +38,23 @@ export default class TicketList extends Component {
 		setState({
 			isAuth: true,
 			show: 'listUsers',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name
 		});
 	}
-	
+
 	showCreateTicket () {
 		setState({
 			isAuth: true,
 			show: 'createTicket',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name,
+			tName: '',
+			tSummary: '',
+			tDescription: '',
+			tCategory: pickerPlaceholder,
+			tRequiredObservations: '',
+			tId: '0'
 		});
 	}
 
@@ -68,18 +79,30 @@ export default class TicketList extends Component {
 				accessor: 'ticketSummary',
 			}, {
 				Header: 'Description',
-				accessor: 'ticketDescription' 
+				accessor: 'ticketDescription'
 			}, {
 				Header: 'Category',
 				accessor: 'ticketCategory'
 			}, {
 				Header: 'Required observations',
 				accessor: 'requiredObservations' // String-based value accessors!
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <UpdateTicketButton tick={props} project={this.props.project} name={this.props.name}/>
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
 			}
 		]
 
 		return (
 			<View>
+				<Button
+					disabled = {true}
+					title = {"Tickets of " + this.props.name}
+				/>
 				<Button
 					onPress = { this.showCreateTicket.bind(this) }
 					title = "Create Ticket"

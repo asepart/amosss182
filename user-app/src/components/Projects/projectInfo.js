@@ -25,19 +25,17 @@ export default class ProjectInfo extends Component {
 	
 	
   componentDidMount() {
-
-            fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
-              .then((response) => response.json())
-              .then((responseJson) => {
-                this.setState({
-                    isLoading: false,
-                    ticketList: responseJson,
-                }, function() {});
-              }).catch((error) => {
-                console.error(error);
-              }); 
-          }
-		
+        fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
+          .then((response) => response.json())
+          .then((responseJson) => {
+            this.setState({
+              isLoading: false,
+              ticketList: responseJson
+            }, function() {});
+          }).catch((error) => {
+             console.error(error);
+          }); 
+	}
   
     static navigationOptions= {
 		title: 'Tickets',
@@ -62,7 +60,7 @@ export default class ProjectInfo extends Component {
 			)
 		}
      
-      return (
+       return (
         <View style={styles.container}>
                 <FlatList
                   style={styles.textLarge}
