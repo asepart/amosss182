@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View} from 'react-native';
-import {getAuth, username, psw} from '../shared/auth';
+import {Button,ActivityIndicator,View} from 'react-native';
+import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
@@ -45,6 +45,10 @@ export default class DeleteUserConfirm extends Component {
 		}
 		return (
 			<View>
+			<Button
+				disabled = {true}
+				title = {"Delete user " + this.state.loginName + " from project " + this.props.name + "?"}
+			/>
 			<Button onPress = { this.deleteUser.bind(this) } title = "Delete" color = "#0c3868"/>
 			<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
 			</View>
