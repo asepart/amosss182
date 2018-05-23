@@ -6,7 +6,7 @@ import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ProjectInfo} from '../Projects/projectInfo';
-import { Icon } from 'react-native-elements';
+import { Icon } from 'react-native-vector-icons';
 import {
 	StackNavigator,
   } from 'react-navigation';
