@@ -351,7 +351,7 @@ public class Database
             throw new WebApplicationException("You are not the admin of this project.");
         }
 
-        else if (!isUserMemberOfProject(session, sender, ticket.getProjectKey()))
+        if (role.equals("User") && !isUserMemberOfProject(session, sender, ticket.getProjectKey()))
         {
             throw new WebApplicationException("You have not joined that project.");
         }
@@ -374,7 +374,7 @@ public class Database
             throw new WebApplicationException("You are not the admin of this project.");
         }
 
-        else if (!isUserMemberOfProject(session, receiver, ticket.getProjectKey()))
+        if (role.equals("User") && !isUserMemberOfProject(session, receiver, ticket.getProjectKey()))
         {
             throw new WebApplicationException("You have not joined that project.");
         }
