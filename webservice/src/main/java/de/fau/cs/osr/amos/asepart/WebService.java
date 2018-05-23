@@ -531,7 +531,7 @@ public class WebService
             ResourceConfig config = new ResourceConfig(WebService.class);
             config.register(CORSFilter.class);
             config.register(AuthenticationFilter.class);
-            // config.register(DebugExceptionMapper.class);
+            config.register(DebugExceptionMapper.class);
 
             JdkHttpServerFactory.createHttpServer(uri, config);
         }
