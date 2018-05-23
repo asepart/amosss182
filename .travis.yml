@@ -11,10 +11,8 @@ matrix:
     - language: node_js
       node_js: 8
       script:
-        - cd user-app && npm install && npm test -- --coverage
-        - cd ../admin-web-app && npm install && npm test -- --coverage
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
+        - cd user-app && npm install && npm test
+        - cd ../admin-web-app && npm install && npm test
         
     - language: android
       before_install:
