@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View} from 'react-native';
-import {getAuth, username} from '../shared/auth';
+import {Button,ActivityIndicator,View} from 'react-native';
+import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
@@ -44,6 +44,10 @@ export default class DeleteProjectConfirm extends Component {
 		}
 		return (
 			<View>
+			<Button
+				disabled = {true}
+				title = {"Delete " + this.props.name + "?"}
+			/>
 			<Button onPress = { this.deleteProject.bind(this) } title = "Delete" color = "#0c3868"/>
 			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
 			</View>
