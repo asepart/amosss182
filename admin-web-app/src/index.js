@@ -8,6 +8,7 @@ import DeleteProjectConfirm from './components/Project/DeleteProjectConfirm';
 import DeleteTicketConfirm from './components/Project/DeleteTicketConfirm';
 import TicketCreate from './components/Project/TicketCreate';
 import TicketList from './components/Project/TicketList';
+import TicketChat from './components/Chat/TicketChat';
 import DeleteUserConfirm from './components/Project/DeleteUserConfirm';
 import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
@@ -80,6 +81,8 @@ class Page extends Component{
 				tCategory = {this.state.tCategory}
 				tRequiredObservations = {this.state.tRequiredObservations}
 				tId = {this.state.tId}/>);
+			case 'ticketChat':
+				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id}/>);
 			default:
 				return (<ProjectList/>);
 		}
