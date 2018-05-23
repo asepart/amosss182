@@ -1,7 +1,7 @@
 import { StyleSheet} from 'react-native';
 
 export default styles=StyleSheet.create({
-   
+  
   container: {
       flex: 1,
       padding: 20,
@@ -11,7 +11,6 @@ export default styles=StyleSheet.create({
 
     container2: {
       flex: 1,
-      flexDirection: 'row',
       justifyContent: 'space-between',
       padding: 20,
       backgroundColor: '#0c3868',
@@ -32,7 +31,7 @@ export default styles=StyleSheet.create({
       flex: 1,
       padding: 20,
       backgroundColor: '#0c3868',
-      //alignItems moves items to upper center
+      //alignItems moves items to buttom
       alignItems: 'baseline',
       //justifyContent moves items to center of page
       justifyContent: 'center'
@@ -51,7 +50,8 @@ export default styles=StyleSheet.create({
     // Text input box span over whole horizontal
     inputLong: {
       height: 40,
-      width: 350,
+      width:350,
+      alignItems: 'baseline',
       color: '#FFF',
       backgroundColor: '#14639e',
       marginBottom: 10,
@@ -102,6 +102,11 @@ export default styles=StyleSheet.create({
     text: {
       color: '#FFF',
       fontSize: 15
+    },
+
+    icon: {
+      width:200,
+      height:100
     }
    
   });

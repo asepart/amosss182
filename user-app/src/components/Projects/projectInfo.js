@@ -8,17 +8,22 @@ import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
 import {key} from './keyValid';
 
+window.btoa = require('Base64').btoa;
+
+
+
 export default class ProjectInfo extends Component {
 
   constructor(props) {
 		super(props);
 		this.state = {
 			isLoading: true,
-            projectName: '',
             ticketList: [],
+           
 		};
 	}
-  
+	
+	
   componentDidMount() {
         fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
           .then((response) => response.json())
@@ -44,7 +49,8 @@ export default class ProjectInfo extends Component {
 
 
     render() {
-      var {params} = this.props.navigation.state;
+    //  var {params} = this.props.navigation.state;
+     // const { navigate } = this.props.navigation;
       
       if (this.state.isLoading) {
 			return (
@@ -54,22 +60,26 @@ export default class ProjectInfo extends Component {
 			)
 		}
      
-      return (
+       return (
         <View style={styles.container}>
                 <FlatList
                   style={styles.textLarge}
                   data={this.state.ticketList}
-                  renderItem={({item}) => <TouchableOpacity
-                 onPress={() =>{const { navigate } = this.props.navigation;
-                 navigate("Sixth", { name: "GetMessage" })} }
+                  renderItem={({item}) =>
+                  <TouchableOpacity
+                 onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id})
+                }
                    style={styles.buttonContainer}>
                    <Text style={styles.buttonText}>
             {item.id}, {item.ticketSummary}, {item.ticketCategory}
             </Text>
             </TouchableOpacity>}
-                  keyExtractor={(item, index) => index}
+                 keyExtractor={(item, index) => index}
+                  //keyExtractor={item => item.id}
                 />
+
         </View>
+        
       );
     }
   }

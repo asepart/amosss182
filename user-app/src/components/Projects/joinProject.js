@@ -49,7 +49,7 @@ export default class JoinProject extends Component {
     
       
     
-    }
+    }s
 
 
     render() {
