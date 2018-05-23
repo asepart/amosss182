@@ -93,7 +93,7 @@ export default class TicketList extends Component {
 			}, {
 				Header: '',
 				accessor: '',
-				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.props.project}/>
+				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
 			}
 		]
 
