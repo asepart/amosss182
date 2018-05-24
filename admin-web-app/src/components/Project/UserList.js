@@ -124,9 +124,6 @@ export default class UserList extends Component {
 						Header: 'Surname',
 						accessor: 'lastName'
 					}, {
-						Header: 'Login Name',
-						accessor: 'loginName'
-					}, {
 						Header: 'Phone Number',
 						accessor: 'phone' // String-based value accessors!
 					}, {
@@ -160,9 +157,6 @@ export default class UserList extends Component {
 				}, {
 					Header: 'Surname',
 					accessor: 'lastName'
-				}, {
-					Header: 'Login Name',
-					accessor: 'loginName'
 				}, {
 					Header: 'Phone Number',
 					accessor: 'phone' // String-based value accessors!
