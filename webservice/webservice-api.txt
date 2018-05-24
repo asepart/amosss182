@@ -153,7 +153,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not found]    if ticket does not exist.
 
-- Create or edit user. Set id=0 to create new user.
+- Create or edit user.
 
   HTTP operation: POST
   Path:           /users
@@ -174,7 +174,7 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
-- Create or edit admin. Set id=0 to create new user.
+- Create or edit admin.
 
   HTTP operation: POST
   Path:           /admins
