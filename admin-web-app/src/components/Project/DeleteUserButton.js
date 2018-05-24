@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Text } from 'react-native';
 import { setState } from '../shared/GlobalState';
-import {getAuth} from '../shared/auth';
-import {URL} from '../shared/const';
 
 export default class DeleteUserButton extends Component {
 
