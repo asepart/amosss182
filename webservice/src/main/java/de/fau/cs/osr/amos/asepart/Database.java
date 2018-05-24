@@ -449,6 +449,24 @@ public class Database
         return users;
     }
 
+    static void deleteUser(Session session, String loginName)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
+
+        Root<Membership> columns = criteria.from(Membership.class);
+        criteria.where(builder.equal(columns.get("loginName"), loginName));
+        List<Membership> resultList = session.createQuery(criteria).getResultList();
+
+        for (Membership member : resultList)
+        {
+            session.delete(member);
+        }
+
+        User oldUser = session.get(User.class, loginName);
+        session.delete(oldUser);
+    }
+
     static void putAdmin(Session session, String loginName, String password, String firstName, String lastName)
     {
         Admin newAdmin = new Admin();
