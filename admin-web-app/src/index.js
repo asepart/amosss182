@@ -29,7 +29,9 @@ class Page extends Component{
 			tCategory: getState().tCategory,
 			tRequiredObservations: getState().tRequiredObservations,
 			tId: getState().tId,
-			id: getState().id
+			id: getState().id,
+			firstName: getState().firstName,
+			lastName: getState().lastName
 		});
 	}
 
@@ -58,9 +60,9 @@ class Page extends Component{
 			case 'deleteProject':
 				return (<DeleteProjectConfirm project={this.state.param} name={this.state.name}/>);
 			case 'deleteTicket':
-				return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id}/>);
+				return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id} tName = {this.state.tName}/>);
 			case 'deleteUser':
-					return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id}/>);
+					return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName}/>);
 			case 'listUsers':
 				return (<UserList project={this.state.param} name={this.state.name}/>);
 			case 'addUser':
