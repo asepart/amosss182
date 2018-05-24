@@ -1,15 +1,19 @@
 import React, {Component} from 'react';
 import {Button,TextInput,ActivityIndicator,View} from 'react-native';
-import {getAuth} from '../shared/auth';
+import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
 
 export default class UserAdd extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
-			userName: 'UselessEmployee',
+			loginName: 'UselessEmployee',
+			password: 'uselessPassword',
+			firstName: 'Useless',
+			lastName: 'Employee',
 			phone:	'+49123456789'
 		};
 	}
@@ -26,38 +30,25 @@ export default class UserAdd extends Component {
 		setState({
 			isAuth: true,
 			show: 'listUsers',
-			param: this.props.project
+			param: ''
 		});
 	}
 
-	async putProject() {
-		await fetch(URL + '/projects/' + this.props.project + '/users/' + this.state.userName, {
-				method: 'PUT',
-				headers: getAuth()
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				this.setState({
-					projectName: "",
-					entryKey: ""
-				}, function() {});
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-		this.showProjectList ();
-	}
-
-	addUser(){
-		fetch(URL + '/projects/' + this.props.project + '/users/' + this.state.phone, {
+	async addUser(){
+		let auth = getAuthForPost();
+		await fetch(URL + '/users', {
 				method: 'POST',
-				headers: getAuth()
+				headers: auth,
+				body: JSON.stringify({loginName: this.state.loginName, password: this.state.password, firstName: this.state.firstName, lastName: this.state.lastName, phone: this.state.phone})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
 				this.setState({
-					projectName: "",
-					entryKey: ""
+					loginName: "",
+					password: "",
+					firstName: "",
+					lastName: "",
+					phone: ""
 				}, function() {});
 			})
 			.catch((error) => {
@@ -74,28 +65,35 @@ export default class UserAdd extends Component {
 				</View>
 			)
 		}
-		if (this.props.project === ''){
-			return(
-				<View>
-					<TextInput
-						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
-						onChangeText = {(text) => this.setState({userName: text})}
-						value = {this.state.userName}
-					/>
-					<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#0c3868" />
-					<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
-				</View>
-			);
-		}
-		return (
+		return(
 			<View>
+				<TextInput
+					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					onChangeText = {(text) => this.setState({loginName: text})}
+					value = {this.state.loginName}
+				/>
+				<TextInput
+					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					onChangeText = {(text) => this.setState({password: text})}
+					value = {this.state.password}
+				/>
+				<TextInput
+					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					onChangeText = {(text) => this.setState({firstName: text})}
+					value = {this.state.firstName}
+				/>
+				<TextInput
+					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					onChangeText = {(text) => this.setState({lastName: text})}
+					value = {this.state.lastName}
+				/>
 				<TextInput
 					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
 					onChangeText = {(text) => this.setState({phone: text})}
 					value = {this.state.phone}
 				/>
 				<Button onPress = { this.addUser.bind(this) } title = "Add" color = "#0c3868" />
-				<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
+				<Button onPress = { this.showUserList.bind() } title = "Cancel" color = "#0e4a80" />
 			</View>
 		);
 	}
