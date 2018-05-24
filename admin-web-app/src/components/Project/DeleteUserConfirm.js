@@ -12,12 +12,17 @@ export default class DeleteUserConfirm extends Component {
 		this.state = {
 			loginName: this.props.id,
 			entryKey: this.props.project,
+			firstName: this.props.firstName,
+			lastName: this.props.lastName
 		};
 	}
 
   async deleteUser() {
     var url = URL;
-    url += '/projects/' + this.state.entryKey + '/users/' + this.state.loginName;
+    if (this.state.entryKey !== undefined) {
+    		url += '/projects/' + this.state.entryKey
+    }
+    url += '/users/' + this.state.loginName;
     await fetch(url, {method:'DELETE', headers: getAuth()})
       .then((response) => response.json())
       .catch((error) => {
@@ -43,11 +48,15 @@ export default class DeleteUserConfirm extends Component {
 				</View>
 			)
 		}
+		var projectName = '';
+		if (this.props.name !== undefined) {
+			projectName = " from project " + this.props.name;
+		}
 		return (
 			<View>
 			<Button
 				disabled = {true}
-				title = {"Delete user " + this.state.loginName + " from project " + this.props.name + "?"}
+				title = {"Delete user " + this.state.firstName + " " + this.state.lastName + projectName + "?"}
 			/>
 			<Button onPress = { this.deleteUser.bind(this) } title = "Delete" color = "#0c3868"/>
 			<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />

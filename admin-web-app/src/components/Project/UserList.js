@@ -124,6 +124,10 @@ export default class UserList extends Component {
 						Header: 'Surname',
 						accessor: 'lastName'
 					}, {
+						Header: 'Login Name',
+						accessor: 'loginName',
+						show: false
+					}, {
 						Header: 'Phone Number',
 						accessor: 'phone' // String-based value accessors!
 					}, {
@@ -158,8 +162,16 @@ export default class UserList extends Component {
 					Header: 'Surname',
 					accessor: 'lastName'
 				}, {
+					Header: 'Login Name',
+					accessor: 'loginName',
+					show: false
+				}, {
 					Header: 'Phone Number',
 					accessor: 'phone' // String-based value accessors!
+				}, {
+					Header: '',
+					accessor: '',
+					Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
 				}
 			] }/>
 		</View>
