@@ -1,11 +1,9 @@
 import React, {Component} from 'react';
-import {Button, FlatList, ActivityIndicator, Text, View, TextInput} from 'react-native';
+import {Button, ActivityIndicator, Text, View, TextInput} from 'react-native';
 import {URL} from '../shared/const';
 import {getAuth} from '../shared/auth';
 import {setState} from '../shared/GlobalState';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
 
 export default class TicketChat extends Component {
 
@@ -55,6 +53,16 @@ export default class TicketChat extends Component {
 		});
 	}
 
+  renderChat() {
+    return this.state.chatHistory.map(function(news, id){
+      return(
+        <View key={id}>
+          <Text style={{fontWeight: 'bold'}}>{news.sender} : {news.content}</Text>
+        </View>
+      );
+    });
+  }
+
   render() {
     if(this.state.isLoading) {
       return(
@@ -64,33 +72,14 @@ export default class TicketChat extends Component {
       )
     }
 
-    const columns = [
-      {
-        Header: 'SENDER',
-        accessor: 'sender',
-        width: 150,
-      }, {
-        Header: 'CONTENT',
-        accessor: 'content',
-      }
-    ]
-
     return(
       <View>
-        <Button onPress = { this.showTicketList.bind(this) } title = "Back to Tickets" color = "#0e4a80" />
-
-        <FlatList
-          //using flatlist would be a better view - no clue why it does not show
-          data={this.state.chatHistory}
-          renderItem={({item}) => <Text>{item.sender} : {item.content}</Text>}
-          keyExtractor={(item) => item.id}
+        <Button
+          disabled = {true}
+          title = {"Chat history of ticket " + this.props.id + " in project " + this.props.name}
         />
 
-        <ReactTable
-          //this is the ugly alternative
-          data={this.state.chatHistory}
-          columns={columns}
-        />
+        {this.renderChat()}
 
         <TextInput
           placeholder = "Message"
@@ -98,6 +87,7 @@ export default class TicketChat extends Component {
           onChangeText = {(text) => this.setState({message: text})} />
 
         <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0e4a80" />
+        <Button onPress = { this.showTicketList.bind(this) } title = "Back to Tickets" color = "#0e4a80" />
       </View>
     );
   }
