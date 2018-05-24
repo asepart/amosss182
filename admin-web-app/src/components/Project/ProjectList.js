@@ -11,6 +11,7 @@ import 'react-table/react-table.css';
 import '../../index.css';
 
 export default class ProjectList extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -84,6 +85,11 @@ export default class ProjectList extends Component {
 				<Button
 					onPress = { this.showAddProject }
 					title = "Add Project"
+					color = "#0c3868"
+				/>
+				<Button
+					onPress = { this.showUserManagement }
+					title = "User Management"
 					color = "#0c3868"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>
