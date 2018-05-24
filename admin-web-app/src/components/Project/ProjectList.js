@@ -4,6 +4,8 @@ import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
+import UpdateProjectButton from './UpdateProjectButton';
+import DeleteProjectButton from './DeleteProjectButton';
 import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
@@ -56,25 +58,32 @@ export default class ProjectList extends Component {
 
 		const columns = [
 			{
-				Header: 'Project Name',
+				Header: 'Name',
 				accessor: 'projectName',
-				Cell: props => <ProjectButton proj={props.value}/>
+				Cell: props => <ProjectButton proj={props}/>
 			}, {
 				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <UpdateProjectButton proj={props}/>
+			}, {
+				Header: '',
+				accessor: '',
+				Cell: props => <DeleteProjectButton proj={props}/>
 			}
 		]
 
 		return (
 			<View>
 				<Button
-					onPress = { this.showAddProject }
-					title = "Add Project"
-					color = "#0c3868"
+					disabled = {true}
+					title = {"Projects"}
 				/>
 				<Button
-					onPress = { this.showUserManagement }
-					title = "User Management"
+					onPress = { this.showAddProject }
+					title = "Add Project"
 					color = "#0c3868"
 				/>
 				<ReactTable data={this.state.dataSource} columns={columns}/>

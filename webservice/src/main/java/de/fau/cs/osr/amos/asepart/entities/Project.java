@@ -10,11 +10,24 @@ import javax.persistence.Table;
 public class Project
 {
     @Id
-    @Column(name = "project_name")
+    @Column(name = "entry_key")
+    private String entryKey;
+
+    @Column(name = "project_name", nullable = false)
     private String projectName;
 
-    @Column(name = "entry_key", nullable = false, unique = true)
-    private String entryKey;
+    @Column(nullable = false)
+    private String owner;
+
+    public String getEntryKey()
+    {
+        return entryKey;
+    }
+
+    public void setEntryKey(String entryKey)
+    {
+        this.entryKey = entryKey;
+    }
 
     public String getProjectName()
     {
@@ -26,13 +39,13 @@ public class Project
         this.projectName = projectName;
     }
 
-    public String getEntryKey()
+    public String getOwner()
     {
-        return entryKey;
+        return owner;
     }
 
-    public void setEntryKey(String entryKey)
+    public void setOwner(String owner)
     {
-        this.entryKey = entryKey;
+        this.owner = owner;
     }
 }

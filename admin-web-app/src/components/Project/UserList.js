@@ -3,12 +3,13 @@ import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
-import ProjectButton from './ProjectButton';
 import { setState } from '../shared/GlobalState';
+import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
 
+var pickerPlaceholder = "Category";
 
 export default class UserList extends Component {
 	constructor(props) {
@@ -43,32 +44,44 @@ export default class UserList extends Component {
 	showAddUser () {
 		setState({
 			isAuth: true,
-			show: 'addUser',
-			param: this.props.project
+			show: 'addUser'
 		});
 	}
-	
+
 	showCreateTicket () {
 		setState({
 			isAuth: true,
 			show: 'createTicket',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name,
+			tName: '',
+			tSummary: '',
+			tDescription: '',
+			tCategory: pickerPlaceholder,
+			tRequiredObservations: '',
+			tId: '0'
 		});
 	}
-	
+
 	showTicketList () {
 		setState({
 			isAuth: true,
 			show: 'showTickets',
-			param: this.props.project
+			param: this.props.project,
+			name: this.props.name,
+			tName: '',
+			tSummary: '',
+			tDescription: '',
+			tCategory: pickerPlaceholder,
+			tRequiredObservations: '',
+			tId: '0'
 		});
 	}
-	
+
 	showProjectList () {
 		setState({
 			isAuth: true,
-			show: '',
-			param: this.props.project
+			show: ''
 		});
 	}
 
@@ -81,29 +94,12 @@ export default class UserList extends Component {
 			)
 		}
 
-		const columns = [
-			{
-				Header: 'Given Name',
-				accessor: 'firstName'
-			}, {
-				Header: 'Surname',
-				accessor: 'lastName'
-			}, {
-				Header: 'Login Name',
-				accessor: 'loginName'
-			}, {
-				Header: 'Phone Number',
-				accessor: 'phone' // String-based value accessors!
-			}
-		]
-
 		if (this.props.project !== '') {
 		return (
 			<View>
 				<Button
-					onPress = { this.showAddUser.bind(this) }
-					title = "Add User"
-					color = "#0c3868"
+					disabled = {true}
+					title = {"Users of " + this.props.name}
 				/>
 				<Button
 					onPress = { this.showCreateTicket.bind(this) }
@@ -120,11 +116,33 @@ export default class UserList extends Component {
 					title = "Back"
 					color = "#0e4a80"
 				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
+				<ReactTable data={this.state.dataSource} columns={ [
+					{
+						Header: 'Given Name',
+						accessor: 'firstName'
+					}, {
+						Header: 'Surname',
+						accessor: 'lastName'
+					}, {
+						Header: 'Login Name',
+						accessor: 'loginName'
+					}, {
+						Header: 'Phone Number',
+						accessor: 'phone' // String-based value accessors!
+					}, {
+						Header: '',
+						accessor: '',
+						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
+					}
+				] }/>
 			</View>
 		);
 		}
-		return( <View>
+		return(<View>
+			<Button
+				disabled = {true}
+				title = {"Users"}
+			/>
 			<Button
 				onPress = { this.showAddUser.bind(this) }
 				title = "Add User"
@@ -135,7 +153,21 @@ export default class UserList extends Component {
 				title = "Back"
 				color = "#0e4a80"
 			/>
-			<ReactTable data={this.state.dataSource} columns={columns}/>
+			<ReactTable data={this.state.dataSource} columns={ [
+				{
+					Header: 'Given Name',
+					accessor: 'firstName'
+				}, {
+					Header: 'Surname',
+					accessor: 'lastName'
+				}, {
+					Header: 'Login Name',
+					accessor: 'loginName'
+				}, {
+					Header: 'Phone Number',
+					accessor: 'phone' // String-based value accessors!
+				}
+			] }/>
 		</View>
 		);
 	}
