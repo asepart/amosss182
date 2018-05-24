@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { Text } from 'react-native';
 import { setState } from '../shared/GlobalState';
 
-export default class DeleteTicketButton extends Component {
+export default class TicketChatButton extends Component {
 
-  showDeleteTicketConfirm() {
+  showTicketChat() {
 		setState({
 			isAuth: true,
-			show: 'deleteTicket',
+			show: 'ticketChat',
 			param: this.props.keyFromParent,
 			name: this.props.nameFromParent,
       id: this.props.proj.row.id
@@ -15,12 +15,12 @@ export default class DeleteTicketButton extends Component {
 	}
 
 	render() {
-		return (	// TODO: add edit icon instead of text here
+		return (	// TODO: add edit icon instead of text here? maybe bubble
 			<Text
-				onPress = { this.showDeleteTicketConfirm.bind(this) }
+				onPress = { this.showTicketChat.bind(this) }
 				style={{color: '#5daedb'}}
 			>
-				DELETE
+				CHAT
 			</Text>
 		);
 	}
