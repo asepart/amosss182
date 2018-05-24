@@ -10,7 +10,8 @@ export default class DeleteTicketButton extends Component {
 			show: 'deleteTicket',
 			param: this.props.keyFromParent,
 			name: this.props.nameFromParent,
-      id: this.props.proj.row.id
+			id: this.props.proj.row.id,
+			tName: this.props.proj.row.ticketName
 		});
 	}
 

@@ -50,13 +50,13 @@ export default class DeleteUserConfirm extends Component {
 		}
 		var projectName = '';
 		if (this.props.name !== undefined) {
-			projectName = " from project " + this.props.name;
+			projectName = " from " + this.props.name;
 		}
 		return (
 			<View>
 			<Button
 				disabled = {true}
-				title = {"Delete user " + this.state.firstName + " " + this.state.lastName + projectName + "?"}
+				title = {"Delete " + this.state.firstName + " " + this.state.lastName + projectName + "?"}
 			/>
 			<Button onPress = { this.deleteUser.bind(this) } title = "Delete" color = "#0c3868"/>
 			<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
