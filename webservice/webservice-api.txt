@@ -164,6 +164,13 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
+- Delete user	//TODO
+
+  HTTP operation: DELETE
+  Path:           /users/{username}
+  Roles:          Admin
+  Status code:
+
 - List users
 
   HTTP operation: GET

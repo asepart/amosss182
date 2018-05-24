@@ -12,6 +12,7 @@ export default class DeleteTicketConfirm extends Component {
 		this.state = {
 			id: this.props.id,
 			entryKey: this.props.project,
+			tName: this.props.tName
 		};
 	}
 
@@ -47,7 +48,7 @@ export default class DeleteTicketConfirm extends Component {
 			<View>
 			<Button
 				disabled = {true}
-				title = {"Delete ticket " + this.state.id + " from project " + this.props.name + "?"}
+				title = {"Delete " + this.state.tName + " from " + this.props.name + "?"}
 			/>
 			<Button onPress = { this.deleteTicket.bind(this) } title = "Delete" color = "#0c3868"/>
 			<Button onPress = { this.showTicketList.bind(this) } title = "Cancel" color = "#0e4a80" />
