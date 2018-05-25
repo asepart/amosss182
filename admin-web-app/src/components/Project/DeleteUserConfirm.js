@@ -19,7 +19,7 @@ export default class DeleteUserConfirm extends Component {
 
   async deleteUser() {
     var url = URL;
-    if (this.state.entryKey !== undefined) {
+    if (this.state.entryKey !== '') {
     		url += '/projects/' + this.state.entryKey
     }
     url += '/users/' + this.state.loginName;
