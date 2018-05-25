@@ -484,7 +484,7 @@ public class WebService
         }
     }
 
-    @Path("/users")
+    @Path("/users/{username}")
     @OPTIONS
     @PermitAll
     public Response deleteUser()
