@@ -8,6 +8,7 @@ import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
+import {Link} from 'react-router-dom'
 
 var pickerPlaceholder = "Category";
 
@@ -98,6 +99,7 @@ export default class UserList extends Component {
 		return (
 			<View>
 				<Button
+					onPress = { function doNothing() {} }
 					disabled = {true}
 					title = {"Users of " + this.props.name}
 				/>
@@ -111,11 +113,13 @@ export default class UserList extends Component {
 					title = "Show Tickets"
 					color = "#0c3868"
 				/>
+				<Link to = "/" >
 				<Button
 					onPress = { this.showProjectList.bind(this) }
 					title = "Back"
 					color = "#0e4a80"
 				/>
+				</Link>
 				<ReactTable data={this.state.dataSource} columns={ [
 					{
 						Header: 'Given Name',
@@ -141,6 +145,7 @@ export default class UserList extends Component {
 		}
 		return(<View>
 			<Button
+				onPress = { function doNothing() {} }
 				disabled = {true}
 				title = {"Users"}
 			/>
@@ -149,11 +154,13 @@ export default class UserList extends Component {
 				title = "Add User"
 				color = "#0c3868"
 			/>
+			<Link to = "/" >
 			<Button
 				onPress = { this.showProjectList.bind(this) }
 				title = "Back"
 				color = "#0e4a80"
 			/>
+			</Link>
 			<ReactTable data={this.state.dataSource} columns={ [
 				{
 					Header: 'Given Name',

@@ -80,6 +80,7 @@ export default class ProjectList extends Component {
 		return (
 			<View>
 				<Button
+					onPress = { function doNothing() {} }
 					disabled = {true}
 					title = {"Projects"}
 				/>
