@@ -15,8 +15,7 @@ import UserAdd from './components/Project/UserAdd';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 import {isAuth} from './components/shared/auth';
-import { BrowserRouter } from 'react-router-dom'
-
+import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
 
 class Page extends Component{
 	handleGlobalState (){
@@ -55,41 +54,54 @@ class Page extends Component{
 	render() {
 		if(!this.state.isAuth){
 			return(<Login />);
-		}
-		switch (this.state.show){
-			case 'addProject':
-				return (<ProjectAdd project={this.state.param} name={this.state.name}/>);
-			case 'deleteProject':
-				return (<DeleteProjectConfirm project={this.state.param} name={this.state.name}/>);
-			case 'deleteTicket':
-				return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id} tName = {this.state.tName}/>);
-			case 'deleteUser':
-					return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName}/>);
-			case 'listUsers':
-				return (<UserList project={this.state.param} name={this.state.name}/>);
-			case 'addUser':
-				return (<UserAdd project={this.state.param}/>);
-			case 'createTicket':
-				return (<TicketCreate project={this.state.param} name={this.state.name}
-						tName = {this.state.tName}
-						tSummary = {this.state.tSummary}
-						tDescription = {this.state.tDescription}
-						tCategory = {this.state.tCategory}
-						tRequiredObservations = {this.state.tRequiredObservations}
-						tId = {this.state.tId}/>);
-			case 'showTickets':
-				return (<TicketList project={this.state.param} name={this.state.name}
-				tName = {this.state.tName}
-				tSummary = {this.state.tSummary}
-				tDescription = {this.state.tDescription}
-				tCategory = {this.state.tCategory}
-				tRequiredObservations = {this.state.tRequiredObservations}
-				tId = {this.state.tId}/>);
-			case 'ticketChat':
-				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id}/>);
-			default:
-				return (<ProjectList/>);
-		}
+        }
+        return(
+        <Switch>
+            <Route exact path="/" component={ProjectList}/>
+            <Route path="/usermanagement" render={props => (<UserList {...props} project={this.state.param} name={this.state.name} />
+            )}/>
+          <Route path='/projectadd' component={ProjectAdd}/>
+        </Switch>
+        )
+		// switch (this.state.show){
+		// 	case 'addProject':
+		// 		return (<ProjectAdd project={this.state.param} name={this.state.name}/>);
+		// 	case 'deleteProject':
+		// 		return (<DeleteProjectConfirm project={this.state.param} name={this.state.name}/>);
+		// 	case 'deleteTicket':
+		// 		return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id} tName = {this.state.tName}/>);
+		// 	case 'deleteUser':
+		// 			return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName}/>);
+		//     case 'listUsers':
+		//         return <Link to="usermanagement" />
+		// 		// return <Route path="/usermanagement" component={UserList} /> 
+		// 		// return <Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} /> } /> 
+		// 		return (<UserList project={this.state.param} name={this.state.name}/>);
+		// 	case 'addUser':
+		// 		return (<UserAdd project={this.state.param}/>);
+		// 	case 'createTicket':
+		// 		return (<TicketCreate project={this.state.param} name={this.state.name}
+		// 				tName = {this.state.tName}
+		// 				tSummary = {this.state.tSummary}
+		// 				tDescription = {this.state.tDescription}
+		// 				tCategory = {this.state.tCategory}
+		// 				tRequiredObservations = {this.state.tRequiredObservations}
+		// 				tId = {this.state.tId}/>);
+		// 	case 'showTickets':
+		// 		return (<TicketList project={this.state.param} name={this.state.name}
+		// 		tName = {this.state.tName}
+		// 		tSummary = {this.state.tSummary}
+		// 		tDescription = {this.state.tDescription}
+		// 		tCategory = {this.state.tCategory}
+		// 		tRequiredObservations = {this.state.tRequiredObservations}
+		// 		tId = {this.state.tId}/>);
+		// 	case 'ticketChat':
+		// 		return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id}/>);
+		//     default:
+		//             return <Link to ='/' />
+		// 		// return <Route exact path="/" component={ProjectList} />
+		// 		// return (<ProjectList/>);
+		// }
 	}
 }
 

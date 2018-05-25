@@ -24,7 +24,7 @@ export default class UserList extends Component {
 
 	componentDidMount() {
 		var url = URL;
-		if (this.props.project !== '') {
+		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
 			url += '/projects/' + this.props.project + '/users';
 		} else {
 			url += '/users';
@@ -94,7 +94,7 @@ export default class UserList extends Component {
 			)
 		}
 
-		if (this.props.project !== '') {
+		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
 		return (
 			<View>
 				<Button
