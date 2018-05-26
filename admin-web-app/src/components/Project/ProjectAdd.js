@@ -4,6 +4,7 @@ import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
+import {Link, Redirect} from 'react-router-dom'
 
 var button = "Add";
 var editKey = true;
@@ -53,6 +54,15 @@ export default class ProjectAdd extends Component {
 				console.error(error);
 			});
 		this.showProjectList ();
+		this.setState({
+			redirect: true
+		  })
+	}
+
+	renderRedirect = () => {
+		if (this.state.redirect) {
+		  return <Redirect to="/"/>
+		}
 	}
 
 	render() {
@@ -79,8 +89,11 @@ export default class ProjectAdd extends Component {
 				value = { this.state.entryKey }
 				editable = {editKey}
 			/>
+			{this.renderRedirect()}
 			<Button onPress = { this.putProject.bind(this) } title = {button} color = "#0c3868" disabled = {!buttonEnabled}/>
-			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
+			<Link to="/" style={{textDecoration: 'none'}}>
+				<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
+			</Link>
 			</View>
 		);
 	}
