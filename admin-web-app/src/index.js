@@ -31,7 +31,9 @@ class Page extends Component{
 			tId: getState().tId,
 			id: getState().id,
 			firstName: getState().firstName,
-			lastName: getState().lastName
+			lastName: getState().lastName,
+			phone: getState().phone,
+			password: getState().password
 		});
 	}
 
@@ -66,7 +68,7 @@ class Page extends Component{
 			case 'listUsers':
 				return (<UserList project={this.state.param} name={this.state.name}/>);
 			case 'addUser':
-				return (<UserAdd project={this.state.param}/>);
+				return (<UserAdd project={this.state.param} id={this.state.id} password={this.state.password} firstName={this.state.firstName} lastName={this.state.lastName} phone={this.state.phone}/>);
 			case 'createTicket':
 				return (<TicketCreate project={this.state.param} name={this.state.name}
 						tName = {this.state.tName}

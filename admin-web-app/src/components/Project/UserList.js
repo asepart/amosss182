@@ -4,6 +4,7 @@ import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
+import UpdateUserButton from './UpdateUserButton';
 import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
@@ -44,7 +45,8 @@ export default class UserList extends Component {
 	showAddUser () {
 		setState({
 			isAuth: true,
-			show: 'addUser'
+			show: 'addUser',
+			id: ''
 		});
 	}
 
@@ -128,6 +130,10 @@ export default class UserList extends Component {
 						accessor: 'loginName',
 						show: false
 					}, {
+						Header: 'Password',
+						accessor: 'password',
+						show: false
+					}, {
 						Header: 'Phone Number',
 						accessor: 'phone' // String-based value accessors!
 					}, {
@@ -166,8 +172,16 @@ export default class UserList extends Component {
 					accessor: 'loginName',
 					show: false
 				}, {
+					Header: 'Password',
+					accessor: 'password',
+					show: false
+				}, {
 					Header: 'Phone Number',
 					accessor: 'phone' // String-based value accessors!
+				}, {
+					Header: '',
+					accessor: '',
+					Cell: props => <UpdateUserButton proj={props}/>
 				}, {
 					Header: '',
 					accessor: '',
