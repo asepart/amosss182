@@ -61,6 +61,7 @@ class Page extends Component{
 			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
 			<Route path='/addproject' render={props => <ProjectAdd project={this.state.param} name={this.state.name} {...props}/>}/>
 			<Route path='/deleteproject' render={props => <DeleteProjectConfirm project={this.state.param} name={this.state.name} {...props} />}/>
+			<Route path='/project/:project' render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
         </Switch>
 		)
 		// switch (this.state.show){
