@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text } from 'react-native';
 import { setState } from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class UpdateProjectButton extends Component {
 	displayProject() {
@@ -13,12 +14,14 @@ export default class UpdateProjectButton extends Component {
 	}
 	render() {
 		return (	// TODO: add edit icon instead of text here
-			<Text
-				onPress = { this.displayProject.bind(this) }
-				style={{color: '#5daedb'}}
-			>
-				EDIT
-			</Text> 
+			<Link to="/addProject" style={{textDecoration: 'none'}}>
+				<Text
+					onPress = { this.displayProject.bind(this) }
+					style={{color: '#5daedb'}}
+				>
+					EDIT
+				</Text> 
+			</Link>
 		);
 	}
 }
