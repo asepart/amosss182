@@ -97,28 +97,88 @@ export default class UserList extends Component {
 		}
 
 		if (this.props.project !== '') {
-		return (
+			return (
+				<View>
+					<View style={{flex:1}}>
+						<Button
+							title = {" "}
+							color = "#0c3868"
+						/>
+					</View>
+					<View style={{flexDirection: 'row'}}>
+						<View style={{flex:1}}>
+							<Button
+								onPress = { this.showTicketList.bind(this) }
+								title = {"Tickets of " + this.props.name}
+								color = "#0e4a80"
+							/>
+						</View>
+						<View style={{flex:1}}>
+							<Button
+								disabled = {true}
+								title = {"Users of " + this.props.name}
+							/>
+						</View>
+					</View>
+					<ReactTable data={this.state.dataSource} defaultPageSize = {10} columns={ [
+						{
+							Header: 'Given Name',
+							accessor: 'firstName'
+						}, {
+							Header: 'Surname',
+							accessor: 'lastName'
+						}, {
+							Header: 'Login Name',
+							accessor: 'loginName',
+							show: false
+						}, {
+							Header: 'Password',
+							accessor: 'password',
+							show: false
+						}, {
+							Header: 'Phone Number',
+							accessor: 'phone' // String-based value accessors!
+						}, {
+							Header: '',
+							accessor: '',
+							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
+						}
+					] }/>
+					<View>
+						<Button
+							onPress = { this.showProjectList.bind(this) }
+							title = "Back to Projects"
+							color = "#0e4a80"
+						/>
+					</View>
+				</View>
+			);
+		}
+		return(
 			<View>
-				<Button
-					disabled = {true}
-					title = {"Users of " + this.props.name}
-				/>
-				<Button
-					onPress = { this.showCreateTicket.bind(this) }
-					title = "Create Ticket"
-					color = "#0c3868"
-				/>
-				<Button
-					onPress = { this.showTicketList.bind(this) }
-					title = "Show Tickets"
-					color = "#0c3868"
-				/>
-				<Button
-					onPress = { this.showProjectList.bind(this) }
-					title = "Back"
-					color = "#0e4a80"
-				/>
-				<ReactTable data={this.state.dataSource} columns={ [
+				<View>
+					<Button
+						onPress = { this.showAddUser.bind(this) }
+						title = "Add User"
+						color = "#0c3868"
+					/>
+				</View>
+				<View style={{flexDirection: 'row'}}>
+					<View style={{flex:1}}>
+						<Button
+							onPress = { this.showProjectList.bind(this) }
+							title = "Projects"
+							color = "#0e4a80"
+						/>
+					</View>
+					<View style={{flex:1}}>
+						<Button
+							disabled = {true}
+							title = {"Users"}
+						/>
+					</View>
+				</View>
+				<ReactTable data={this.state.dataSource} defaultPageSize = {10} columns={ [
 					{
 						Header: 'Given Name',
 						accessor: 'firstName'
@@ -139,56 +199,14 @@ export default class UserList extends Component {
 					}, {
 						Header: '',
 						accessor: '',
+						Cell: props => <UpdateUserButton proj={props}/>
+					}, {
+						Header: '',
+						accessor: '',
 						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
 					}
 				] }/>
 			</View>
-		);
-		}
-		return(<View>
-			<Button
-				disabled = {true}
-				title = {"Users"}
-			/>
-			<Button
-				onPress = { this.showAddUser.bind(this) }
-				title = "Add User"
-				color = "#0c3868"
-			/>
-			<Button
-				onPress = { this.showProjectList.bind(this) }
-				title = "Back"
-				color = "#0e4a80"
-			/>
-			<ReactTable data={this.state.dataSource} columns={ [
-				{
-					Header: 'Given Name',
-					accessor: 'firstName'
-				}, {
-					Header: 'Surname',
-					accessor: 'lastName'
-				}, {
-					Header: 'Login Name',
-					accessor: 'loginName',
-					show: false
-				}, {
-					Header: 'Password',
-					accessor: 'password',
-					show: false
-				}, {
-					Header: 'Phone Number',
-					accessor: 'phone' // String-based value accessors!
-				}, {
-					Header: '',
-					accessor: '',
-					Cell: props => <UpdateUserButton proj={props}/>
-				}, {
-					Header: '',
-					accessor: '',
-					Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
-				}
-			] }/>
-		</View>
 		);
 	}
 }

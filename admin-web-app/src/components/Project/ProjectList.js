@@ -78,21 +78,29 @@ export default class ProjectList extends Component {
 
 		return (
 			<View>
-				<Button
-					disabled = {true}
-					title = {"Projects"}
-				/>
-				<Button
-					onPress = { this.showAddProject }
-					title = "Add Project"
-					color = "#0c3868"
-				/>
-				<Button
-					onPress = { this.showUserManagement }
-					title = "User Management"
-					color = "#0c3868"
-				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
+				<View>
+					<Button
+						onPress = { this.showAddProject }
+						title = "Add Project"
+						color = "#0c3868"
+					/>
+				</View>
+				<View style={{flexDirection: 'row'}}>
+					<View style={{flex:1}}>
+						<Button
+							disabled = {true}
+							title = {"Projects"}
+						/>
+					</View>
+					<View style={{flex:1}}>
+						<Button
+							onPress = { this.showUserManagement }
+							title = "Users"
+							color = "#0e4a80"
+						/>
+					</View>
+				</View>
+				<ReactTable data={this.state.dataSource} defaultPageSize = {10} columns={columns}/>
 			</View>
 		);
 	}
