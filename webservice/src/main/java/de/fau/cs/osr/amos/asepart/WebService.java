@@ -190,7 +190,7 @@ public class WebService
 
         try (Session session = Database.openSession())
         {
-            Ticket[] tickets = Database.getTicketsOfProject(session, sc.getUserPrincipal().getName(), role, projectKey);
+            Ticket[] tickets = Database.getTicketsOfProject(session, principal.getName(), role, projectKey);
             return Response.ok(tickets).build();
         }
 
@@ -206,6 +206,39 @@ public class WebService
     public Response ticket()
     {
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}")
+    @GET
+    @RolesAllowed({"Admin", "User"})
+    public Response getTicket(@Context SecurityContext sc, @PathParam("key") String projectKey, @PathParam("id") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isProject(session, projectKey) || !Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+            Project project = Database.getProject(session, projectKey);
+
+            if (!ticket.getProjectKey().equals(projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            else if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            session.getTransaction().commit();
+
+            return Response.ok(ticket).build();
+        }
     }
 
     @Path("/projects/{key}/tickets/{id}")
@@ -449,6 +482,34 @@ public class WebService
         {
             return Response.ok(Database.listUsers(session)).build();
         }
+    }
+
+    @Path("/users/{username}")
+    @OPTIONS
+    @PermitAll
+    public Response deleteUser()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/users/{username}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response deleteUser(@Context SecurityContext sc, @PathParam("username") String username)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isUser(session, username))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Database.deleteUser(session, username);
+
+            session.getTransaction().commit();
+        }
+
+        return Response.ok("User deleted.").build();
     }
 
     @Path("/admins")
