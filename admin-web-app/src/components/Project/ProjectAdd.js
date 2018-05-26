@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View} from 'react-native';
+import {Button,TextInput,ActivityIndicator,View,Text} from 'react-native';
 import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
@@ -64,8 +64,14 @@ export default class ProjectAdd extends Component {
 				</View>
 			)
 		}
-		return (
+		return (	// TODO: add home icon instead of text here
 			<View>
+				<Text
+					onPress = { this.showProjectList.bind(this) }
+					style={{color: '#5daedb'}}
+				>
+					HOME
+				</Text> 
 			<TextInput
 				placeholder = "Name"
 				style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}

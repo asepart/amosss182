@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View} from 'react-native';
+import {ActivityIndicator,Button,View,Text} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -97,8 +97,16 @@ export default class UserList extends Component {
 		}
 
 		if (this.props.project !== '') {
-			return (
+			return (// TODO: add home icon instead of text here
 				<View>
+					<View>
+						<Text
+							onPress = { this.showProjectList.bind(this) }
+							style={{color: '#5daedb'}}
+						>
+							HOME
+						</Text> 
+					</View>
 					<View style={{flex:1}}>
 						<Button
 							title = {" "}
@@ -120,7 +128,7 @@ export default class UserList extends Component {
 							/>
 						</View>
 					</View>
-					<ReactTable data={this.state.dataSource} defaultPageSize = {10} columns={ [
+					<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={ [
 						{
 							Header: 'Given Name',
 							accessor: 'firstName'
@@ -154,8 +162,16 @@ export default class UserList extends Component {
 				</View>
 			);
 		}
-		return(
+		return(// TODO: add home icon instead of text here
 			<View>
+				<View>
+					<Text
+						onPress = { this.showProjectList.bind(this) }
+						style={{color: '#5daedb'}}
+					>
+						HOME
+					</Text> 
+				</View>
 				<View>
 					<Button
 						onPress = { this.showAddUser.bind(this) }
@@ -178,7 +194,7 @@ export default class UserList extends Component {
 						/>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} defaultPageSize = {10} columns={ [
+				<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={ [
 					{
 						Header: 'Given Name',
 						accessor: 'firstName'

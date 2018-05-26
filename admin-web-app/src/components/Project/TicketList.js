@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View} from 'react-native';
+import {ActivityIndicator,Button, View, Text} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -109,8 +109,16 @@ export default class TicketList extends Component {
 			}
 		]
 
-		return (
+		return (// TODO: add home icon instead of text here
 			<View>
+				<View>
+					<Text
+						onPress = { this.showProjectList.bind(this) }
+						style={{color: '#5daedb'}}
+					>
+						HOME
+					</Text> 
+				</View>
 				<View>
 					<Button
 						onPress = { this.showCreateTicket.bind(this) }
@@ -133,7 +141,7 @@ export default class TicketList extends Component {
 						/>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize = {10}/>
+				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize={10} showPagination={false}/>
 				<View>
 					<Button
 						onPress = { this.showProjectList.bind(this) }

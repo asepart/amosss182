@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View} from 'react-native';
+import {ActivityIndicator,Button, View,Text} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -47,6 +47,13 @@ export default class ProjectList extends Component {
 			param: ''
 		});
 	}
+	
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: ''
+		});
+	}
 
 	render() {
 		if (this.state.isLoading) {
@@ -76,8 +83,16 @@ export default class ProjectList extends Component {
 			}
 		]
 
-		return (
+		return (	// TODO: add home icon instead of text here
 			<View>
+				<View>
+					<Text
+						onPress = { this.showProjectList.bind(this) }
+						style={{color: '#5daedb'}}
+					>
+						HOME
+					</Text> 
+				</View>
 				<View>
 					<Button
 						onPress = { this.showAddProject }
@@ -100,7 +115,7 @@ export default class ProjectList extends Component {
 						/>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} defaultPageSize = {10} columns={columns}/>
+				<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={columns}/>
 			</View>
 		);
 	}

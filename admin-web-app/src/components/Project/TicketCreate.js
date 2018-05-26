@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View, Picker} from 'react-native';
+import {Button,TextInput,ActivityIndicator,View,Picker,Text} from 'react-native';
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
@@ -49,6 +49,13 @@ export default class TicketCreate extends Component {
 			tId: '0'
 		});
 	}
+	
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: ''
+		});
+	}
 
 	async createTicket() {
 		let auth = getAuthForPost();
@@ -83,8 +90,14 @@ export default class TicketCreate extends Component {
 				</View>
 			)
 		}
-		return(
+		return(	// TODO: add home icon instead of text here
 				<View>
+					<Text
+						onPress = { this.showProjectList.bind(this) }
+						style={{color: '#5daedb'}}
+					>
+						HOME
+					</Text>
 					<TextInput
 						placeholder = "Name"
 						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}

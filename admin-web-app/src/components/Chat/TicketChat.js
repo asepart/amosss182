@@ -52,6 +52,14 @@ export default class TicketChat extends Component {
 			name: this.props.name
 		});
 	}
+  
+  showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: ''
+		});
+	}
 
   renderChat() {
     return this.state.chatHistory.map(function(news, id){
@@ -72,8 +80,14 @@ export default class TicketChat extends Component {
       )
     }
 
-    return(
-      <View>
+    return(// TODO: add home icon instead of text here
+		<View>
+			<Text
+				onPress = { this.showProjectList.bind(this) }
+				style={{color: '#5daedb'}}
+			>
+				HOME
+			</Text>
         <Button
           disabled = {true}
           title = {"Chat history of ticket " + this.props.id + " in project " + this.props.name}

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button,ActivityIndicator,View} from 'react-native';
+import {Button,ActivityIndicator,View,Text} from 'react-native';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
@@ -15,6 +15,14 @@ export default class DeleteUserConfirm extends Component {
 			firstName: this.props.firstName,
 			lastName: this.props.lastName
 		};
+	}
+	
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: ''
+		});
 	}
 
   async deleteUser() {
@@ -52,8 +60,14 @@ export default class DeleteUserConfirm extends Component {
 		if (this.props.name !== undefined) {
 			projectName = " from " + this.props.name;
 		}
-		return (
+		return (// TODO: add home icon instead of text here
 			<View>
+				<Text
+					onPress = { this.showProjectList.bind(this) }
+					style={{color: '#5daedb'}}
+				>
+					HOME
+				</Text>
 			<Button
 				disabled = {true}
 				title = {"Delete " + this.state.firstName + " " + this.state.lastName + projectName + "?"}
