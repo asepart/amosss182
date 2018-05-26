@@ -113,12 +113,12 @@ export default class UserList extends Component {
 					title = "Show Tickets"
 					color = "#0c3868"
 				/>
-				<Link to = "/" >
-				<Button
-					onPress = { this.showProjectList.bind(this) }
-					title = "Back"
-					color = "#0e4a80"
-				/>
+				<Link to = "/" style={{textDecoration: 'none'}} >
+					<Button
+						onPress = { this.showProjectList.bind(this) }
+						title = "Back"
+						color = "#0e4a80"
+					/>
 				</Link>
 				<ReactTable data={this.state.dataSource} columns={ [
 					{
@@ -147,19 +147,19 @@ export default class UserList extends Component {
 			<Button
 				onPress = { function doNothing() {} }
 				disabled = {true}
-				title = {"Users"}
+				title = {"All Users"}
 			/>
 			<Button
 				onPress = { this.showAddUser.bind(this) }
 				title = "Add User"
 				color = "#0c3868"
 			/>
-			<Link to = "/" >
-			<Button
-				onPress = { this.showProjectList.bind(this) }
-				title = "Back"
-				color = "#0e4a80"
-			/>
+			<Link to = "/" style={{textDecoration: 'none'}} >
+				<Button
+					onPress = { this.showProjectList.bind(this) }
+					title = "Back"
+					color = "#0e4a80"
+				/>
 			</Link>
 			<ReactTable data={this.state.dataSource} columns={ [
 				{

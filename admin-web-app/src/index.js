@@ -57,12 +57,12 @@ class Page extends Component{
         }
         return(
         <Switch>
-            <Route exact path="/" component={ProjectList}/>
-            <Route path="/usermanagement" render={props => (<UserList {...props} project={this.state.param} name={this.state.name} />
-            )}/>
-          <Route path='/projectadd' component={ProjectAdd}/>
+			<Route exact path="/" component={ProjectList}/>
+			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
+			<Route path='/addproject' render={props => <ProjectAdd project={this.state.param} name={this.state.name} {...props}/>}/>
+			<Route path='/deleteproject' render={props => <DeleteProjectConfirm project={this.state.param} name={this.state.name} {...props} />}/>
         </Switch>
-        )
+		)
 		// switch (this.state.show){
 		// 	case 'addProject':
 		// 		return (<ProjectAdd project={this.state.param} name={this.state.name}/>);

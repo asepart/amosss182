@@ -9,7 +9,7 @@ import DeleteProjectButton from './DeleteProjectButton';
 import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
-import {Link, Redirect} from 'react-router-dom'
+import {Link} from 'react-router-dom'
 
 export default class ProjectList extends Component {
 
@@ -84,14 +84,15 @@ export default class ProjectList extends Component {
 					disabled = {true}
 					title = {"Projects"}
 				/>
-				<Button
-					onPress = { this.showAddProject }
-					title = "Add Project"
-					color = "#0c3868"
-				/>
-				<Link to="usermanagement">
+				<Link to="/addproject" style={{textDecoration: 'none'}}>
 					<Button
-						tag ="Link"
+						onPress = { this.showAddProject }
+						title = "Add Project"
+						color = "#0c3868"
+					/>
+				</Link>
+				<Link to="/usermanagement" style={{textDecoration: 'none'}}>
+					<Button
 						onPress = { this.showUserManagement }
 						title = "User Management"
 						color = "#0c3868"
