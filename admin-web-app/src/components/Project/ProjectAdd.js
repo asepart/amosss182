@@ -74,13 +74,13 @@ export default class ProjectAdd extends Component {
 				</Text> 
 			<TextInput
 				placeholder = "Name"
-				style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+				style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 				onChangeText = {(text) => this.setState({projectName: text})}
 				value = {this.state.projectName}
 			/>
 			<TextInput
 				placeholder = "Entry Code"
-				style = {{height: 40,width: '25em',borderColor: 'gray',borderWidth: 1}}
+				style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 				onChangeText = { (text) => this.setState({entryKey: text})}
 				value = { this.state.entryKey }
 				editable = {editKey}

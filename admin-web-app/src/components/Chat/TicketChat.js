@@ -90,7 +90,7 @@ export default class TicketChat extends Component {
 			</Text>
         <Button
           disabled = {true}
-          title = {"Chat history of ticket " + this.props.id + " in project " + this.props.name}
+          title = {"Chat history of " + this.props.tName + " in " + this.props.name}
         />
 
         {this.renderChat()}
@@ -100,7 +100,7 @@ export default class TicketChat extends Component {
           style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
           onChangeText = {(text) => this.setState({message: text})} />
 
-        <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0e4a80" />
+        <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" />
         <Button onPress = { this.showTicketList.bind(this) } title = "Back to Tickets" color = "#0e4a80" />
       </View>
     );

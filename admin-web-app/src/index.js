@@ -86,7 +86,7 @@ class Page extends Component{
 				tRequiredObservations = {this.state.tRequiredObservations}
 				tId = {this.state.tId}/>);
 			case 'ticketChat':
-				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id}/>);
+				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id} tName={this.state.tName}/>);
 			default:
 				return (<ProjectList/>);
 		}

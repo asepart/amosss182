@@ -100,24 +100,27 @@ export default class TicketCreate extends Component {
 					</Text>
 					<TextInput
 						placeholder = "Name"
-						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+						textAlign={'center'}
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({ticketName: text})}
 						value = {this.state.ticketName}
 					/>
 					<TextInput
 						placeholder = "Summary"
-						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+						textAlign={'center'}
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({ticketSummary: text})}
 						value = {this.state.ticketSummary}
 					/>
 					<TextInput
 						placeholder = "Description"
-						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+						textAlign={'center'}
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({ticketDescription: text})}
 						value = {this.state.ticketDescription}
 					/>
 					<Picker
-						style = {{height: 40, width: '22em', backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1}}
+						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1, textAlign: 'center'}}
 						onValueChange = {(text) => this.setState({ticketCategory: text})}
 						selectedValue = {this.state.ticketCategory}
 					>
@@ -128,7 +131,7 @@ export default class TicketCreate extends Component {
 					</Picker>
 					<TextInput
 						placeholder = "Required Observations"
-						style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {this.state.requiredObservations}
 					/>

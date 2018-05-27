@@ -7,6 +7,7 @@ import '../../index.css';
 
 export default class DeleteUserConfirm extends Component {
 
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -56,8 +57,10 @@ export default class DeleteUserConfirm extends Component {
 				</View>
 			)
 		}
+		var button = "Delete ";
 		var projectName = '';
 		if (this.props.name !== undefined) {
+			button = "Remove "
 			projectName = " from " + this.props.name;
 		}
 		return (// TODO: add home icon instead of text here
@@ -70,9 +73,9 @@ export default class DeleteUserConfirm extends Component {
 				</Text>
 			<Button
 				disabled = {true}
-				title = {"Delete " + this.state.firstName + " " + this.state.lastName + projectName + "?"}
+				title = {button + this.state.firstName + " " + this.state.lastName + projectName + "?"}
 			/>
-			<Button onPress = { this.deleteUser.bind(this) } title = "Delete" color = "#0c3868"/>
+			<Button onPress = { this.deleteUser.bind(this) } title = {button} color = "#0c3868"/>
 			<Button onPress = { this.showUserList.bind(this) } title = "Cancel" color = "#0e4a80" />
 			</View>
 		);
