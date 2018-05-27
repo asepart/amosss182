@@ -3,15 +3,26 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setKey, isValid} from './keyValid';
-
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
-	StackNavigator,
+	StackNavigator, DrawerNavigator
   } from 'react-navigation';
 
 
 export default class JoinProject extends Component {
 
   static navigationOptions= {
+    tabBarLabel: 'Join Projects',
+   // drawerIcon: ({tintColor}) => {
+    //  return(
+    //  <MaterialIcons
+   //   name= "create_new_folder"
+   //   size= {24}  
+   //   style={{color: tintColor}}
+   //   >
+   //     </MaterialIcons>
+   // );
+   // } ,
 		title: 'Join Projects',
 		headerStyle: {
 			backgroundColor:'#5daedb'
