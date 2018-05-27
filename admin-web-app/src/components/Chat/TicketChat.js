@@ -52,6 +52,14 @@ export default class TicketChat extends Component {
 			name: this.props.name
 		});
 	}
+  
+  showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: ''
+		});
+	}
 
   renderChat() {
     return this.state.chatHistory.map(function(news, id){
@@ -72,11 +80,17 @@ export default class TicketChat extends Component {
       )
     }
 
-    return(
-      <View>
+    return(// TODO: add home icon instead of text here
+		<View>
+			<Text
+				onPress = { this.showProjectList.bind(this) }
+				style={{color: '#5daedb'}}
+			>
+				HOME
+			</Text>
         <Button
           disabled = {true}
-          title = {"Chat history of ticket " + this.props.id + " in project " + this.props.name}
+          title = {"Chat history of " + this.props.tName + " in " + this.props.name}
         />
 
         {this.renderChat()}
@@ -86,7 +100,7 @@ export default class TicketChat extends Component {
           style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
           onChangeText = {(text) => this.setState({message: text})} />
 
-        <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0e4a80" />
+        <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" />
         <Button onPress = { this.showTicketList.bind(this) } title = "Back to Tickets" color = "#0e4a80" />
       </View>
     );

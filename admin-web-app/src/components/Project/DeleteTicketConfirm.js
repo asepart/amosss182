@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button,ActivityIndicator,View} from 'react-native';
+import {Button,ActivityIndicator,View,Text} from 'react-native';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
@@ -24,6 +24,14 @@ export default class DeleteTicketConfirm extends Component {
 			name: this.props.name
 		});
 	}
+  
+  showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: ''
+		});
+	}
 
   async deleteTicket() {
     var url = URL;
@@ -44,8 +52,14 @@ export default class DeleteTicketConfirm extends Component {
 				</View>
 			)
 		}
-		return (
+		return (// TODO: add home icon instead of text here
 			<View>
+				<Text
+					onPress = { this.showProjectList.bind(this) }
+					style={{color: '#5daedb'}}
+				>
+					HOME
+				</Text>
 			<Button
 				disabled = {true}
 				title = {"Delete " + this.state.tName + " from " + this.props.name + "?"}

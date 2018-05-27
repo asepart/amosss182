@@ -10,7 +10,8 @@ export default class TicketChatButton extends Component {
 			show: 'ticketChat',
 			param: this.props.keyFromParent,
 			name: this.props.nameFromParent,
-      id: this.props.proj.row.id
+			id: this.props.proj.row.id,
+			tName: this.props.proj.row.ticketName
 		});
 	}
 

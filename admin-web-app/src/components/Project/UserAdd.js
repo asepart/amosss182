@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View} from 'react-native';
+import {Button,TextInput,ActivityIndicator,View,Text} from 'react-native';
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
@@ -76,36 +76,42 @@ export default class UserAdd extends Component {
 				</View>
 			)
 		}
-		return(
+		return(	// TODO: add home icon instead of text here
 			<View>
+				<Text
+					onPress = { this.showProjectList.bind(this) }
+					style={{color: '#5daedb'}}
+				>
+					HOME
+				</Text> 
 				<TextInput
 					placeholder = "Login Name"
-					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 					onChangeText = {(text) => this.setState({loginName: text})}
 					value = {this.state.loginName}
 					editable = {editKey}
 				/>
 				<TextInput
 					placeholder = "Password"
-					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 					onChangeText = {(text) => this.setState({password: text})}
 					value = {this.state.password}
 				/>
 				<TextInput
 					placeholder = "Given Name"
-					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 					onChangeText = {(text) => this.setState({firstName: text})}
 					value = {this.state.firstName}
 				/>
 				<TextInput
 					placeholder = "Surname"
-					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 					onChangeText = {(text) => this.setState({lastName: text})}
 					value = {this.state.lastName}
 				/>
 				<TextInput
 					placeholder = "Phone Number"
-					style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+					style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 					onChangeText = {(text) => this.setState({phone: text})}
 					value = {this.state.phone}
 				/>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View} from 'react-native';
+import {ActivityIndicator,Button, View, Text} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -58,6 +58,13 @@ export default class TicketList extends Component {
 			tId: '0'
 		});
 	}
+	
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: ''
+		});
+	}
 
 	render() {
 		if (this.state.isLoading) {
@@ -102,23 +109,46 @@ export default class TicketList extends Component {
 			}
 		]
 
-		return (
+		return (// TODO: add home icon instead of text here
 			<View>
-				<Button
-					disabled = {true}
-					title = {"Tickets of " + this.props.name}
-				/>
-				<Button
-					onPress = { this.showCreateTicket.bind(this) }
-					title = "Create Ticket"
-					color = "#0c3868"
-				/>
-				<Button
-					onPress = { this.showUserManagement.bind(this) }
-					title = "Back"
-					color = "#0e4a80"
-				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
+				<View>
+					<Text
+						onPress = { this.showProjectList.bind(this) }
+						style={{color: '#5daedb'}}
+					>
+						HOME
+					</Text> 
+				</View>
+				<View>
+					<Button
+						onPress = { this.showCreateTicket.bind(this) }
+						title = "Add Ticket"
+						color = "#0c3868"
+					/>
+				</View>
+				<View style={{flexDirection: 'row'}}>
+					<View style={{flex:1}}>
+						<Button
+							disabled = {true}
+							title = {"Tickets of " + this.props.name}
+						/>
+					</View>
+					<View style={{flex:1}}>
+						<Button
+							onPress = { this.showUserManagement.bind(this) }
+							title = {"Users of "  + this.props.name}
+							color = "#0e4a80"
+						/>
+					</View>
+				</View>
+				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize={10} showPagination={false}/>
+				<View>
+					<Button
+						onPress = { this.showProjectList.bind(this) }
+						title = "Back to Projects"
+						color = "#0e4a80"
+					/>
+				</View>
 			</View>
 		);
 	}

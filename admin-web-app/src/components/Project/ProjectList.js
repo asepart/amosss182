@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View} from 'react-native';
+import {ActivityIndicator,Button, View,Text} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -47,6 +47,13 @@ export default class ProjectList extends Component {
 			param: ''
 		});
 	}
+	
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: ''
+		});
+	}
 
 	render() {
 		if (this.state.isLoading) {
@@ -76,23 +83,39 @@ export default class ProjectList extends Component {
 			}
 		]
 
-		return (
+		return (	// TODO: add home icon instead of text here
 			<View>
-				<Button
-					disabled = {true}
-					title = {"Projects"}
-				/>
-				<Button
-					onPress = { this.showAddProject }
-					title = "Add Project"
-					color = "#0c3868"
-				/>
-				<Button
-					onPress = { this.showUserManagement }
-					title = "User Management"
-					color = "#0c3868"
-				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
+				<View>
+					<Text
+						onPress = { this.showProjectList.bind(this) }
+						style={{color: '#5daedb'}}
+					>
+						HOME
+					</Text> 
+				</View>
+				<View>
+					<Button
+						onPress = { this.showAddProject }
+						title = "Add Project"
+						color = "#0c3868"
+					/>
+				</View>
+				<View style={{flexDirection: 'row'}}>
+					<View style={{flex:1}}>
+						<Button
+							disabled = {true}
+							title = {"Projects"}
+						/>
+					</View>
+					<View style={{flex:1}}>
+						<Button
+							onPress = { this.showUserManagement }
+							title = "Users"
+							color = "#0e4a80"
+						/>
+					</View>
+				</View>
+				<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={columns}/>
 			</View>
 		);
 	}
