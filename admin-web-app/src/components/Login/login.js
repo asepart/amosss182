@@ -5,6 +5,7 @@ import {
 	View,
 	TextInput,
 	TouchableOpacity,
+	Image
 } from 'react-native';
 import {isAuth, setPSW, setUsername} from '../shared/auth';
 import {setState} from '../shared/GlobalState';
@@ -34,7 +35,8 @@ export default class Login extends Component {
 	render() {
 		return (
 			<View style={styles.container}>
-				<TextInput onChangeText={(text) => this.setState({email: text})} placeholder="email" placeholderTextColor="#FFF" style={styles.input}/>
+				<img src={require('../images/icon.png')}/><p/>
+				<TextInput onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
 				<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" secureTextEntry={true} style={styles.input}/>
 				<TouchableOpacity onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 					<Text style={styles.buttonText}>LOGIN</Text>
