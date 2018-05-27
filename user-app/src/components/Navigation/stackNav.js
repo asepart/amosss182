@@ -5,6 +5,7 @@ import Login from '../Login/login';
 import JoinProject from '../Projects/joinProject';
 import GetMessages from '../Chat/messages';
 import TicketDetails from '../Projects/ticketView';
+import SecondScreen from '../secondScreen';
 
 
 
@@ -12,31 +13,50 @@ import {
   StackNavigator, DrawerNavigator
 } from 'react-navigation';
 
-const AppNavigation = StackNavigator({
-  First: { screen: Login },
-  Third: {screen: JoinProject,
-    title: 'Join Projects',
-    headerStyle: {
-        backgroundColor:'#5daedb'
+const DrawerExample = DrawerNavigator(
+    { 
+      First: 
+      {
+        screen: SecondScreen,
+        navigationOptions: {
+          drawerLabel: "Home",
+          title: 'Home',
+  
+         // drawerIcon: ({ tintColor }) => <MaterialIcons
+         // name= "rocket"
+          //size= {24}  
+         // style={{color: tintColor}}
+         // >
+        //    </MaterialIcons>
+      },
+      },
+  
+      Second: {
+        screen: JoinProject,
+        navigationOptions: {
+            drawerLabel: "Join Projects",
+            title: 'Join Projects',
+      headerStyle: {
+          backgroundColor:'#5daedb'
+      },
+      headerTitleStyle: {
+          color:'#FFF'
+      }
     },
-    headerTitleStyle: {
-        color:'#FFF'
+},
+
+    Third: {
+        screen:Login
     }
 },
-  Fourth: {screen: ProjectInfo},
-  Sixth: {screen: GetMessages, 
-     navigationOptions: ({navigation}) => ({
-    id: navigation.state.params.id,
-    headerStyle: {
-      backgroundColor:'#5daedb'
+  {
+  initialRouteName: 'First',
+  drawerPosition: 'left',
+  drawerWidth: 150,
+  contentOptions: {
+    activeTintColor: '#0c3868'
   },
-	headerTitleStyle: {
-		color:'#FFF'
-	}
-  })},
-  Seventh: {screen: TicketDetails}
- 
- 
-
-}); 
-export default AppNavigation;
+  }
+  );
+  
+  export default DrawerExample;

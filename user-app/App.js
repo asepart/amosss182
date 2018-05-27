@@ -14,36 +14,42 @@ import {
   StackNavigator, DrawerNavigator
 } from 'react-navigation';
 
-
-const DrawerExample = DrawerNavigator(
-  { 
-    First: {
-      screen: stackNav,
-      navigationOptions: {
-        drawerLabel: "Login",
-       // drawerIcon: ({ tintColor }) => <MaterialIcons
-       // name= "rocket"
-        //size= {24}  
-       // style={{color: tintColor}}
-       // >
-      //    </MaterialIcons>
+const AppNavigation = StackNavigator({
+  First: { screen: Login },
+  Second: {screen: stackNav  }}, {
+    headerMode: 'float',
+    navigationOptions: ({navigation}) => ({
+      headerStyle: {backgroundColor: '#5daedb'},
+      title: 'Home',
+     
+      headerTintColor: 'white',
+    }),
+  Third: {screen: JoinProject,
+    title: 'Join Projects',
+    headerStyle: {
+        backgroundColor:'#5daedb'
     },
-    },
+    headerTitleStyle: {
+        color:'#FFF'
+    }
+},
+  Fourth: {screen: ProjectInfo},
+  Sixth: {screen: GetMessages, 
+     navigationOptions: ({navigation}) => ({
+    id: navigation.state.params.id,
+    headerStyle: {
+      backgroundColor:'#5daedb'
+  },
+	headerTitleStyle: {
+		color:'#FFF'
+	}
+  })},
+  Seventh: {screen: TicketDetails}
+ 
+ 
 
-    Second: {
-      screen: JoinProject
+}); 
 
-}},
-{
-initialRouteName: 'First',
-drawerPosition: 'left',
-drawerWidth: 150,
-contentOptions: {
-  activeTintColor: '#0c3868'
-}
-}
-);
+export default AppNavigation;
 
-export default DrawerExample;
-
-AppRegistry.registerComponent('user-app', () => DrawerExample);
+AppRegistry.registerComponent('user-app', () => AppNavigation);
