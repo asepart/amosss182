@@ -98,7 +98,7 @@ export default class UserList extends Component {
 		}
 
 		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
-			return (// TODO: add home icon instead of text here
+			return (
 				<View>
 					<View style={{flex:1}}>
 						<Button
@@ -158,18 +158,8 @@ export default class UserList extends Component {
 				</View>
 			);
 		}
-		return(// TODO: add home icon instead of text here
+		return(
 			<View>
-				<View>
-					<Link to = "/" style={{textDecoration: 'none'}} >
-					<Text
-						onPress = { this.showProjectList.bind(this) }
-						style={{color: '#5daedb'}}
-					>
-						HOME
-					</Text>
-					</Link>
-				</View>
 				<View>
 					<Button
 						onPress = { this.showAddUser.bind(this) }

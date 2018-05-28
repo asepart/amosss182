@@ -8,7 +8,7 @@ const Header = () => (
         <Link to="/" style={{textDecoration: 'none'}}>
         <Text
             onPress = { function doNothing() {} }
-            style={{color: '#5daedb'}}
+            style={{color: '#5daedb', marginLeft: 5}}
         >
             HOME
         </Text>

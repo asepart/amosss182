@@ -44,27 +44,23 @@ class Page extends Component{
 		this.state = {
 			isAuth: false
 		};
-		registerFunc (this.handleGlobalState.bind(this));
-		this.checkAuth();
-	}
-	async checkAuth () {
-		if (await isAuth())
-			this.setState({
-				isAuth: true
-			});
 	}
 
+	
 	render() {
-		if(!this.state.isAuth){
-			return(<Login />);
-		}
 		return(
 		<Switch>
 			<Route exact path="/" component={ProjectList}/>
 			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
 			<Route path='/addproject' render={props => <ProjectAdd project={this.state.param} name={this.state.name} {...props}/>}/>
 			<Route path='/deleteproject' render={props => <DeleteProjectConfirm project={this.state.param} name={this.state.name} {...props} />}/>
-			<Route exact path='/project/:project' render={props => <TicketList project={this.state.param} name={this.state.name} {...props} />}/>
+			<Route path='/project/:project/tickets' render={props => <TicketList project={this.state.param} name={this.state.name} 
+																		tName = {this.state.tName}
+																		tSummary = {this.state.tSummary}
+																		tDescription = {this.state.tDescription}
+																		tCategory = {this.state.tCategory}
+																		tRequiredObservations = {this.state.tRequiredObservations}
+																		tId = {this.state.tId} {...props} />}/>
 			<Route path='/project/:project/edit' render={props => <ProjectAdd project={this.state.param} name={this.state.name} {...props} />}/>
 		</Switch>
 		)
@@ -105,12 +101,48 @@ class Page extends Component{
 	}
 }
 
-const App = () => (
-	<div>
-		<Header />
-		<Page />
-	</div>
-)
+class App extends Component{
+	handleAuthState (){
+		this.setState ({
+			isAuth: getState().isAuth,
+			isLoading: getState().isLoading,
+			firstName: getState().firstName,
+			lastName: getState().lastName,
+			phone: getState().phone,
+			password: getState().password
+		});
+	}
+	constructor () {
+		super ();
+		this.state = {
+			isAuth: false,
+		};
+
+		registerFunc (this.handleAuthState.bind(this));
+		this.checkAuth();
+	}
+
+	async checkAuth () {
+		if (await isAuth())
+			this.setState({
+				isAuth: true,
+			});
+	}
+	
+	render() {
+		if(!this.state.isAuth){
+			return(<Login />);
+		}
+		else {
+			return (
+				<div>
+					<Header />
+					<Page />
+				</div>
+			)
+		}
+	}
+}
 
 ReactDOM.render((
 	<BrowserRouter>
