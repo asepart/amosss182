@@ -424,6 +424,9 @@ public class WebService
 
         try (Session session = Database.openSession())
         {
+            if (!Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
             return Response.ok(Database.listMessages(session, ticketId, principal.getName(), role)).build();
         }
 

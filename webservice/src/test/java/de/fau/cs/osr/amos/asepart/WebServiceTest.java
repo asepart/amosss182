@@ -198,5 +198,81 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
         }
+
+        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
     }
+
+    @Test
+    public void testMessages()
+    {
+        Project project = new Project();
+        project.setEntryKey("junit_test");
+        project.setOwner("admin");
+        project.setProjectName("JUnit Test Project");
+
+        try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Ticket ticket = new Ticket();
+        ticket.setProjectKey("junit_test");
+        ticket.setTicketName("Test Ticket");
+        ticket.setTicketSummary("Test Ticket Summary");
+        ticket.setTicketDescription("Description of Test Ticket");
+        ticket.setTicketCategory(TicketCategory.TRACE);
+        ticket.setRequiredObservations(42);
+
+        try (Response response = getAdminClient().path("/projects/junit_test/tickets").request().post(Entity.json(ticket)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Integer ticketId;
+
+        try (Response response = getAdminClient().path("/projects/junit_test/tickets").request().get())
+        {
+            GenericType<Ticket[]> type = new GenericType<Ticket[]>() {};
+            Ticket[] tickets = response.readEntity(type);
+            ticketId = tickets[tickets.length - 1].getId();
+
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/messages").path(ticketId.toString()).request().post(Entity.text("Hello, World!")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/messages").path(ticketId.toString()).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Message[]> type = new GenericType<Message[]>() {};
+            Message[] messages = response.readEntity(type);
+
+            assertEquals(1, messages.length);
+            assertEquals("Hello, World!", messages[0].getContent());
+            assertEquals("admin", messages[0].getSender());
+        }
+
+        try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/messages").path(ticketId.toString()).request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
 }
