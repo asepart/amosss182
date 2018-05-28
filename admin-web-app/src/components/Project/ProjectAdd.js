@@ -10,7 +10,7 @@ var button = "Add";
 var editKey = true;
 
 export default class ProjectAdd extends Component {
-	
+	// TODO: add a get request for project data when accessed directly by URL
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -76,12 +76,6 @@ export default class ProjectAdd extends Component {
 		}
 		return (	// TODO: add home icon instead of text here
 			<View>
-				<Text
-					onPress = { this.showProjectList.bind(this) }
-					style={{color: '#5daedb'}}
-				>
-					HOME
-				</Text> 
 			<TextInput
 				placeholder = "Name"
 				style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}

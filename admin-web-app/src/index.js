@@ -12,6 +12,7 @@ import TicketChat from './components/Chat/TicketChat';
 import DeleteUserConfirm from './components/Project/DeleteUserConfirm';
 import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
+import Header from './components/shared/Header';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 import {isAuth} from './components/shared/auth';
@@ -63,7 +64,8 @@ class Page extends Component{
 			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
 			<Route path='/addproject' render={props => <ProjectAdd project={this.state.param} name={this.state.name} {...props}/>}/>
 			<Route path='/deleteproject' render={props => <DeleteProjectConfirm project={this.state.param} name={this.state.name} {...props} />}/>
-			<Route path='/project/:project' render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
+			<Route exact path='/project/:project' render={props => <TicketList project={this.state.param} name={this.state.name} {...props} />}/>
+			<Route path='/project/:project/edit' render={props => <ProjectAdd project={this.state.param} name={this.state.name} {...props} />}/>
 		</Switch>
 		)
 		switch (this.state.show){
@@ -103,9 +105,16 @@ class Page extends Component{
 	}
 }
 
+const App = () => (
+	<div>
+		<Header />
+		<Page />
+	</div>
+)
+
 ReactDOM.render((
 	<BrowserRouter>
-		<Page />
+		<App />
 	</BrowserRouter>
 ), document.getElementById('root'));
 registerServiceWorker();

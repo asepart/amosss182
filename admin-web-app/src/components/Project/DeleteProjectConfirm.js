@@ -54,12 +54,6 @@ export default class DeleteProjectConfirm extends Component {
 		}
 		return (	// TODO: add home icon instead of text here
 			<View>
-				<Text
-					onPress = { this.showProjectList.bind(this) }
-					style={{color: '#5daedb'}}
-				>
-					HOME
-				</Text>
 			<Button
 				onPress = { function doNothing() {} }
 				disabled = {true}

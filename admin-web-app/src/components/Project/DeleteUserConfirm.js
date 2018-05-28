@@ -65,12 +65,6 @@ export default class DeleteUserConfirm extends Component {
 		}
 		return (// TODO: add home icon instead of text here
 			<View>
-				<Text
-					onPress = { this.showProjectList.bind(this) }
-					style={{color: '#5daedb'}}
-				>
-					HOME
-				</Text>
 			<Button
 				disabled = {true}
 				title = {button + this.state.firstName + " " + this.state.lastName + projectName + "?"}

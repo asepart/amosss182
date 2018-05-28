@@ -112,14 +112,6 @@ export default class TicketList extends Component {
 		return (// TODO: add home icon instead of text here
 			<View>
 				<View>
-					<Text
-						onPress = { this.showProjectList.bind(this) }
-						style={{color: '#5daedb'}}
-					>
-						HOME
-					</Text> 
-				</View>
-				<View>
 					<Button
 						onPress = { this.showCreateTicket.bind(this) }
 						title = "Add Ticket"
