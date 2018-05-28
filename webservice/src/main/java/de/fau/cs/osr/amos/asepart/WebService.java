@@ -168,7 +168,7 @@ public class WebService
 
             Ticket target;
 
-            if (Database.isTicket(session, ticket.getId()))
+            if (ticket.getId() != null && Database.isTicket(session, ticket.getId()))
             {
                 target = Database.getTicket(session, ticket.getId());
                 target.setTicketName(ticket.getTicketName());
@@ -185,7 +185,7 @@ public class WebService
             String projectName = Database.getProject(session, projectKey).getProjectName();
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added/modified ticket %s of project %s.", ticket.getTicketName(), projectName)).build();
+            return Response.ok(String.format("Added/modified ticket id %d with name %s of project %s.", ticket.getId(), ticket.getTicketName(), projectName)).build();
         }
     }
 
@@ -262,6 +262,8 @@ public class WebService
 
             Ticket oldTicket = session.get(Ticket.class, ticketId);
 
+            if (oldTicket == null)
+                return Response.status(Response.Status.NOT_FOUND).build();
             if (!oldTicket.getProjectKey().equals(projectKey))
                 return Response.status(Response.Status.BAD_REQUEST).build();
             if (!Database.isAdminOfProject(session, sc.getUserPrincipal().getName(), oldTicket.getProjectKey()))
@@ -367,16 +369,10 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-
             Project project = Database.getProject(session, entryKey);
-            boolean authorized = Database.isUserMemberOfProject(session, sc.getUserPrincipal().getName(), entryKey);
-
             session.getTransaction().commit();
 
-            if (!authorized)
-                return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to join this project.").build();
-            else
-                return Response.ok(project.getProjectName()).build();
+            return Response.ok(project.getProjectName()).build();
         }
 
         catch (WebApplicationException e)
