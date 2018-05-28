@@ -22,7 +22,7 @@ export default class ProjectButton extends Component {
 	}
 	render() {
 		return (
-			<Link to={"/project/" + this.props.proj.row.entryKey} style={{textDecoration: 'none'}}>
+			<Link to={"/projects/" + this.props.proj.row.entryKey} style={{textDecoration: 'none'}}>
 				<Text
 					onPress = { this.displayProject.bind(this) }
 					style={{color: '#5daedb'}}

@@ -52,7 +52,7 @@ export default class DeleteProjectConfirm extends Component {
 				</View>
 			)
 		}
-		return (	// TODO: add home icon instead of text here
+		return (
 			<View>
 			<Button
 				onPress = { function doNothing() {} }
@@ -61,9 +61,7 @@ export default class DeleteProjectConfirm extends Component {
 			/>
 			{this.renderRedirect()}
 			<Button onPress = { this.deleteProject.bind(this) } title = "Delete" color = "#0c3868"/>
-			<Link to="/" style={{textDecoration: 'none'}}>
-				<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
-			</Link>
+			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
 			</View>
 		);
 	}

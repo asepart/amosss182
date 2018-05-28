@@ -16,14 +16,12 @@ export default class DeleteProjectButton extends Component {
 
 	render() {
 		return (	// TODO: add edit icon instead of text here
-			<Link to="/deleteproject" style={{textDecoration: 'none'}}>
 				<Text
 					onPress = { this.showDeleteProjectConfirm.bind(this) }
 					style={{color: '#5daedb'}}
 				>
 					DELETE
 				</Text>
-			</Link>
 		);
 	}
 }

@@ -59,12 +59,6 @@ export default class ProjectAdd extends Component {
 		  })
 	}
 
-	renderRedirect = () => {
-		if (this.state.redirect) {
-		  return <Redirect to="/"/>
-		}
-	}
-
 	render() {
 		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
 		if (this.state.isLoading) {
@@ -74,7 +68,7 @@ export default class ProjectAdd extends Component {
 				</View>
 			)
 		}
-		return (	// TODO: add home icon instead of text here
+		return (
 			<View>
 			<TextInput
 				placeholder = "Name"
@@ -89,11 +83,8 @@ export default class ProjectAdd extends Component {
 				value = { this.state.entryKey }
 				editable = {editKey}
 			/>
-			{this.renderRedirect()}
 			<Button onPress = { this.putProject.bind(this) } title = {button} color = "#0c3868" disabled = {!buttonEnabled}/>
-			<Link to="/" style={{textDecoration: 'none'}}>
-				<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
-			</Link>
+			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
 			</View>
 		);
 	}

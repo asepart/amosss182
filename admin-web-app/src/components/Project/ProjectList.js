@@ -84,16 +84,14 @@ export default class ProjectList extends Component {
 			}
 		]
 
-		return (	// TODO: add home icon instead of text here
+		return (
 			<View>
 				<View>
-					<Link to="/addproject" style={{textDecoration: 'none'}}>
 					<Button
 						onPress = { this.showAddProject }
 						title = "Add Project"
 						color = "#0c3868"
 					/>
-					</Link>
 				</View>
 				<View style={{flexDirection: 'row'}}>
 					<View style={{flex:1}}>
