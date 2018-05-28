@@ -27,7 +27,7 @@ export default class UserList extends Component {
 	componentDidMount() {
 		var url = URL;
 		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
-			url += '/projects/' + this.props.project + '/users';
+			url += '/projects/' + this.props.match.params.project + '/users';
 		} else {
 			url += '/users';
 		}
@@ -108,11 +108,13 @@ export default class UserList extends Component {
 					</View>
 					<View style={{flexDirection: 'row'}}>
 						<View style={{flex:1}}>
+							<Link to={"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
 							<Button
 								onPress = { this.showTicketList.bind(this) }
 								title = {"Tickets of " + this.props.name}
 								color = "#0e4a80"
 							/>
+							</Link>
 						</View>
 						<View style={{flex:1}}>
 							<Button
