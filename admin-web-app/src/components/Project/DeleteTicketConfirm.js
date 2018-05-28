@@ -52,7 +52,7 @@ export default class DeleteTicketConfirm extends Component {
 				</View>
 			)
 		}
-		return (// TODO: add home icon instead of text here
+		return (
 			<View>
 			<Button
 				disabled = {true}

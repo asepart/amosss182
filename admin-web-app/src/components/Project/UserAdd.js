@@ -76,7 +76,7 @@ export default class UserAdd extends Component {
 				</View>
 			)
 		}
-		return(	// TODO: add home icon instead of text here
+		return(
 			<View>
 				<TextInput
 					placeholder = "Login Name"

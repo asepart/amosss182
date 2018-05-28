@@ -63,7 +63,7 @@ export default class DeleteUserConfirm extends Component {
 			button = "Remove "
 			projectName = " from " + this.props.name;
 		}
-		return (// TODO: add home icon instead of text here
+		return (
 			<View>
 			<Button
 				disabled = {true}

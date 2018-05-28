@@ -80,14 +80,8 @@ export default class TicketChat extends Component {
       )
     }
 
-    return(// TODO: add home icon instead of text here
+    return(
 		<View>
-			<Text
-				onPress = { this.showProjectList.bind(this) }
-				style={{color: '#5daedb'}}
-			>
-				HOME
-			</Text>
         <Button
           disabled = {true}
           title = {"Chat history of " + this.props.tName + " in " + this.props.name}

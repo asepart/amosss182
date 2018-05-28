@@ -10,7 +10,6 @@ var button = "Add";
 var editKey = true;
 
 export default class ProjectAdd extends Component {
-	// TODO: add a get request for project data when accessed directly by URL
 	constructor(props) {
 		super(props);
 		this.state = {

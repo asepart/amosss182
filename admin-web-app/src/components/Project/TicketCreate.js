@@ -90,7 +90,7 @@ export default class TicketCreate extends Component {
 				</View>
 			)
 		}
-		return(	// TODO: add home icon instead of text here
+		return(
 				<View>
 					<TextInput
 						placeholder = "Name"
