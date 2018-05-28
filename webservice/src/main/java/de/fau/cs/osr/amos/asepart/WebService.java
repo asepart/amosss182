@@ -7,7 +7,16 @@ import java.security.Principal;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -164,6 +173,7 @@ public class WebService
                 target = Database.getTicket(session, ticket.getId());
                 target.setTicketName(ticket.getTicketName());
                 target.setTicketSummary(ticket.getTicketSummary());
+                target.setTicketDescription(ticket.getTicketDescription());
                 target.setTicketCategory(ticket.getTicketCategory());
                 target.setRequiredObservations(ticket.getRequiredObservations());
                 target.setProjectKey(ticket.getProjectKey());
