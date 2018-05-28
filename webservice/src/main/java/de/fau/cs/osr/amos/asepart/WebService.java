@@ -577,25 +577,13 @@ public class WebService
             return Response.ok(Database.listAdmins(session)).build();
         }
     }
-    
-    public static void main(String[] args)
+
+    public static void startBackground(int port)
     {
         try
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
             final String address = "http://" + ip + "/";
-
-            int port = 12345;
-
-            try
-            {
-                port = Integer.parseInt(System.getenv("PORT"));
-            }
-
-            catch (NumberFormatException e)
-            {
-                System.err.println("Environment variable PORT not set, using default: " + port);
-            }
 
             final URI uri = UriBuilder.fromUri(address).port(port).build();
 
@@ -612,5 +600,22 @@ public class WebService
             System.err.println("Failed to get server's own ip address.");
             e.printStackTrace();
         }
+    }
+    
+    public static void main(String[] args)
+    {
+        int port = 12345;
+
+        try
+        {
+            port = Integer.parseInt(System.getenv("PORT"));
+        }
+
+        catch (NumberFormatException e)
+        {
+            System.err.println("Environment variable PORT not set, using default: " + port);
+        }
+
+        startBackground(port);
     }
 }
