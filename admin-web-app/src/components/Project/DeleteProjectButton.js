@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text } from 'react-native';
 import { setState } from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class DeleteProjectButton extends Component {
 
@@ -15,12 +16,12 @@ export default class DeleteProjectButton extends Component {
 
 	render() {
 		return (	// TODO: add edit icon instead of text here
-			<Text
-				onPress = { this.showDeleteProjectConfirm.bind(this) }
-				style={{color: '#5daedb'}}
-			>
-				DELETE
-			</Text>
+				<Text
+					onPress = { this.showDeleteProjectConfirm.bind(this) }
+					style={{color: '#5daedb'}}
+				>
+					DELETE
+				</Text>
 		);
 	}
 }

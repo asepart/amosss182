@@ -12,9 +12,11 @@ import TicketChat from './components/Chat/TicketChat';
 import DeleteUserConfirm from './components/Project/DeleteUserConfirm';
 import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
+import Header from './components/shared/Header';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 import {isAuth} from './components/shared/auth';
+import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
 
 class Page extends Component{
 	handleGlobalState (){
@@ -43,19 +45,10 @@ class Page extends Component{
 			isAuth: false
 		};
 		registerFunc (this.handleGlobalState.bind(this));
-		this.checkAuth();
-	}
-	async checkAuth () {
-		if (await isAuth())
-			this.setState({
-				isAuth: true
-			});
 	}
 
+	
 	render() {
-		if(!this.state.isAuth){
-			return(<Login />);
-		}
 		switch (this.state.show){
 			case 'addProject':
 				return (<ProjectAdd project={this.state.param} name={this.state.name}/>);
@@ -65,8 +58,6 @@ class Page extends Component{
 				return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id} tName = {this.state.tName}/>);
 			case 'deleteUser':
 					return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName}/>);
-			case 'listUsers':
-				return (<UserList project={this.state.param} name={this.state.name}/>);
 			case 'addUser':
 				return (<UserAdd project={this.state.param} id={this.state.id} password={this.state.password} firstName={this.state.firstName} lastName={this.state.lastName} phone={this.state.phone}/>);
 			case 'createTicket':
@@ -77,21 +68,78 @@ class Page extends Component{
 						tCategory = {this.state.tCategory}
 						tRequiredObservations = {this.state.tRequiredObservations}
 						tId = {this.state.tId}/>);
-			case 'showTickets':
-				return (<TicketList project={this.state.param} name={this.state.name}
-				tName = {this.state.tName}
-				tSummary = {this.state.tSummary}
-				tDescription = {this.state.tDescription}
-				tCategory = {this.state.tCategory}
-				tRequiredObservations = {this.state.tRequiredObservations}
-				tId = {this.state.tId}/>);
 			case 'ticketChat':
 				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id} tName={this.state.tName}/>);
-			default:
-				return (<ProjectList/>);
+		};
+		return(
+		<Switch>
+			<Route exact path="/" component={ProjectList}/>
+			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
+			<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name} 
+																		tName = {this.state.tName}
+																		tSummary = {this.state.tSummary}
+																		tDescription = {this.state.tDescription}
+																		tCategory = {this.state.tCategory}
+																		tRequiredObservations = {this.state.tRequiredObservations}
+																		tId = {this.state.tId} {...props} />}/>
+			<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
+																		tName = {this.state.tName}
+																		tSummary = {this.state.tSummary}
+																		tDescription = {this.state.tDescription}
+																		tCategory = {this.state.tCategory}
+																		tRequiredObservations = {this.state.tRequiredObservations}
+																		tId = {this.state.tId} {...props} />}/>
+		</Switch>
+		)
+	}
+}
+
+class App extends Component{
+	handleAuthState (){
+		this.setState ({
+			isAuth: getState().isAuth,
+			isLoading: getState().isLoading,
+			firstName: getState().firstName,
+			lastName: getState().lastName,
+			phone: getState().phone,
+			password: getState().password
+		});
+	}
+	constructor () {
+		super ();
+		this.state = {
+			isAuth: false,
+		};
+
+		registerFunc (this.handleAuthState.bind(this));
+		this.checkAuth();
+	}
+
+	async checkAuth () {
+		if (await isAuth())
+			this.setState({
+				isAuth: true,
+			});
+	}
+	
+	render() {
+		if(!this.state.isAuth){
+			return(<Login />);
+		}
+		else {
+			return (
+				<div>
+					<Header />
+					<Page />
+				</div>
+			)
 		}
 	}
 }
 
-ReactDOM.render(<Page />, document.getElementById('root'));
+ReactDOM.render((
+	<BrowserRouter>
+		<App />
+	</BrowserRouter>
+), document.getElementById('root'));
 registerServiceWorker();

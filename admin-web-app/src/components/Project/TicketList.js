@@ -9,6 +9,7 @@ import DeleteTicketButton from './DeleteTicketButton';
 import TicketChatButton from '../Chat/TicketChatButton';
 import 'react-table/react-table.css';
 import '../../index.css';
+import { Link } from 'react-router-dom';
 
 var pickerPlaceholder = "Category";
 
@@ -22,7 +23,7 @@ export default class TicketList extends Component {
 
 	componentDidMount() {
 		var url = URL;
-		url += '/projects/' + this.props.project + '/tickets';
+		url += '/projects/' + this.props.match.params.project + '/tickets';
 		return fetch(url, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -109,16 +110,8 @@ export default class TicketList extends Component {
 			}
 		]
 
-		return (// TODO: add home icon instead of text here
+		return (
 			<View>
-				<View>
-					<Text
-						onPress = { this.showProjectList.bind(this) }
-						style={{color: '#5daedb'}}
-					>
-						HOME
-					</Text> 
-				</View>
 				<View>
 					<Button
 						onPress = { this.showCreateTicket.bind(this) }
@@ -134,11 +127,13 @@ export default class TicketList extends Component {
 						/>
 					</View>
 					<View style={{flex:1}}>
+						<Link to={"/projects/" + this.props.project + "/users"} style={{textDecoration: 'none'}}>
 						<Button
 							onPress = { this.showUserManagement.bind(this) }
 							title = {"Users of "  + this.props.name}
 							color = "#0e4a80"
 						/>
+						</Link>
 					</View>
 				</View>
 				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize={10} showPagination={false}/>

@@ -9,6 +9,7 @@ import DeleteProjectButton from './DeleteProjectButton';
 import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
+import {Link} from 'react-router-dom'
 
 export default class ProjectList extends Component {
 
@@ -83,16 +84,8 @@ export default class ProjectList extends Component {
 			}
 		]
 
-		return (	// TODO: add home icon instead of text here
+		return (
 			<View>
-				<View>
-					<Text
-						onPress = { this.showProjectList.bind(this) }
-						style={{color: '#5daedb'}}
-					>
-						HOME
-					</Text> 
-				</View>
 				<View>
 					<Button
 						onPress = { this.showAddProject }
@@ -103,16 +96,19 @@ export default class ProjectList extends Component {
 				<View style={{flexDirection: 'row'}}>
 					<View style={{flex:1}}>
 						<Button
+							onPress = { function doNothing() {} }
 							disabled = {true}
 							title = {"Projects"}
 						/>
 					</View>
 					<View style={{flex:1}}>
+						<Link to="/usermanagement" style={{textDecoration: 'none'}}>
 						<Button
 							onPress = { this.showUserManagement }
 							title = "Users"
 							color = "#0e4a80"
 						/>
+						</Link>
 					</View>
 				</View>
 				<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={columns}/>

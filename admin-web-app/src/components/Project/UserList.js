@@ -9,6 +9,7 @@ import DeleteUserButton from './DeleteUserButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
+import {Link} from 'react-router-dom'
 
 var pickerPlaceholder = "Category";
 
@@ -25,8 +26,8 @@ export default class UserList extends Component {
 
 	componentDidMount() {
 		var url = URL;
-		if (this.props.project !== '') {
-			url += '/projects/' + this.props.project + '/users';
+		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
+			url += '/projects/' + this.props.match.params.project + '/users';
 		} else {
 			url += '/users';
 		}
@@ -96,17 +97,9 @@ export default class UserList extends Component {
 			)
 		}
 
-		if (this.props.project !== '') {
-			return (// TODO: add home icon instead of text here
+		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
+			return (
 				<View>
-					<View>
-						<Text
-							onPress = { this.showProjectList.bind(this) }
-							style={{color: '#5daedb'}}
-						>
-							HOME
-						</Text> 
-					</View>
 					<View style={{flex:1}}>
 						<Button
 							title = {" "}
@@ -115,14 +108,17 @@ export default class UserList extends Component {
 					</View>
 					<View style={{flexDirection: 'row'}}>
 						<View style={{flex:1}}>
+							<Link to={"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
 							<Button
 								onPress = { this.showTicketList.bind(this) }
 								title = {"Tickets of " + this.props.name}
 								color = "#0e4a80"
 							/>
+							</Link>
 						</View>
 						<View style={{flex:1}}>
 							<Button
+								onPress = { function doNothing() {} }
 								disabled = {true}
 								title = {"Users of " + this.props.name}
 							/>
@@ -153,25 +149,19 @@ export default class UserList extends Component {
 						}
 					] }/>
 					<View>
+						<Link to = "/" style={{textDecoration: 'none'}} >
 						<Button
 							onPress = { this.showProjectList.bind(this) }
 							title = "Back to Projects"
 							color = "#0e4a80"
 						/>
+						</Link>
 					</View>
 				</View>
 			);
 		}
-		return(// TODO: add home icon instead of text here
+		return(
 			<View>
-				<View>
-					<Text
-						onPress = { this.showProjectList.bind(this) }
-						style={{color: '#5daedb'}}
-					>
-						HOME
-					</Text> 
-				</View>
 				<View>
 					<Button
 						onPress = { this.showAddUser.bind(this) }
@@ -181,14 +171,17 @@ export default class UserList extends Component {
 				</View>
 				<View style={{flexDirection: 'row'}}>
 					<View style={{flex:1}}>
+						<Link to = "/" style={{textDecoration: 'none'}} >
 						<Button
 							onPress = { this.showProjectList.bind(this) }
 							title = "Projects"
 							color = "#0e4a80"
 						/>
+						</Link>
 					</View>
 					<View style={{flex:1}}>
 						<Button
+							onPress = { function doNothing() {} }
 							disabled = {true}
 							title = {"Users"}
 						/>

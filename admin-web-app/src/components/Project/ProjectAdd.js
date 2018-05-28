@@ -4,12 +4,12 @@ import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import { setState } from '../shared/GlobalState';
 import '../../index.css';
+import {Link, Redirect} from 'react-router-dom'
 
 var button = "Add";
 var editKey = true;
 
 export default class ProjectAdd extends Component {
-	
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -53,6 +53,9 @@ export default class ProjectAdd extends Component {
 				console.error(error);
 			});
 		this.showProjectList ();
+		this.setState({
+			redirect: true
+		  })
 	}
 
 	render() {
@@ -64,14 +67,8 @@ export default class ProjectAdd extends Component {
 				</View>
 			)
 		}
-		return (	// TODO: add home icon instead of text here
+		return (
 			<View>
-				<Text
-					onPress = { this.showProjectList.bind(this) }
-					style={{color: '#5daedb'}}
-				>
-					HOME
-				</Text> 
 			<TextInput
 				placeholder = "Name"
 				style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
