@@ -7,8 +7,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -53,12 +51,12 @@ public class Database
             {
                 session.beginTransaction();
 
-                Database.putAdmin(session, "admin", "admin", "Default", "Admin");
-                Database.putUser(session, "user", "user", "Default", "User", "+4917123456");
+                Database.writeAdmin(session, "admin", "admin", "Default", "Admin");
+                Database.writeUser(session, "user", "user", "Default", "User", "+4917123456");
 
-                Database.putProject(session, "pizza", "Pizza Project", "admin");
+                Database.writeProject(session, "pizza", "Pizza Project", "admin");
                 
-                Database.putTicket(session, "pizza", "Developers are hungry",
+                Database.writeTicket(session, "pizza", "Developers are hungry",
                         "There is an insufficient amount of pizza available.",
                         "A developer is a tool which converts pizza into code.",
                         TicketCategory.BEHAVIOR,
@@ -105,17 +103,17 @@ public class Database
         return false;
     }
 
-    static void putProject(Session session, String key, String name, String owner)
+    static void writeProject(Session session, String key, String name, String owner)
     {
         Project project = new Project();
         project.setEntryKey(key);
         project.setProjectName(name);
         project.setOwner(owner);
 
-        putProject(session, project);
+        writeProject(session, project);
     }
 
-    static void putProject(Session session, Project project)
+    static void writeProject(Session session, Project project)
     {
         session.save(project);
     }
@@ -225,15 +223,6 @@ public class Database
 
     static void joinProject(Session session, String userName, String entryKey)
     {
-        if (!isUser(session, userName))
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("User does not exist.").build());
-
-        if (!isProject(session, entryKey))
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project does not exist.").build());
-
-        if (isUserMemberOfProject(session, userName, entryKey))
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User already member of project.").build());
-
         Membership m = new Membership();
         m.setLoginName(userName);
         m.setProjectKey(entryKey);
@@ -243,12 +232,6 @@ public class Database
 
     static void leaveProject(Session session, String userName, String entryKey)
     {
-        if (!isUser(session, userName))
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("User does not exist.").build());
-
-        if (!isProject(session, entryKey))
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Project does not exist.").build());
-
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Membership> criteria = builder.createQuery(Membership.class);
         Root<Membership> columns = criteria.from(Membership.class);
@@ -260,16 +243,13 @@ public class Database
 
         List<Membership> resultList = session.createQuery(criteria).getResultList();
 
-        if (resultList.size() == 0)
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("User not member of project.").build());
-
         for (Membership member : resultList)
         {
             session.delete(member);
         }
     }
 
-    static Integer putTicket(Session session, String projectKey, String ticketName, String ticketSummary, String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
+    static Integer writeTicket(Session session, String projectKey, String ticketName, String ticketSummary, String ticketDescription, TicketCategory ticketCategory, Integer requiredObservations)
     {
         Ticket ticket = new Ticket();
         ticket.setTicketName(ticketName);
@@ -279,10 +259,10 @@ public class Database
         ticket.setRequiredObservations(requiredObservations);
         ticket.setProjectKey(projectKey);
 
-        return putTicket(session, ticket);
+        return writeTicket(session, ticket);
     }
 
-    static Integer putTicket(Session session, Ticket ticket)
+    static Integer writeTicket(Session session, Ticket ticket)
     {
         return (Integer) session.save(ticket);
     }
@@ -306,28 +286,11 @@ public class Database
 
     static Ticket getTicket(Session session, Integer ticketId)
     {
-        if (!isTicket(session, ticketId))
-        {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("Ticket not found.").build());
-        }
-
         return session.get(Ticket.class, ticketId);
     }
 
     static Ticket[] getTicketsOfProject(Session session, String loginName, String role, String projectKey)
     {
-        Project project = getProject(session, projectKey);
-
-        if (role.equals("Admin") && !project.getOwner().equals(loginName))
-        {
-            throw new WebApplicationException("You are not the admin of this project.");
-        }
-
-        else if (role.equals("User") && !isUserMemberOfProject(session, loginName, projectKey))
-        {
-            throw new WebApplicationException("You have not joined that project.");
-        }
-
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Ticket> criteria = builder.createQuery(Ticket.class);
         Root<Ticket> columns = criteria.from(Ticket.class);
@@ -343,21 +306,8 @@ public class Database
         return tickets;
     }
 
-    static void putMessage(Session session, Integer ticketId, String message, String sender, String role)
+    static void sendMessage(Session session, Integer ticketId, String message, String sender, String role)
     {
-        Ticket ticket = getTicket(session, ticketId);
-        Project project = getProject(session, ticket.getProjectKey());
-
-        if (role.equals("Admin") && !project.getOwner().equals(sender))
-        {
-            throw new WebApplicationException("You are not the admin of this project.");
-        }
-
-        if (role.equals("User") && !isUserMemberOfProject(session, sender, ticket.getProjectKey()))
-        {
-            throw new WebApplicationException("You have not joined that project.");
-        }
-
         Message m = new Message();
         m.setTicketId(ticketId);
         m.setSender(sender);
@@ -368,19 +318,6 @@ public class Database
 
     static Message[] listMessages(Session session, Integer ticketId, String receiver, String role)
     {
-        Ticket ticket = getTicket(session, ticketId);
-        Project project = getProject(session, ticket.getProjectKey());
-
-        if (role.equals("Admin") && !project.getOwner().equals(receiver))
-        {
-            throw new WebApplicationException("You are not the admin of this project.");
-        }
-
-        if (role.equals("User") && !isUserMemberOfProject(session, receiver, ticket.getProjectKey()))
-        {
-            throw new WebApplicationException("You have not joined that project.");
-        }
-
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Message> criteria = builder.createQuery(Message.class);
         Root<Message> columns = criteria.from(Message.class);
@@ -396,7 +333,7 @@ public class Database
         return messages;
     }
 
-    static void putUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
+    static void writeUser(Session session, String loginName, String password, String firstName, String lastName, String phone)
     {
         User newUser = new User();
         newUser.setLoginName(loginName);
@@ -405,14 +342,11 @@ public class Database
         newUser.setLastName(lastName);
         newUser.setPhone(phone);
 
-        putUser(session, newUser);
+        writeUser(session, newUser);
     }
 
-    static void putUser(Session session, User user)
+    static void writeUser(Session session, User user)
     {
-        if (isAdmin(session, user.getLoginName()))
-            throw new WebApplicationException("Admin with same login name already exists.");
-
         String password = user.getPassword();
         user.setPassword(hashPassword(password));
 
@@ -469,7 +403,7 @@ public class Database
         session.delete(oldUser);
     }
 
-    static void putAdmin(Session session, String loginName, String password, String firstName, String lastName)
+    static void writeAdmin(Session session, String loginName, String password, String firstName, String lastName)
     {
         Admin newAdmin = new Admin();
         newAdmin.setLoginName(loginName);
@@ -477,14 +411,11 @@ public class Database
         newAdmin.setFirstName(firstName);
         newAdmin.setLastName(lastName);
 
-        putAdmin(session, newAdmin);
+        writeAdmin(session, newAdmin);
     }
 
-    static void putAdmin(Session session, Admin admin)
+    static void writeAdmin(Session session, Admin admin)
     {
-        if (isUser(session, admin.getLoginName()))
-            throw new WebApplicationException("User with same login name already exists.");
-
         String password = admin.getPassword();
         admin.setPassword(hashPassword(password));
 
