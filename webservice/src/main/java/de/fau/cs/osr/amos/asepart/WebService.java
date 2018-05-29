@@ -120,6 +120,18 @@ public class WebService
     }
 
     @Path("/projects/{key}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response getProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
+    {
+        try (Session session = Database.openSession())
+        {
+            return Response.ok(Database.getProject(session, entryKey)).build();
+        }
+    }
+    
+    @Path("/projects/{key}")
     @DELETE
     @RolesAllowed({"Admin"})
     public Response deleteProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
