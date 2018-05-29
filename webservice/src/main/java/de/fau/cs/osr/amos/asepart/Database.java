@@ -64,6 +64,8 @@ public class Database
                         TicketCategory.BEHAVIOR,
                         8);
 
+                Database.joinProject(session, "user", "pizza");
+
                 session.getTransaction().commit();
             }
         }

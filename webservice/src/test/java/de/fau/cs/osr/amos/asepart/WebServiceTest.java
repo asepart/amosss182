@@ -231,7 +231,7 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
         {
             Ticket ticket = response.readEntity(Ticket.class);
 
@@ -246,7 +246,7 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
         {
             Ticket ticket = response.readEntity(Ticket.class);
 
@@ -273,6 +273,11 @@ public class WebServiceTest
             String projectName = response.readEntity(String.class);
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
             assertEquals("Pizza Project", projectName);
+        }
+
+        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
