@@ -56,13 +56,13 @@ public class Database
                 Database.putAdmin(session, "admin", "admin", "Default", "Admin");
                 Database.putUser(session, "user", "user", "Default", "User", "+4917123456");
 
-                Database.putProject(session, "pizza", "testproject", "admin");
+                Database.putProject(session, "pizza", "Pizza Project", "admin");
                 
-                Database.putTicket(session, "pizza", "Name",
-                        "Summary",
-                        "Description",
-                        TicketCategory.ONE_TIME_ERROR,
-                        13);
+                Database.putTicket(session, "pizza", "Developers are hungry",
+                        "There is an insufficient amount of pizza available.",
+                        "A developer is a tool which converts pizza into code.",
+                        TicketCategory.BEHAVIOR,
+                        8);
 
                 session.getTransaction().commit();
             }
