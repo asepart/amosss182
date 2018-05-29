@@ -472,5 +472,41 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
+
+        try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    public void testCreateUserWithExistingAdminName()
+    {
+        User newUser = new User();
+        newUser.setFirstName("JUnit");
+        newUser.setLastName("User");
+        newUser.setLoginName("admin");
+        newUser.setPassword("secure");
+        newUser.setPhone("01INVALID");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    public void testCreateAdminWithExistingUserName()
+    {
+        Admin newAdmin = new Admin();
+        newAdmin.setFirstName("JUnit");
+        newAdmin.setLastName("Admin");
+        newAdmin.setLoginName("user");
+        newAdmin.setPassword("secure");
+
+        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
     }
 }
