@@ -6,24 +6,34 @@ import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ProjectInfo} from '../Projects/projectInfo';
+import {TicketView} from '../Projects/ticketView';
+import {ticket} from './sendMessages';
 import {
 	StackNavigator,
   } from 'react-navigation';
 
 export default class GetMessages extends Component {
 
+  static navigationOptions= {
+		title: 'Chat',
+		headerStyle: {
+			backgroundColor:'#5daedb'
+		},
+		headerTitleStyle: {
+			color:'#FFF'
+		}
+	} 
   
   constructor(props){
     super(props);
-    this.state ={ isLoading: true, message: "", error: "", idTicket: ""
+    this.state ={ isLoading: true, message: "", error: "",
+    // idTicket: ""
     }
   }
 
   async onSendPressed() {
    
-
   setMsg(this.state.message);
-  setTicketID(this.state.idTicket);
    //if (message === '') {
    // this.setState({error: "message empty"});
   // }
@@ -36,11 +46,7 @@ export default class GetMessages extends Component {
 
 async makeApiCall() {
   
-  let ticketID = this.props.navigation.state.params.id;  
-  this.setState({
-    idTicket: ticketID
-  })
-  return fetch(URL + '/messages/' + ticketID ,   {method:'GET', headers: getAuth()})
+  return fetch(URL + '/messages/' + ticket ,   {method:'GET', headers: getAuth()})
   .then((response) => response.json())
   .then((responseJson) => {
 
