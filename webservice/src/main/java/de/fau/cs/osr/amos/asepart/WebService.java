@@ -281,6 +281,43 @@ public class WebService
         return Response.ok().build();
     }
 
+    @Path("/projects/{key}/tickets/{id}/accept")
+    @OPTIONS
+    @PermitAll
+    public Response acceptTicket()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}/accept")
+    @POST
+    @RolesAllowed({"User"})
+    public Response acceptTicket(@Context SecurityContext sc, @PathParam("key") String projectKey, @PathParam("id") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isProject(session, projectKey) || !Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+
+            if (!ticket.getProjectKey().equals(projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            if (!Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            Database.acceptTicket(session, principal.getName(), ticketId);
+            session.getTransaction().commit();
+
+            return Response.ok().build();
+        }
+    }
+
     @Path("/projects/{key}/users")
     @OPTIONS
     @PermitAll

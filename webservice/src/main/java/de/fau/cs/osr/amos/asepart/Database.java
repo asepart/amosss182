@@ -39,6 +39,7 @@ public class Database
 
             // Relationships
             configuration.addAnnotatedClass(Membership.class);
+            configuration.addAnnotatedClass(Assignment.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());
@@ -269,12 +270,15 @@ public class Database
 
     static void deleteTicket(Session session, Integer ticketId)
     {
-        Ticket oldTicket = getTicket(session, ticketId);
+        Query assignmentQuery = session.createQuery("delete from Assignment where ticketId = :ticketId");
+        assignmentQuery.setParameter("ticketId", ticketId);
+        assignmentQuery.executeUpdate();
 
         Query msgQuery = session.createQuery("delete from Message where ticketId = :ticketId");
         msgQuery.setParameter("ticketId", ticketId);
         msgQuery.executeUpdate();
 
+        Ticket oldTicket = getTicket(session, ticketId);
         session.delete(oldTicket);
     }
 
@@ -304,6 +308,13 @@ public class Database
         tickets = ticketList.toArray(tickets);
 
         return tickets;
+    }
+
+    static void acceptTicket(Session session, String userName, Integer ticketId)
+    {
+        Assignment assignment = new Assignment();
+        assignment.setLoginName(userName);
+        assignment.setTicketId(ticketId);
     }
 
     static void sendMessage(Session session, Integer ticketId, String message, String sender)
