@@ -146,7 +146,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testCreateProject()
+    public void testCreateDeleteProject()
     {
         Project project = new Project();
         project.setEntryKey("junit_test");
@@ -163,6 +163,21 @@ public class WebServiceTest
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/join").request().post(Entity.text("junit_test")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/projects/junit_test/users").request().get())
+        {
+            GenericType<User[]> type = new GenericType<User[]>() {};
+            User[] users = response.readEntity(type);
+
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(1, users.length);
+            assertEquals("user", users[0].getLoginName());
         }
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
