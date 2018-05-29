@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
 
@@ -31,9 +30,14 @@ public class WebServiceTest
 
     private WebTarget getUserClient()
     {
+        return getUserClient("user", "user");
+    }
+
+    private WebTarget getUserClient(String username, String password)
+    {
         WebTarget client = getClient();
 
-        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("user", "user");
+        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic(username, password);
         WebServiceRole role = WebServiceRole.user();
 
         client.register(af);
@@ -44,9 +48,14 @@ public class WebServiceTest
 
     private WebTarget getAdminClient()
     {
+        return getAdminClient("admin", "admin");
+    }
+
+    private WebTarget getAdminClient(String adminname, String password)
+    {
         WebTarget client = getClient();
 
-        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
+        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic(adminname, password);
         WebServiceRole role = WebServiceRole.admin();
 
         client.register(af);
@@ -92,6 +101,13 @@ public class WebServiceTest
         Project project = new Project();
         project.setEntryKey("junit_test");
         project.setOwner("admin");
+        project.setProjectName("JUnit Test Project xxx");
+
+        try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         project.setProjectName("JUnit Test Project");
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
@@ -275,4 +291,89 @@ public class WebServiceTest
         }
     }
 
+    @Test
+    public void testCreateDeleteUser()
+    {
+        User newUser = new User();
+        newUser.setFirstName("JUnit");
+        newUser.setLastName("User");
+        newUser.setLoginName("junit_user");
+        newUser.setPassword("secure");
+        newUser.setPhone("01INVALID");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets/1").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/join").request().post(Entity.text("pizza")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets/1").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newUser.setPhone("+4917123456789");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/users/junit_user").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/users/junit_user").request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+    }
+
+    @Test
+    public void testCreateAdmin()
+    {
+        Admin newAdmin = new Admin();
+        newAdmin.setFirstName("JUnit");
+        newAdmin.setLastName("Admin");
+        newAdmin.setLoginName("junit_admin");
+        newAdmin.setPassword("secure");
+
+        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newAdmin.setPassword("supergeheim");
+
+        try (Response response = getAdminClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())
+        {
+            assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").request().delete())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").path("tickets").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
 }
