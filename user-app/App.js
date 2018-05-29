@@ -4,6 +4,7 @@ import ProjectInfo from './src/components/Projects/projectInfo';
 import Login from './src/components/Login/login';
 import JoinProject from '../user-app/src/components/Projects/joinProject';
 import GetMessages from './src/components/Chat/messages';
+import TicketView from '../user-app/src/components/Projects/ticketView';
 
 import {
   StackNavigator,
@@ -13,7 +14,7 @@ const AppNavigation = StackNavigator({
   First: { screen: Login },
   Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
-  Sixth: {screen: GetMessages, 
+  Sixth: {screen: TicketView, 
      navigationOptions: ({navigation}) => ({
     id: navigation.state.params.id,
     headerStyle: {
@@ -22,7 +23,8 @@ const AppNavigation = StackNavigator({
 	headerTitleStyle: {
 		color:'#FFF'
 	}
-  })}
+  })},
+  Seventh: {screen: GetMessages}
  
 
 }); 

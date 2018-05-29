@@ -9,6 +9,11 @@ export default styles=StyleSheet.create({
   
     },
 
+  containerScroll: {
+    flex:1,
+    backgroundColor: '#0c3868',
+  },  
+
     container2: {
       flex: 1,
       justifyContent: 'space-between',
@@ -102,6 +107,11 @@ export default styles=StyleSheet.create({
     text: {
       color: '#FFF',
       fontSize: 15
+    },
+
+    testText: {
+      color: '#FFF',
+      fontSize: 30,
     },
 
     icon: {
