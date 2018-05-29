@@ -38,7 +38,8 @@ export default class TicketView extends Component {
   }
 
   onAcceptPressed() {
-    var response = await fetch(URL + '/projects/' + key + '/tickets/'+ ticketID + '/accept', {
+    let ticketID = this.props.navigation.state.params.id;    
+    var response = fetch(URL + '/projects/' + key + '/tickets/'+ ticketID + '/accept', {
       method: 'POST',
       headers: getAuth()
     })
