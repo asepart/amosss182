@@ -289,7 +289,7 @@ public class Database
         return session.get(Ticket.class, ticketId);
     }
 
-    static Ticket[] getTicketsOfProject(Session session, String loginName, String role, String projectKey)
+    static Ticket[] getTicketsOfProject(Session session, String projectKey)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Ticket> criteria = builder.createQuery(Ticket.class);
@@ -306,7 +306,7 @@ public class Database
         return tickets;
     }
 
-    static void sendMessage(Session session, Integer ticketId, String message, String sender, String role)
+    static void sendMessage(Session session, Integer ticketId, String message, String sender)
     {
         Message m = new Message();
         m.setTicketId(ticketId);
@@ -316,7 +316,7 @@ public class Database
         session.save(m);
     }
 
-    static Message[] listMessages(Session session, Integer ticketId, String receiver, String role)
+    static Message[] listMessages(Session session, Integer ticketId)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Message> criteria = builder.createQuery(Message.class);

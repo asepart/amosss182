@@ -210,7 +210,7 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            Ticket[] tickets = Database.getTicketsOfProject(session, principal.getName(), role, projectKey);
+            Ticket[] tickets = Database.getTicketsOfProject(session, projectKey);
             return Response.ok(tickets).build();
         }
     }
@@ -426,7 +426,7 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            Database.sendMessage(session, ticketId, message, principal.getName(), role);
+            Database.sendMessage(session, ticketId, message, principal.getName());
             session.getTransaction().commit();
         }
 
@@ -460,7 +460,7 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            return Response.ok(Database.listMessages(session, ticketId, principal.getName(), role)).build();
+            return Response.ok(Database.listMessages(session, ticketId)).build();
         }
     }
 
@@ -530,16 +530,16 @@ public class WebService
     @Path("/users/{username}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteUser(@Context SecurityContext sc, @PathParam("username") String username)
+    public Response deleteUser(@Context SecurityContext sc, @PathParam("username") String userName)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
 
-            if (!Database.isUser(session, username))
+            if (!Database.isUser(session, userName))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Database.deleteUser(session, username);
+            Database.deleteUser(session, userName);
 
             session.getTransaction().commit();
         }
@@ -604,16 +604,16 @@ public class WebService
     @Path("/admins/{adminname}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("adminname") String adminname)
+    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("adminname") String adminName)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
 
-            if (!Database.isAdmin(session, adminname))
+            if (!Database.isAdmin(session, adminName))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Database.deleteAdmin(session, adminname);
+            Database.deleteAdmin(session, adminName);
 
             session.getTransaction().commit();
         }
