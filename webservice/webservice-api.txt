@@ -206,6 +206,16 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
+- Delete admin
+
+  HTTP operation: DELETE
+  Path:           /admins/{adminname}
+  Roles:          Admin
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not an admin account.
+                  [404 Not found]    if admin does not exist.
+
 - List admins
 
   HTTP operation: GET

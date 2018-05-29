@@ -520,4 +520,12 @@ public class Database
 
         return admins;
     }
+
+    static void deleteAdmin(Session session, String loginName)
+    {
+        // TODO: delete admin's projects or keep them?
+
+        Admin oldAdmin = session.get(Admin.class, loginName);
+        session.delete(oldAdmin);
+    }
 }

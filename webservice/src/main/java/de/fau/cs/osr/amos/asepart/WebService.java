@@ -577,6 +577,26 @@ public class WebService
         }
     }
 
+    @Path("/admins/{adminname}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("adminname") String adminname)
+    {
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isAdmin(session, adminname))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Database.deleteAdmin(session, adminname);
+
+            session.getTransaction().commit();
+        }
+
+        return Response.ok("Admin deleted.").build();
+    }
+
     public static void startBackground(int port)
     {
         try

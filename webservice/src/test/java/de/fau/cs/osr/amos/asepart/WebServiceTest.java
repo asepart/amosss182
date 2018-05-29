@@ -453,5 +453,19 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
+
+        try (Response response = getAdminClient().path("/admins").request().get())
+        {
+            GenericType<Admin[]> type = new GenericType<Admin[]>() {};
+            Admin[] admins = response.readEntity(type);
+
+            assertEquals(2, admins.length);
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
     }
 }
