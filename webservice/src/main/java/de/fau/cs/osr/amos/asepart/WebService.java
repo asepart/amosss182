@@ -50,7 +50,7 @@ public class WebService
     {
         /* If credentials are invalid, the method call will automatically fail.
          * This is done by the AuthenticationFilter, so if the return statement
-         * below is reached the credentials have been validated already.
+         * below is reached only if the credentials have been validated already.
          */
 
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();

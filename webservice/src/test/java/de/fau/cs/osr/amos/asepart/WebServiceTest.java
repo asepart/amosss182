@@ -83,6 +83,56 @@ public class WebServiceTest
     }
 
     @Test
+    public void testUnauthorized()
+    {
+        try (Response response = getClient().path("/login").request().get())
+        {
+            String answer = response.readEntity(String.class);
+
+            assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    public void testMissingRole()
+    {
+        WebTarget client = getClient();
+        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
+
+        client.register(af);
+
+        try (Response response = client.path("/login").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    public void testInvalidRole()
+    {
+        WebTarget client = getClient();
+        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
+
+        client.register(af);
+
+        try (Response response = client.path("/login").request().header("X-ASEPART-Role", "God").get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    public void testWrongPassword()
+    {
+        try (Response response = getAdminClient("invalid", "wrong").path("/login").request().get())
+        {
+            String answer = response.readEntity(String.class);
+
+            assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
     public void testListProject()
     {
         try (Response response = getAdminClient().path("/projects").request().get())
