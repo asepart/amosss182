@@ -8,6 +8,7 @@ import DeleteProjectConfirm from './components/Project/DeleteProjectConfirm';
 import DeleteTicketConfirm from './components/Project/DeleteTicketConfirm';
 import TicketCreate from './components/Project/TicketCreate';
 import TicketList from './components/Project/TicketList';
+import TicketDetail from './components/Project/TicketDetail';
 import TicketChat from './components/Chat/TicketChat';
 import DeleteUserConfirm from './components/Project/DeleteUserConfirm';
 import UserList from './components/Project/UserList';
@@ -47,7 +48,7 @@ class Page extends Component{
 		registerFunc (this.handleGlobalState.bind(this));
 	}
 
-	
+
 	render() {
 		switch (this.state.show){
 			case 'addProject':
@@ -75,14 +76,15 @@ class Page extends Component{
 		<Switch>
 			<Route exact path="/" component={ProjectList}/>
 			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
-			<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name} 
+			<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name}
 																		tName = {this.state.tName}
 																		tSummary = {this.state.tSummary}
 																		tDescription = {this.state.tDescription}
 																		tCategory = {this.state.tCategory}
 																		tRequiredObservations = {this.state.tRequiredObservations}
 																		tId = {this.state.tId} {...props} />}/>
-			<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
+			<Route exact path='/projects/:project/:id' component={TicketDetailBar} />
+			<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name}
 																		tName = {this.state.tName}
 																		tSummary = {this.state.tSummary}
 																		tDescription = {this.state.tDescription}
@@ -93,6 +95,8 @@ class Page extends Component{
 		)
 	}
 }
+
+const TicketDetailBar = ({match}) => (<TicketDetail project={match.params.project} id={match.params.id}/>);
 
 class App extends Component{
 	handleAuthState (){
@@ -121,7 +125,7 @@ class App extends Component{
 				isAuth: true,
 			});
 	}
-	
+
 	render() {
 		if(!this.state.isAuth){
 			return(<Login />);

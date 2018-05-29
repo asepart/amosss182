@@ -7,6 +7,7 @@ import UpdateTicketButton from './UpdateTicketButton';
 import { setState } from '../shared/GlobalState';
 import DeleteTicketButton from './DeleteTicketButton';
 import TicketChatButton from '../Chat/TicketChatButton';
+import TicketDetailButton from './TicketDetailButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
@@ -59,7 +60,7 @@ export default class TicketList extends Component {
 			tId: '0'
 		});
 	}
-	
+
 	showProjectList () {
 		setState({
 			isAuth: true,
@@ -83,6 +84,7 @@ export default class TicketList extends Component {
 			}, {
 				Header: 'Name',
 				accessor: 'ticketName',
+				Cell: props => <TicketDetailButton proj={props} keyProj={this.props.match.params.project}/>
 			}, {
 				Header: 'Summary',
 				accessor: 'ticketSummary',
