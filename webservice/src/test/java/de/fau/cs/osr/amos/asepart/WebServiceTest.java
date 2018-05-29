@@ -73,6 +73,11 @@ public class WebServiceTest
     @Test
     public void testLogin()
     {
+        {
+            Response response = getAdminClient().path("/login").request().options();
+            response.close();
+        }
+
         try (Response response = getAdminClient().path("/login").request().get())
         {
             String answer = response.readEntity(String.class);
