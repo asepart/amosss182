@@ -70,27 +70,28 @@ class Page extends Component{
 						tId = {this.state.tId}/>);
 			case 'ticketChat':
 				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id} tName={this.state.tName}/>);
+			default:
+				return(
+				<Switch>
+					<Route exact path="/" component={ProjectList}/>
+					<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
+					<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name} 
+																				tName = {this.state.tName}
+																				tSummary = {this.state.tSummary}
+																				tDescription = {this.state.tDescription}
+																				tCategory = {this.state.tCategory}
+																				tRequiredObservations = {this.state.tRequiredObservations}
+																				tId = {this.state.tId} {...props} />}/>
+					<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
+																				tName = {this.state.tName}
+																				tSummary = {this.state.tSummary}
+																				tDescription = {this.state.tDescription}
+																				tCategory = {this.state.tCategory}
+																				tRequiredObservations = {this.state.tRequiredObservations}
+																				tId = {this.state.tId} {...props} />}/>
+				</Switch>
+				)
 		};
-		return(
-		<Switch>
-			<Route exact path="/" component={ProjectList}/>
-			<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
-			<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name} 
-																		tName = {this.state.tName}
-																		tSummary = {this.state.tSummary}
-																		tDescription = {this.state.tDescription}
-																		tCategory = {this.state.tCategory}
-																		tRequiredObservations = {this.state.tRequiredObservations}
-																		tId = {this.state.tId} {...props} />}/>
-			<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
-																		tName = {this.state.tName}
-																		tSummary = {this.state.tSummary}
-																		tDescription = {this.state.tDescription}
-																		tCategory = {this.state.tCategory}
-																		tRequiredObservations = {this.state.tRequiredObservations}
-																		tId = {this.state.tId} {...props} />}/>
-		</Switch>
-		)
 	}
 }
 
