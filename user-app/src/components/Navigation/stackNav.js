@@ -45,20 +45,6 @@ const DrawerExample = DrawerNavigator(
     },
 },
 
-    Third: {
-      screen: Login,
-      navigationOptions: {
-        drawerLabel: "Login",
-        title: 'Login',
-  headerStyle: {
-      backgroundColor:'#5daedb'
-  },
-  headerTitleStyle: {
-      color:'#FFF'
-  }
-},
-    }
-
    
 },
   {
