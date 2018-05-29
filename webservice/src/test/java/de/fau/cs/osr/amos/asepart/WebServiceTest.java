@@ -393,6 +393,15 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getAdminClient().path("/users").request().get())
+        {
+            GenericType<User[]> type = new GenericType<User[]>() {};
+            User[] users = response.readEntity(type);
+
+            assertEquals(2, users.length);
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getAdminClient().path("/users/junit_user").request().delete())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
@@ -402,7 +411,6 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
-
     }
 
     @Test
