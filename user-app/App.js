@@ -4,37 +4,19 @@ import ProjectInfo from './src/components/Projects/projectInfo';
 import Login from './src/components/Login/login';
 import JoinProject from '../user-app/src/components/Projects/joinProject';
 import GetMessages from './src/components/Chat/messages';
-import TicketDetails from '../user-app/src/components/Projects/ticketView';
-import stackNav from '../user-app/src/components/Navigation/stackNav';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
-
+import TicketView from '../user-app/src/components/Projects/ticketView';
+import stackNav from '../user-app/src/components/Navigation/stackNav'
 
 import {
-  StackNavigator, DrawerNavigator
+  StackNavigator,DrawerNavigator
 } from 'react-navigation';
 
 const AppNavigation = StackNavigator({
   First: { screen: Login },
-  Second: {screen: stackNav  }}, {
-    headerMode: 'float',
-    navigationOptions: ({navigation}) => ({
-      headerStyle: {backgroundColor: '#5daedb'},
-      title: 'Home',
-     
-      headerTintColor: 'white',
-    }),
-  Third: {screen: JoinProject,
-    title: 'Join Projects',
-    headerStyle: {
-        backgroundColor:'#5daedb'
-    },
-    headerTitleStyle: {
-        color:'#FFF'
-    }
-},
+  Second: {screen: stackNav},
+  Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
-  Sixth: {screen: GetMessages, 
+  Sixth: {screen: TicketView, 
      navigationOptions: ({navigation}) => ({
     id: navigation.state.params.id,
     headerStyle: {
@@ -44,12 +26,10 @@ const AppNavigation = StackNavigator({
 		color:'#FFF'
 	}
   })},
-  Seventh: {screen: TicketDetails}
- 
+  Seventh: {screen: GetMessages}
  
 
 }); 
-
 export default AppNavigation;
 
 AppRegistry.registerComponent('user-app', () => AppNavigation);

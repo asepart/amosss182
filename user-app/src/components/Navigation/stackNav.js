@@ -34,8 +34,8 @@ const DrawerExample = DrawerNavigator(
       Second: {
         screen: JoinProject,
         navigationOptions: {
-            drawerLabel: "Join Projects",
-            title: 'Join Projects',
+            drawerLabel: "Join Project",
+            title: 'Join Project',
       headerStyle: {
           backgroundColor:'#5daedb'
       },
@@ -46,8 +46,20 @@ const DrawerExample = DrawerNavigator(
 },
 
     Third: {
-        screen:Login
+      screen: Login,
+      navigationOptions: {
+        drawerLabel: "Login",
+        title: 'Login',
+  headerStyle: {
+      backgroundColor:'#5daedb'
+  },
+  headerTitleStyle: {
+      color:'#FFF'
+  }
+},
     }
+
+   
 },
   {
   initialRouteName: 'First',

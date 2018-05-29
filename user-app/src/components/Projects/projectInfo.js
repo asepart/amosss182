@@ -10,6 +10,8 @@ import {key} from './keyValid';
 
 window.btoa = require('Base64').btoa;
 
+
+
 export default class ProjectInfo extends Component {
 
   constructor(props) {
@@ -47,7 +49,8 @@ export default class ProjectInfo extends Component {
 
 
     render() {
-
+    //  var {params} = this.props.navigation.state;
+     // const { navigate } = this.props.navigation;
       
       if (this.state.isLoading) {
 			return (
