@@ -16,7 +16,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -104,11 +103,11 @@ public class WebService
 
             else target = project;
 
-            Database.putProject(session, target);
+            Database.writeProject(session, target);
             session.getTransaction().commit();
         }
 
-        return Response.ok(String.format("Project with key %s created/modified.", project.getEntryKey())).build();
+        return Response.ok().build();
     }
 
     @Path("/projects/{key}")
@@ -149,7 +148,7 @@ public class WebService
             session.getTransaction().commit();
         }
 
-        return Response.ok("Project deleted.").build();
+        return Response.ok().build();
     }
 
     @Path("/projects/{key}/tickets/")
@@ -193,11 +192,10 @@ public class WebService
 
             else target = ticket;
 
-            Database.putTicket(session, target);
-            String projectName = Database.getProject(session, projectKey).getProjectName();
+            Database.writeTicket(session, target);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added/modified ticket id %d with name %s of project %s.", ticket.getId(), ticket.getTicketName(), projectName)).build();
+            return Response.ok().build();
         }
     }
 
@@ -212,13 +210,20 @@ public class WebService
 
         try (Session session = Database.openSession())
         {
-            Ticket[] tickets = Database.getTicketsOfProject(session, principal.getName(), role, projectKey);
-            return Response.ok(tickets).build();
-        }
+            Project project = Database.getProject(session, projectKey);
 
-        catch (WebApplicationException e)
-        {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            else if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Ticket[] tickets = Database.getTicketsOfProject(session, projectKey);
+            return Response.ok(tickets).build();
         }
     }
 
@@ -272,7 +277,7 @@ public class WebService
         {
             session.beginTransaction();
 
-            Ticket oldTicket = session.get(Ticket.class, ticketId);
+            Ticket oldTicket = Database.getTicket(session, ticketId);
 
             if (oldTicket == null)
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -285,7 +290,44 @@ public class WebService
             session.getTransaction().commit();
         }
 
-        return Response.ok("Ticket deleted.").build();
+        return Response.ok().build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}/accept")
+    @OPTIONS
+    @PermitAll
+    public Response acceptTicket()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}/accept")
+    @POST
+    @RolesAllowed({"User"})
+    public Response acceptTicket(@Context SecurityContext sc, @PathParam("key") String projectKey, @PathParam("id") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isProject(session, projectKey) || !Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+
+            if (!ticket.getProjectKey().equals(projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            if (!Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            Database.acceptTicket(session, principal.getName(), ticketId);
+            session.getTransaction().commit();
+
+            return Response.ok().build();
+        }
     }
 
     @Path("/projects/{key}/users")
@@ -330,16 +372,21 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
+
+            if (!Database.isUser(session, user))
+                return Response.status(Response.Status.NOT_FOUND).entity("User does not exist.").build();
+
+            if (!Database.isProject(session, projectKey))
+                return Response.status(Response.Status.NOT_FOUND).entity("Project does not exist.").build();
+
+            if (!Database.isUserMemberOfProject(session, user, projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).entity("User not member of project.").build();
+
             Database.leaveProject(session, user, projectKey);
             session.getTransaction().commit();
         }
 
-        catch (WebApplicationException e)
-        {
-            return e.getResponse();
-        }
-
-        return Response.ok("User removed from project.").build();
+        return Response.ok().build();
     }
 
     @Path("/join")
@@ -356,19 +403,25 @@ public class WebService
     @RolesAllowed({"User"})
     public Response joinProject(@Context SecurityContext sc, String entryKey)
     {
+        final String userName = sc.getUserPrincipal().getName();
+
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.joinProject(session, sc.getUserPrincipal().getName(), entryKey);
-            String projectName = Database.getProject(session, entryKey).getProjectName();
+
+            if (!Database.isUser(session, userName))
+                return Response.status(Response.Status.NOT_FOUND).entity("User does not exist.").build();
+
+            if (!Database.isProject(session, entryKey))
+                return Response.status(Response.Status.NOT_FOUND).entity("Project does not exist.").build();
+
+            if (Database.isUserMemberOfProject(session, userName, entryKey))
+                return Response.status(Response.Status.BAD_REQUEST).entity("User already member of project.").build();
+
+            Database.joinProject(session, userName, entryKey);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("You joined project %s.", projectName)).build();
-        }
-
-        catch (WebApplicationException e)
-        {
-            return e.getResponse();
+            return Response.ok().build();
         }
     }
 
@@ -385,11 +438,6 @@ public class WebService
             session.getTransaction().commit();
 
             return Response.ok(project.getProjectName()).build();
-        }
-
-        catch (WebApplicationException e)
-        {
-            return e.getResponse();
         }
     }
 
@@ -413,16 +461,25 @@ public class WebService
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
-            Database.putMessage(session, ticketId, message, principal.getName(), role);
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+            Project project = Database.getProject(session, ticket.getProjectKey());
+
+            if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), ticket.getProjectKey()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Database.sendMessage(session, ticketId, message, principal.getName());
             session.getTransaction().commit();
         }
 
-        catch (WebApplicationException e)
-        {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-
-        return Response.ok("Message sent.").build();
+        return Response.ok().build();
     }
 
     @Path("/messages/{ticket}")
@@ -439,12 +496,20 @@ public class WebService
             if (!Database.isTicket(session, ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            return Response.ok(Database.listMessages(session, ticketId, principal.getName(), role)).build();
-        }
+            Ticket ticket = Database.getTicket(session, ticketId);
+            Project project = Database.getProject(session, ticket.getProjectKey());
 
-        catch (WebApplicationException e)
-        {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), ticket.getProjectKey()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            return Response.ok(Database.listMessages(session, ticketId)).build();
         }
     }
 
@@ -460,7 +525,7 @@ public class WebService
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response addUser(@Context SecurityContext sc, User user)
+    public Response writeUser(@Context SecurityContext sc, User user)
     {
         try (Session session = Database.openSession())
         {
@@ -481,15 +546,13 @@ public class WebService
 
             else target = user;
 
-            Database.putUser(session, target);
+            if (Database.isAdmin(session, user.getLoginName()))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            Database.writeUser(session, target);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added/modified user %s.", loginName)).build();
-        }
-
-        catch (WebApplicationException e)
-        {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.ok().build();
         }
     }
 
@@ -516,21 +579,21 @@ public class WebService
     @Path("/users/{username}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteUser(@Context SecurityContext sc, @PathParam("username") String username)
+    public Response deleteUser(@Context SecurityContext sc, @PathParam("username") String userName)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
 
-            if (!Database.isUser(session, username))
+            if (!Database.isUser(session, userName))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Database.deleteUser(session, username);
+            Database.deleteUser(session, userName);
 
             session.getTransaction().commit();
         }
 
-        return Response.ok("User deleted.").build();
+        return Response.ok().build();
     }
 
     @Path("/admins")
@@ -565,15 +628,13 @@ public class WebService
 
             else target = admin;
 
-            Database.putAdmin(session, target);
+            if (Database.isUser(session, admin.getLoginName()))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            Database.writeAdmin(session, target);
             session.getTransaction().commit();
 
-            return Response.ok(String.format("Added/modified admin %s.", loginName)).build();
-        }
-
-        catch (WebApplicationException e)
-        {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.ok().build();
         }
     }
 
@@ -592,21 +653,21 @@ public class WebService
     @Path("/admins/{adminname}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("adminname") String adminname)
+    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("adminname") String adminName)
     {
         try (Session session = Database.openSession())
         {
             session.beginTransaction();
 
-            if (!Database.isAdmin(session, adminname))
+            if (!Database.isAdmin(session, adminName))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Database.deleteAdmin(session, adminname);
+            Database.deleteAdmin(session, adminName);
 
             session.getTransaction().commit();
         }
 
-        return Response.ok("Admin deleted.").build();
+        return Response.ok().build();
     }
 
     public static void startBackground(int port)

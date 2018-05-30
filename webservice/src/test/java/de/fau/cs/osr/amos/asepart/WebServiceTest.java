@@ -254,6 +254,16 @@ public class WebServiceTest
             assertEquals("Test Ticket Modified", ticket.getTicketName());
         }
 
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/projects/nonsense/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().delete())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
