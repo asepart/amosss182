@@ -48,9 +48,9 @@ To build the app one have to change the directory to `user-app` and run
 
 `npm install`
 
-`npm run eject`
+`npm start`
 
-`npm run android`
+The console outputs an QR code which can be scanned using the "Expo" app.
 
 ## Testing
 
