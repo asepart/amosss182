@@ -83,7 +83,7 @@ class Page extends Component{
 																				tCategory = {this.state.tCategory}
 																				tRequiredObservations = {this.state.tRequiredObservations}
 																				tId = {this.state.tId} {...props} />}/>
-					<Route exact path='/projects/:project/:id' component={TicketDetailBar} />
+					<Route exact path='/projects/:project/:id' component={TicketDetail} />
 					<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
 																				tName = {this.state.tName}
 																				tSummary = {this.state.tSummary}
@@ -96,8 +96,6 @@ class Page extends Component{
 		};
 	}
 }
-
-const TicketDetailBar = ({match}) => (<TicketDetail project={match.params.project} id={match.params.id}/>);
 
 class App extends Component{
 	handleAuthState (){
