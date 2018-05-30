@@ -25,8 +25,18 @@ export default class UserList extends Component {
 	}
 
 	componentDidMount() {
+		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				name: responseJson.projectName,
+				project: this.props.match.params.project
+			}, function() {});
+		}).catch((error) => {
+			console.error(error);
+		});
 		var url = URL;
-		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
+		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			url += '/projects/' + this.props.match.params.project + '/users';
 		} else {
 			url += '/users';
@@ -55,8 +65,8 @@ export default class UserList extends Component {
 		setState({
 			isAuth: true,
 			show: 'createTicket',
-			param: this.props.project,
-			name: this.props.name,
+			param: this.state.project,
+			name: this.state.name,
 			tName: '',
 			tSummary: '',
 			tDescription: '',
@@ -70,8 +80,8 @@ export default class UserList extends Component {
 		setState({
 			isAuth: true,
 			show: 'showTickets',
-			param: this.props.project,
-			name: this.props.name,
+			param: this.state.project,
+			name: this.state.name,
 			tName: '',
 			tSummary: '',
 			tDescription: '',
@@ -97,7 +107,7 @@ export default class UserList extends Component {
 			)
 		}
 
-		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
+		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			return (
 				<View>
 					<View style={{flex:1}}>
@@ -108,10 +118,10 @@ export default class UserList extends Component {
 					</View>
 					<View style={{flexDirection: 'row'}}>
 						<View style={{flex:1}}>
-							<Link to={"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
+							<Link to={"/projects/" + this.props.match.params.project} style={{textDecoration: 'none'}}>
 							<Button
 								onPress = { this.showTicketList.bind(this) }
-								title = {"Tickets of " + this.props.name}
+								title = {"Tickets of " + this.state.name}
 								color = "#0e4a80"
 							/>
 							</Link>
@@ -120,7 +130,7 @@ export default class UserList extends Component {
 							<Button
 								onPress = { function doNothing() {} }
 								disabled = {true}
-								title = {"Users of " + this.props.name}
+								title = {"Users of " + this.state.name}
 							/>
 						</View>
 					</View>
@@ -145,7 +155,7 @@ export default class UserList extends Component {
 						}, {
 							Header: '',
 							accessor: '',
-							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
+							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 						}
 					] }/>
 					<View>
@@ -212,7 +222,7 @@ export default class UserList extends Component {
 					}, {
 						Header: '',
 						accessor: '',
-						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.props.project} nameFromParent={this.props.name}/>
+						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 					}
 				] }/>
 			</View>
