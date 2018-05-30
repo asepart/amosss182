@@ -26,7 +26,7 @@ export default class UserList extends Component {
 
 	componentDidMount() {
 		var url = URL;
-		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
+		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			url += '/projects/' + this.props.match.params.project + '/users';
 		} else {
 			url += '/users';
@@ -97,7 +97,7 @@ export default class UserList extends Component {
 			)
 		}
 
-		if (this.props.project !== '' && typeof this.props.project !== "undefined") {
+		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			return (
 				<View>
 					<View style={{flex:1}}>
@@ -108,7 +108,7 @@ export default class UserList extends Component {
 					</View>
 					<View style={{flexDirection: 'row'}}>
 						<View style={{flex:1}}>
-							<Link to={"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
+							<Link to={"/projects/" + this.props.match.params.project} style={{textDecoration: 'none'}}>
 							<Button
 								onPress = { this.showTicketList.bind(this) }
 								title = {"Tickets of " + this.props.name}

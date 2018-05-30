@@ -138,11 +138,13 @@ export default class TicketList extends Component {
 				</View>
 				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize={10} showPagination={false}/>
 				<View>
+					<Link to="/">
 					<Button
 						onPress = { this.showProjectList.bind(this) }
 						title = "Back to Projects"
 						color = "#0e4a80"
 					/>
+					</Link>
 				</View>
 			</View>
 		);
