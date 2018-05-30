@@ -16,7 +16,7 @@ export default class TicketDetailButton extends Component {
 
 	render() {
 		return (
-			<Link to={"/projects/" + this.props.keyProj + "/" + this.props.proj.row.id } style={{textDecoration: 'none'}}>
+			<Link to={"/projects/" + this.props.keyProj + "/tickets/" + this.props.proj.row.id } style={{textDecoration: 'none'}}>
 				<Text
 					onPress = { this.showTicketDetails.bind(this) }
 					style={{color: '#5daedb'}}
