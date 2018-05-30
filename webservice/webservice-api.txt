@@ -97,6 +97,17 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not found]    if project or ticket did not exist before request.
 
+- Accept ticket
+
+  HTTP operation: POST
+  Path:           /projects/{key}/tickets/{id}/accept
+  Roles:          User
+  Status code:    [200 OK]           in case of success.
+                  [400 Bad Request]  if ticket is not part of project.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not found]    if project or ticket do not exist.
+
 - List users of project
 
   HTTP operation: GET
