@@ -83,7 +83,7 @@ class Page extends Component{
 																				tCategory = {this.state.tCategory}
 																				tRequiredObservations = {this.state.tRequiredObservations}
 																				tId = {this.state.tId} {...props} />}/>
-					<Route exact path='/projects/:project/:id' component={TicketDetail} />
+					<Route path='/projects/:project/tickets/:id' component={TicketDetail} />
 					<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
 																				tName = {this.state.tName}
 																				tSummary = {this.state.tSummary}
