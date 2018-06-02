@@ -45,6 +45,12 @@ export default class TicketView extends Component {
     })
   }
 
+  onProcessTicketPressed() {
+    const { navigate } = this.props.navigation;
+
+		navigate("Eigth", { name: "TicketProcessing" })
+  }
+
   async GetTicketInfo() {
     let ticketID = this.props.navigation.state.params.id;
     this.setState({
