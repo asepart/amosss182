@@ -87,6 +87,11 @@ export default class TicketView extends Component {
           style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Accept</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          //onPress={this.onProcessTicketPressed.bind(this)}
+          style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>Process Ticket</Text>
+        </TouchableOpacity>
         <Text style={styles.text}>
           Id: {this.state.ticketDetail.id}
         </Text>
