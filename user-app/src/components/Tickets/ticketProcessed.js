@@ -29,16 +29,20 @@ export default class TicketProcessing extends Component {
             observations: ""
 		}
     }
+
+  //  onSubmitPressed() {
+       //on submit pressed return back to ticket overview
+ //   }
     
     render() {
         return (
             <View style={styles.container}>
 					<Picker
-						style = {{height: 40, backgroundColor: '#8eacbb', borderColor: 'gray', borderWidth: 1, textAlign: 'center'}}
-						onValueChange = {(text) => this.setState({ticketOutcome: text})}
-						selectedValue = {this.state.ticketOutcome}
+						style = {{width: 200, borderColor: 'gray', borderWidth: 1,}}
+                        selectedValue = {this.state.ticketOutcome}
+                        onValueChange = {(text) => this.setState({ticketOutcome: text})}
+						
 					>
-						<Picker.Item label = {pickerPlaceholder}  />
 						<Picker.Item label = "Positive" value = "Positive" />
 						<Picker.Item label = "Negative" value = "Negative" />
 					</Picker>
@@ -50,6 +54,12 @@ export default class TicketProcessing extends Component {
 						onChangeText = {(text) => this.setState({observations: text})}
 						value = {this.state.observations}
 					/>
+                    <TouchableOpacity
+                      //  onPress={this.onSubmitPressed.bind(this)}
+                        style={styles.buttonContainer}>
+                     <Text 
+                        style={styles.buttonText}>Submit</Text>
+                     </TouchableOpacity>
             </View>
         );
 
