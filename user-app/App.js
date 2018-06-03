@@ -9,6 +9,7 @@ import TicketView from '../user-app/src/components/Projects/ticketView';
 import {
   StackNavigator,
 } from 'react-navigation';
+import TabViewExample from './src/components/Ticket View/ticketTabView';
 
 const AppNavigation = StackNavigator({
   First: { screen: Login },
@@ -24,7 +25,9 @@ const AppNavigation = StackNavigator({
 		color:'#FFF'
 	}
   })},
-  Seventh: {screen: GetMessages}
+  Seventh: {screen: GetMessages},
+  Ninth: {screen: TabViewExample}
+
  
 
 }); 

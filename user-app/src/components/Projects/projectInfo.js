@@ -67,7 +67,9 @@ export default class ProjectInfo extends Component {
                   data={this.state.ticketList}
                   renderItem={({item}) =>
                   <TouchableOpacity
-                 onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id})
+                 onPress={()=> this.props.navigation.navigate("Ninth", {name: 'TabViewExample'}
+                // {id:item.id}
+                )
                 }
                    style={styles.buttonContainer}>
                    <Text style={styles.buttonText}>
