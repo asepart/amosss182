@@ -6,22 +6,22 @@ import {
   } from 'react-navigation';
 
 const FirstRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#ff4081' }]} />
+  <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
 );
 const SecondRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
+  <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
 );
 
 const ThirdRoute = () => (
-    <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
+    <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
   );
 
 const FourthRoute = () => (
-    <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
+    <View style={[styles.container, { backgroundColor: '#0c38687' }]} />
   );  
 
 const FifthRoute = () => (
-    <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
+    <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
   );  
 
 export default class TabViewExample extends Component {
