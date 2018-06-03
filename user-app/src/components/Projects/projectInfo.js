@@ -48,10 +48,18 @@ export default class ProjectInfo extends Component {
     } 
 
 
+    _renderItem = ({item}) => (
+            <TouchableOpacity
+                  onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
+                }
+                   style={styles.buttonContainer}>
+                   <Text style={styles.buttonText}>
+            {item.id}, {item.ticketSummary}, {item.ticketCategory}
+            </Text>
+            </TouchableOpacity>
+    );
+    
     render() {
-    //  var {params} = this.props.navigation.state;
-     // const { navigate } = this.props.navigation;
-      
       if (this.state.isLoading) {
 			return (
 				<View style={{flex: 1,padding: 20}}>
@@ -60,21 +68,12 @@ export default class ProjectInfo extends Component {
 			)
 		}
      
-       return (
+       return (  
         <View style={styles.container}>
                 <FlatList
                   style={styles.textLarge}
                   data={this.state.ticketList}
-                  renderItem={({item}) =>
-                  <TouchableOpacity
-                 onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}
-                )
-                }
-                   style={styles.buttonContainer}>
-                   <Text style={styles.buttonText}>
-            {item.id}, {item.ticketSummary}, {item.ticketCategory}
-            </Text>
-            </TouchableOpacity>}
+                  renderItem={this._renderItem.bind(this)}  
                  keyExtractor={(item, index) => index}
                   //keyExtractor={item => item.id}
                 />

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 import ProjectInfo from '../Projects/projectInfo';
+import TicketView from '../Projects/ticketView';
 import {
 	StackNavigator,
   } from 'react-navigation';
@@ -20,7 +21,7 @@ const ThirdRoute = () => (
   );
 
 const FourthRoute = () => (
-    <View style={[styles.container, { backgroundColor: '#0c38687' }]} />
+    <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
   );  
 
 const FifthRoute = () => (
@@ -48,10 +49,10 @@ export default class TabViewExample extends Component {
       { key: 'fifth', title: 'COMPLETED' },
     ],
   };
-
   render() {
-    return (
+    return (   
       <TabView
+      
         navigationState={this.state}
         renderScene={SceneMap({
           first: ProjectInfo,
