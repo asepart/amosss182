@@ -38,6 +38,7 @@ export default class TicketView extends Component {
   }
 
   onAcceptPressed() {
+    alert("Ticket successfully accepted")
     let ticketID = this.props.navigation.state.params.id;    
     var response = fetch(URL + '/projects/' + key + '/tickets/'+ ticketID + '/accept', {
       method: 'POST',
@@ -46,6 +47,9 @@ export default class TicketView extends Component {
   }
 
   onProcessTicketPressed() {
+
+    //if ticket not accepted yet -> alert: "ticket has to be accepted first"
+    //alert("Ticket needs to be accepted first")
     const { navigate } = this.props.navigation;
 
 		navigate("Eigth", { name: "TicketProcessing" })
