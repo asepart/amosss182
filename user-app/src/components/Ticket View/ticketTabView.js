@@ -1,12 +1,15 @@
 import React, {Component} from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
+import ProjectInfo from '../Projects/projectInfo';
 import {
 	StackNavigator,
   } from 'react-navigation';
 
+
 const FirstRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
+  <View style={[styles.container, { backgroundColor: '#0c3868' }]}
+  />
 );
 const SecondRoute = () => (
   <View style={[styles.container, { backgroundColor: '#0c3868' }]} />
@@ -51,7 +54,7 @@ export default class TabViewExample extends Component {
       <TabView
         navigationState={this.state}
         renderScene={SceneMap({
-          first: FirstRoute,
+          first: ProjectInfo,
           second: SecondRoute,
           third: ThirdRoute,
           fourth: FourthRoute,
