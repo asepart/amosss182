@@ -94,7 +94,7 @@ export default class TicketView extends Component {
           <Text style={styles.buttonText}>Accept</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          //onPress={this.onProcessTicketPressed.bind(this)}
+          onPress={this.onProcessTicketPressed.bind(this)}
           style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Process Ticket</Text>
         </TouchableOpacity>
