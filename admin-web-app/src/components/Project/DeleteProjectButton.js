@@ -26,9 +26,8 @@ export default class DeleteProjectButton extends Component {
         console.error(error);
       });
     this.setState({
-      open: false,
+      open: false
 		})
-    this.forceUpdate()
 	}
 
 	render() {
@@ -40,7 +39,7 @@ export default class DeleteProjectButton extends Component {
           <Popup
             open={this.state.open}
             closeOnDocumentClick
-            onClose={this.closeModal}
+            onClose={this.closePopup}
           >
             <View>
             <Button
