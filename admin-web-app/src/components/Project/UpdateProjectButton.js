@@ -52,7 +52,7 @@ export default class UpdateProjectButton extends Component {
 		return (	// TODO: add edit icon instead of text here
 			<div>
 				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
-					UPDATE
+					EDIT
 				</button>
 				<Popup
 					open={this.state.open}
