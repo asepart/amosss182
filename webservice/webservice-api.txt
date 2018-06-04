@@ -197,6 +197,17 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not found]    if ticket does not exist.
 
+- Receive ticket statistics
+
+  HTTP operation: GET
+  Path:           /statistics/{ticket}
+  Roles:          Admin
+  Return:         JSON objects with statistics of ticket.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not a member of the associated project.
+                  [404 Not found]    if ticket does not exist.
+
 - Create or edit user
 
   HTTP operation: POST

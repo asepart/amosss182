@@ -18,6 +18,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
 import de.fau.cs.osr.amos.asepart.relationships.*;
+import de.fau.cs.osr.amos.asepart.structures.*;
 
 public class Database
 {
@@ -336,6 +337,21 @@ public class Database
         return resultList.size() != 0;
     }
 
+    static int acceptingUsers(Session session, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Assignment> criteria = builder.createQuery(Assignment.class);
+        Root<Assignment> columns = criteria.from(Assignment.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Assignment> resultList = session.createQuery(criteria).getResultList();
+
+        return resultList.size();
+    }
+
     static int numberOfUserObservations(Session session, String userName, Integer ticketId)
     {
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -422,6 +438,32 @@ public class Database
         messages = messageList.toArray(messages);
 
         return messages;
+    }
+
+    static Statistics getStatistics(Session session, Integer ticketId)
+    {
+        Statistics stat = new Statistics();
+
+        Observation[] observations = listObservations(session, ticketId);
+
+        for (Observation o : observations)
+        {
+            if (o.getOutcome() == ObservationOutcome.POSITIVE)
+                stat.OP++;
+            if (o.getOutcome() == ObservationOutcome.NEGATIVE)
+                stat.ON++;
+        }
+
+        stat.U = acceptingUsers(session, ticketId);
+
+        Query upQuery = session.createQuery("select loginName from Observation " +
+                "where ticketId = :ticketId and outcome = :outcome group by loginName");
+
+        upQuery.setParameter("ticketId", ticketId);
+        upQuery.setParameter("outcome", ObservationOutcome.POSITIVE);
+        stat.UP = upQuery.getResultList().size();
+
+        return stat;
     }
 
     static void writeUser(Session session, String loginName, String password, String firstName, String lastName, String phone)

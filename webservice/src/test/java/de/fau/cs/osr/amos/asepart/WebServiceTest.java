@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
+import de.fau.cs.osr.amos.asepart.structures.*;
 
 public class WebServiceTest
 {
@@ -287,6 +288,16 @@ public class WebServiceTest
         try (Response response = getUserClient().path("/projects/nonsense/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
+        {
+            Statistics stat = response.readEntity(Statistics.class);
+
+            assertEquals(1, stat.U);
+            assertEquals(1, stat.UP);
+            assertEquals(1, stat.OP);
+            assertEquals(0, stat.ON);
         }
 
         try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().delete())

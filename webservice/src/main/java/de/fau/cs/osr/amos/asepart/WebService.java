@@ -629,6 +629,39 @@ public class WebService
         }
     }
 
+    @Path("/statistics/{ticket}")
+    @OPTIONS
+    @PermitAll
+    public Response statistics()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/statistics/{ticket}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin"})
+    public Response getStatistics(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+
+        try (Session session = Database.openSession())
+        {
+            if (!Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+            Project project = Database.getProject(session, ticket.getProjectKey());
+
+            if (!project.getOwner().equals(principal.getName()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            return Response.ok(Database.getStatistics(session, ticketId)).build();
+        }
+    }
+
     @Path("/users")
     @OPTIONS
     @PermitAll
