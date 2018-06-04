@@ -4,15 +4,13 @@ import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import UpdateTicketButton from './UpdateTicketButton';
-import { setState } from '../shared/GlobalState';
+import TicketCreate from './TicketCreate';
 import DeleteTicketButton from './DeleteTicketButton';
 import TicketChatButton from '../Chat/TicketChatButton';
 import TicketDetailButton from './TicketDetailButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
-
-var pickerPlaceholder = "Category";
 
 export default class TicketList extends Component {
 	constructor(props) {
@@ -59,37 +57,6 @@ export default class TicketList extends Component {
 		});
 	}
 
-	showUserManagement () {
-		setState({
-			isAuth: true,
-			show: 'listUsers',
-			param: this.state.project,
-			name: this.state.name
-		});
-	}
-
-	showCreateTicket () {
-		setState({
-			isAuth: true,
-			show: 'createTicket',
-			param: this.state.project,
-			name: this.state.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
-		});
-	}
-
 	render() {
 		if (this.state.isLoading) {
 			return (
@@ -103,6 +70,7 @@ export default class TicketList extends Component {
 			{
 				Header: 'ID',
 				accessor: 'id',
+				Footer: props => <TicketCreate project={this.state.project} name={this.state.name}/>
 			}, {
 				Header: 'Name',
 				accessor: 'ticketName',
@@ -126,23 +94,18 @@ export default class TicketList extends Component {
 			}, {
 				Header: '',
 				accessor: '',
+				maxWidth: 55,
 				Cell: props => <UpdateTicketButton tick={props} project={this.state.project} name={this.state.name}/>
 			}, {
 				Header: '',
 				accessor: '',
+				maxWidth: 75,
 				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 			}
 		]
 
 		return (
 			<View>
-				<View>
-					<Button
-						onPress = { this.showCreateTicket.bind(this) }
-						title = "Add Ticket"
-						color = "#0c3868"
-					/>
-				</View>
 				<View style={{flexDirection: 'row'}}>
 					<View style={{flex:1}}>
 						<Button
@@ -154,23 +117,19 @@ export default class TicketList extends Component {
 					<View style={{flex:1}}>
 						<Link to={"/projects/" + this.state.project + "/users"} style={{textDecoration: 'none'}}>
 						<Button
-							onPress = { this.showUserManagement.bind(this) }
 							title = {"Users of "  + this.state.name}
 							color = "#0e4a80"
 						/>
 						</Link>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize={10} showPagination={false}/>
-				<View>
-					<Link to="/">
-					<Button
-						onPress = { this.showProjectList.bind(this) }
-						title = "Back to Projects"
-						color = "#0e4a80"
-					/>
-					</Link>
-				</View>
+				<ReactTable
+						data={this.state.dataSource}
+						noDataText="No Tickets found!"
+						defaultPageSize={10}
+						showPagination={false}
+						columns={columns}
+				/>
 			</View>
 		);
 	}
