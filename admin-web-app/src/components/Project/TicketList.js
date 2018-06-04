@@ -41,22 +41,10 @@ export default class TicketList extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		var url = URL;
-		url += '/projects/' + this.props.match.params.project + '/tickets';
-		return fetch(url, {method:'GET', headers: getAuth()})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				dataSource: responseJson
-			}, function() {});
-		}).catch((error) => {
-			console.error(error);
-		});
+		this.updateData()
 	}
 
 	updateData() {
-		//at first this looks like redundant code but it improves the loading time - instead of just reusing fetchData in componentDidUpdate
 		var url = URL;
 		url += '/projects/' + this.props.match.params.project + '/tickets';
 		return fetch(url, {method:'GET', headers: getAuth()})
