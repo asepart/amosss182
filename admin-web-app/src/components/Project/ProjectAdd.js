@@ -1,42 +1,31 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View,Text} from 'react-native';
+import {Button,TextInput,View} from 'react-native';
 import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
-import { setState } from '../shared/GlobalState';
 import '../../index.css';
-import {Link, Redirect} from 'react-router-dom'
-
-var button = "Add";
-var editKey = true;
+import Popup from "reactjs-popup";
 
 export default class ProjectAdd extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
+			open: false,
 			projectName: this.props.name,
 			entryKey: this.props.project,
 			owner: username
 		};
-		if(this.state.entryKey !== '') {
-			button = "Update";
-			editKey = false;
-		} else {
-			button = "Add";
-			editKey = true;
-		}
 	}
+	openPopup = () => {
+    this.setState({ open: true });
+  };
+  closePopup = () => {
+    this.setState({ open: false });
+  };
 
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: '',
-			param: ''
-		});
-	}
-
-	async putProject() {
+	putProject() {
 		let auth = getAuthForPost();
-		await fetch(URL + '/projects', {
+		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
 				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: this.state.owner})
@@ -52,39 +41,43 @@ export default class ProjectAdd extends Component {
 			.catch((error) => {
 				console.error(error);
 			});
-		this.showProjectList ();
 		this.setState({
-			redirect: true
-		  })
+		  	open: false
+		})
 	}
 
 	render() {
 		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
-		if (this.state.isLoading) {
-			return (
-				<View style = {{flex: 1, padding: 20}}>
-					<ActivityIndicator / >
-				</View>
-			)
-		}
+
 		return (
-			<View>
-			<TextInput
-				placeholder = "Name"
-				style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-				onChangeText = {(text) => this.setState({projectName: text})}
-				value = {this.state.projectName}
-			/>
-			<TextInput
-				placeholder = "Entry Code"
-				style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-				onChangeText = { (text) => this.setState({entryKey: text})}
-				value = { this.state.entryKey }
-				editable = {editKey}
-			/>
-			<Button onPress = { this.putProject.bind(this) } title = {button} color = "#0c3868" disabled = {!buttonEnabled}/>
-			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
-			</View>
+			<div>
+				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
+					ADD PROJECT
+				</button>
+				<Popup
+					open={this.state.open}
+					closeOnDocumentClick
+					onClose={this.closePopup}
+				>
+					<View>
+					<TextInput
+						placeholder = "Name"
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = {(text) => this.setState({projectName: text})}
+						value = { this.state.projectName }
+					/>
+					<TextInput
+						placeholder = "Entry Code"
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = { (text) => this.setState({entryKey: text})}
+						value = { this.state.entryKey }
+						editable = { true }
+					/>
+					<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#0c3868" disabled = {!buttonEnabled}/>
+					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
+					</View>
+				</Popup>
+			</div>
 		);
 	}
 }
