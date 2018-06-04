@@ -4,6 +4,7 @@ import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
+import ProjectAdd from './ProjectAdd';
 import UpdateProjectButton from './UpdateProjectButton';
 import DeleteProjectButton from './DeleteProjectButton';
 import { setState } from '../shared/GlobalState';
@@ -41,26 +42,11 @@ export default class ProjectList extends Component {
 		});
 	}
 
-	showAddProject () {
-		setState({
-			isAuth: true,
-			show: 'addProject',
-			param: ''
-		});
-	}
-
 	showUserManagement () {
 		setState({
 			isAuth: true,
 			show: 'listUsers',
 			param: ''
-		});
-	}
-
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
 		});
 	}
 
@@ -77,30 +63,26 @@ export default class ProjectList extends Component {
 			{
 				Header: 'Name',
 				accessor: 'projectName',
-				Cell: props => <ProjectButton proj={props}/>
+				Cell: props => <ProjectButton proj={props}/>,
+				Footer: props => <ProjectAdd project={this.state.param} name={this.state.name}/>
 			}, {
 				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
 			}, {
 				Header: '',
 				accessor: '',
-				Cell: props => <UpdateProjectButton proj={props}/>
+				maxWidth: 80,
+				Cell: props => <UpdateProjectButton project={props.row.entryKey} name={props.row.projectName}/>
 			}, {
 				Header: '',
 				accessor: '',
+				maxWidth: 80,
 				Cell: props => <DeleteProjectButton proj={props}/>
 			}
 		]
 
 		return (
 			<View>
-				<View>
-					<Button
-						onPress = { this.showAddProject }
-						title = "Add Project"
-						color = "#0c3868"
-					/>
-				</View>
 				<View style={{flexDirection: 'row'}}>
 					<View style={{flex:1}}>
 						<Button
@@ -119,7 +101,13 @@ export default class ProjectList extends Component {
 						</Link>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={columns}/>
+				<ReactTable
+					data={this.state.dataSource}
+					noDataText="No Projects found!"
+					defaultPageSize={10}
+					showPagination={false}
+					columns={columns}
+				/>
 			</View>
 		);
 	}
