@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View, Text} from 'react-native';
+import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -23,6 +23,14 @@ export default class TicketList extends Component {
 	}
 
 	componentDidMount() {
+		this.fetchData();
+	}
+
+	componentDidUpdate() {
+		this.updateData();
+	}
+
+	fetchData() {
 		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -33,6 +41,22 @@ export default class TicketList extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
+		var url = URL;
+		url += '/projects/' + this.props.match.params.project + '/tickets';
+		return fetch(url, {method:'GET', headers: getAuth()})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				isLoading: false,
+				dataSource: responseJson
+			}, function() {});
+		}).catch((error) => {
+			console.error(error);
+		});
+	}
+
+	updateData() {
+		//at first this looks like redundant code but it improves the loading time - instead of just reusing fetchData in componentDidUpdate
 		var url = URL;
 		url += '/projects/' + this.props.match.params.project + '/tickets';
 		return fetch(url, {method:'GET', headers: getAuth()})
