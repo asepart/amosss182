@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View,Text} from 'react-native';
+import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -21,6 +21,14 @@ export default class ProjectList extends Component {
 	}
 
 	componentDidMount() {
+		this.fetchData();
+	}
+
+	componentDidUpdate() {
+		this.fetchData();
+	}
+
+	fetchData() {
 		return fetch(URL + '/projects', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -48,7 +56,7 @@ export default class ProjectList extends Component {
 			param: ''
 		});
 	}
-	
+
 	showProjectList () {
 		setState({
 			isAuth: true,
