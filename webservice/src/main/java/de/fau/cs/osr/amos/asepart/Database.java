@@ -40,6 +40,7 @@ public class Database
             // Relationships
             configuration.addAnnotatedClass(Membership.class);
             configuration.addAnnotatedClass(Assignment.class);
+            configuration.addAnnotatedClass(Observation.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());
@@ -315,16 +316,40 @@ public class Database
         Assignment assignment = new Assignment();
         assignment.setLoginName(userName);
         assignment.setTicketId(ticketId);
+
+        session.save(assignment);
     }
 
-    static void sendMessage(Session session, Integer ticketId, String message, String sender)
+    static void submitObservation(Session session, Observation observation)
     {
-        Message m = new Message();
-        m.setTicketId(ticketId);
-        m.setSender(sender);
-        m.setContent(message);
+        session.save(observation);
+    }
 
-        session.save(m);
+    static Observation[] listObservations(Session session, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Observation> criteria = builder.createQuery(Observation.class);
+        Root<Observation> columns = criteria.from(Observation.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+        List<Observation> observationList = session.createQuery(criteria).getResultList();
+
+        Observation[] observations = new Observation[observationList.size()];
+        observations = observationList.toArray(observations);
+
+        return observations;
+    }
+
+    static void sendMessage(Session session, Integer ticketId, String messageText, String sender)
+    {
+        Message message = new Message();
+        message.setTicketId(ticketId);
+        message.setSender(sender);
+        message.setContent(messageText);
+
+        session.save(message);
     }
 
     static Message[] listMessages(Session session, Integer ticketId)

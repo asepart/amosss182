@@ -8,6 +8,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import de.fau.cs.osr.amos.asepart.relationships.Observation;
+import de.fau.cs.osr.amos.asepart.relationships.ObservationOutcome;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -255,6 +257,15 @@ public class WebServiceTest
         }
 
         try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Observation o = new Observation();
+        o.setOutcome(ObservationOutcome.POSITIVE);
+        o.setQuantity(4);
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().post(Entity.json(o)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }

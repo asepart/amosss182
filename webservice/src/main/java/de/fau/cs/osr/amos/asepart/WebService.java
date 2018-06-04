@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
+import de.fau.cs.osr.amos.asepart.relationships.Observation;
 import org.hibernate.Session;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -325,8 +326,87 @@ public class WebService
 
             Database.acceptTicket(session, principal.getName(), ticketId);
             session.getTransaction().commit();
+        }
 
-            return Response.ok().build();
+        return Response.ok().build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}/observations")
+    @OPTIONS
+    @PermitAll
+    public Response observations()
+    {
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}/observations")
+    @POST
+    @RolesAllowed({"User"})
+    public Response submitObservation(@Context SecurityContext sc,
+                                      @PathParam("key") String projectKey,
+                                      @PathParam("id") Integer ticketId,
+                                      Observation observation)
+    {
+        Principal principal = sc.getUserPrincipal();
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isProject(session, projectKey) || !Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+
+            if (!ticket.getProjectKey().equals(projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            if (!Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            observation.setLoginName(principal.getName());
+            observation.setTicketId(ticketId);
+
+            Database.submitObservation(session, observation);
+            session.getTransaction().commit();
+        }
+
+        return Response.ok().build();
+    }
+
+    @Path("/projects/{key}/tickets/{id}/observations")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin", "User"})
+    public Response listObservations(@Context SecurityContext sc,
+                                    @PathParam("key") String projectKey,
+                                    @PathParam("id") Integer ticketId)
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (Session session = Database.openSession())
+        {
+            session.beginTransaction();
+
+            if (!Database.isProject(session, projectKey) || !Database.isTicket(session, ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Ticket ticket = Database.getTicket(session, ticketId);
+            Project project = Database.getProject(session, projectKey);
+
+            if (!ticket.getProjectKey().equals(projectKey))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
+            if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            else if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            session.getTransaction().commit();
+
+            return Response.ok(Database.listObservations(session, ticketId)).build();
         }
     }
 
