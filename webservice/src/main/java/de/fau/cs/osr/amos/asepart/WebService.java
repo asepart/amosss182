@@ -640,7 +640,7 @@ public class WebService
     @Path("/statistics/{ticket}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response getStatistics(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId)
     {
         Principal principal = sc.getUserPrincipal();

@@ -201,7 +201,7 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /statistics/{ticket}
-  Roles:          Admin
+  Roles:          Admin, User
   Return:         JSON objects with statistics of ticket.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
