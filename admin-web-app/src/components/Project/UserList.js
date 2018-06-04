@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button,View,Text} from 'react-native';
+import {ActivityIndicator,Button,View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -14,6 +14,7 @@ import {Link} from 'react-router-dom'
 var pickerPlaceholder = "Category";
 
 export default class UserList extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -25,6 +26,14 @@ export default class UserList extends Component {
 	}
 
 	componentDidMount() {
+		this.fetchData();
+	}
+
+	componentDidUpdate() {
+		this.updateData();
+	}
+
+	fetchData() {
 		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -35,6 +44,10 @@ export default class UserList extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
+		this.updateData()
+	}
+
+	updateData() {
 		var url = URL;
 		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			url += '/projects/' + this.props.match.params.project + '/users';
