@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Button } from 'react-native';
-import { setState } from '../shared/GlobalState';
+import { View, Button } from 'react-native';
 import Popup from "reactjs-popup";
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
