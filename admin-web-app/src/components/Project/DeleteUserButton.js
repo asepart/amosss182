@@ -19,7 +19,7 @@ export default class DeleteUserButton extends Component {
 
   deleteUser() {
     var url = URL;
-    if (this.props.keyFromParent !== '') {
+    if (this.props.keyFromParent !== undefined) {
         url += '/projects/' + this.props.keyFromParent
     }
     url += '/users/' + this.props.proj.row.loginName;
