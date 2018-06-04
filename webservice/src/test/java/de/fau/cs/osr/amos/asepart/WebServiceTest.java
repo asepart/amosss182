@@ -261,6 +261,13 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        {
+            Ticket ticket = response.readEntity(Ticket.class);
+
+            assertEquals(TicketStatus.ACCEPTED, ticket.getTicketStatus());
+        }
+
         Observation o = new Observation();
         o.setOutcome(ObservationOutcome.POSITIVE);
         o.setQuantity(4);
@@ -268,6 +275,13 @@ public class WebServiceTest
         try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().post(Entity.json(o)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        {
+            Ticket ticket = response.readEntity(Ticket.class);
+
+            assertEquals(TicketStatus.PROCESSED, ticket.getTicketStatus());
         }
 
         try (Response response = getUserClient().path("/projects/nonsense/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))

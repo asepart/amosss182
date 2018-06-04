@@ -224,6 +224,25 @@ public class WebService
             }
 
             Ticket[] tickets = Database.getTicketsOfProject(session, projectKey);
+
+            if (role.equals("User"))
+            {
+                for (Ticket ticket : tickets)
+                {
+                    if (ticket.getTicketStatus() == TicketStatus.OPEN
+                            && Database.hasUserAcceptedTicket(session, principal.getName(), ticket.getId()))
+                    {
+                        ticket.setTicketStatus(TicketStatus.ACCEPTED);
+                    }
+
+                    if (ticket.getTicketStatus() == TicketStatus.ACCEPTED
+                            && Database.numberOfUserObservations(session, principal.getName(), ticket.getId()) > 0)
+                    {
+                        ticket.setTicketStatus(TicketStatus.PROCESSED);
+                    }
+                }
+            }
+
             return Response.ok(tickets).build();
         }
     }
@@ -260,8 +279,25 @@ public class WebService
             if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            else if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), projectKey))
-                return Response.status(Response.Status.FORBIDDEN).build();
+            else if (role.equals("User"))
+            {
+                if (!Database.isUserMemberOfProject(session, principal.getName(), projectKey))
+                {
+                    return Response.status(Response.Status.FORBIDDEN).build();
+                }
+
+                if (ticket.getTicketStatus() == TicketStatus.OPEN
+                        && Database.hasUserAcceptedTicket(session, principal.getName(), ticketId))
+                {
+                    ticket.setTicketStatus(TicketStatus.ACCEPTED);
+                }
+
+                if (ticket.getTicketStatus() == TicketStatus.ACCEPTED
+                        && Database.numberOfUserObservations(session, principal.getName(), ticketId) > 0)
+                {
+                    ticket.setTicketStatus(TicketStatus.PROCESSED);
+                }
+            }
 
             session.getTransaction().commit();
 

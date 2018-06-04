@@ -320,9 +320,64 @@ public class Database
         session.save(assignment);
     }
 
+    static boolean hasUserAcceptedTicket(Session session, String userName, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Assignment> criteria = builder.createQuery(Assignment.class);
+        Root<Assignment> columns = criteria.from(Assignment.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Assignment> resultList = session.createQuery(criteria).getResultList();
+
+        return resultList.size() != 0;
+    }
+
+    static int numberOfUserObservations(Session session, String userName, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Observation> criteria = builder.createQuery(Observation.class);
+        Root<Observation> columns = criteria.from(Observation.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Observation> resultList = session.createQuery(criteria).getResultList();
+
+        int number = 0;
+
+        for (Observation o : resultList)
+        {
+            number += o.getQuantity();
+        }
+
+        return number;
+    }
+
     static void submitObservation(Session session, Observation observation)
     {
         session.save(observation);
+
+        Ticket ticket = getTicket(session, observation.getTicketId());
+        Observation[] observations = listObservations(session, observation.getTicketId());
+
+        int number = 0;
+
+        for (Observation o : observations)
+        {
+            number += o.getQuantity();
+        }
+
+        if (number >= ticket.getRequiredObservations())
+        {
+            ticket.setTicketStatus(TicketStatus.FINISHED);
+            writeTicket(session, ticket);
+        }
     }
 
     static Observation[] listObservations(Session session, Integer ticketId)
