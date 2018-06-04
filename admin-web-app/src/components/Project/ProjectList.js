@@ -7,7 +7,6 @@ import ProjectButton from './ProjectButton';
 import ProjectAdd from './ProjectAdd';
 import UpdateProjectButton from './UpdateProjectButton';
 import DeleteProjectButton from './DeleteProjectButton';
-import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
 import {Link} from 'react-router-dom'
@@ -42,14 +41,6 @@ export default class ProjectList extends Component {
 		});
 	}
 
-	showUserManagement () {
-		setState({
-			isAuth: true,
-			show: 'listUsers',
-			param: ''
-		});
-	}
-
 	render() {
 		if (this.state.isLoading) {
 			return (
@@ -71,12 +62,12 @@ export default class ProjectList extends Component {
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 80,
+				maxWidth: 55,
 				Cell: props => <UpdateProjectButton project={props.row.entryKey} name={props.row.projectName}/>
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 80,
+				maxWidth: 75,
 				Cell: props => <DeleteProjectButton proj={props}/>
 			}
 		]
@@ -94,7 +85,6 @@ export default class ProjectList extends Component {
 					<View style={{flex:1}}>
 						<Link to="/usermanagement" style={{textDecoration: 'none'}}>
 						<Button
-							onPress = { this.showUserManagement }
 							title = "Users"
 							color = "#0e4a80"
 						/>
