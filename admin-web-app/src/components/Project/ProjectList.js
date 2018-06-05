@@ -23,7 +23,7 @@ export default class ProjectList extends Component {
 	componentDidMount() {
 		this.fetchData();
 	}
-
+	
 	componentDidUpdate() {
 		this.fetchData();
 	}
@@ -63,7 +63,7 @@ export default class ProjectList extends Component {
 				Header: '',
 				accessor: '',
 				maxWidth: 55,
-				Cell: props => <UpdateProjectButton project={props.row.entryKey} name={props.row.projectName}/>
+				Cell: props => <UpdateProjectButton proj={props}/>
 			}, {
 				Header: '',
 				accessor: '',
@@ -94,7 +94,7 @@ export default class ProjectList extends Component {
 				<ReactTable
 					data={this.state.dataSource}
 					noDataText="No Projects found!"
-					defaultPageSize={10}
+					minRows={this.state.dataSource.length}
 					showPagination={false}
 					columns={columns}
 				/>
