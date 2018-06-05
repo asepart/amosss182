@@ -4,6 +4,7 @@ import {URL} from '../shared/const';
 import {getAuth} from '../shared/auth';
 import {setState} from '../shared/GlobalState';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
+import { Link } from 'react-router-dom';
 
 export default class TicketChat extends Component {
 
@@ -12,7 +13,7 @@ export default class TicketChat extends Component {
     this.state = {
       isLoading: true,
       message: "",
-      idTicket: this.props.id,
+      idTicket: this.props.match.params.id,
       chatHistory: [],
     }
   }
@@ -44,23 +45,6 @@ export default class TicketChat extends Component {
     this.makeApiCall();
   }
 
-  showTicketList() {
-		setState({
-			isAuth: true,
-			show: 'showTickets',
-			param: this.props.project,
-			name: this.props.name
-		});
-	}
-  
-  showProjectList () {
-		setState({
-			isAuth: true,
-			show: '',
-			param: ''
-		});
-	}
-
   renderChat() {
     return this.state.chatHistory.map(function(news, id){
       return(
@@ -83,6 +67,7 @@ export default class TicketChat extends Component {
     return(
 		<View>
         <Button
+          onPress = { function doNothing() {} }
           disabled = {true}
           title = {"Chat history of " + this.props.tName + " in " + this.props.name}
         />
@@ -95,7 +80,12 @@ export default class TicketChat extends Component {
           onChangeText = {(text) => this.setState({message: text})} />
 
         <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" />
-        <Button onPress = { this.showTicketList.bind(this) } title = "Back to Tickets" color = "#0e4a80" />
+				<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id }>
+          <Button
+            onPress = { function doNothing() {} }
+            title = "Back to Tickets"
+            color = "#0e4a80" />
+				</Link>
       </View>
     );
   }
