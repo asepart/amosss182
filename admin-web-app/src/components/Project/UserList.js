@@ -115,6 +115,7 @@ export default class UserList extends Component {
 						}, {
 							Header: '',
 							accessor: '',
+							maxWidth: 75,
 							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 						}
 					] }/>
@@ -162,10 +163,12 @@ export default class UserList extends Component {
 					}, {
 						Header: '',
 						accessor: '',
+						maxWidth: 55,
 						Cell: props => <UpdateUserButton proj={props}/>
 					}, {
 						Header: '',
 						accessor: '',
+						maxWidth: 75,
 						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 					}
 				] }/>
