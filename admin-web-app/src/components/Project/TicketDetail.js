@@ -62,9 +62,9 @@ export default class TicketDetail extends Component {
 					<Text>Project key: {this.state.project} </Text>
 					<Text>Required observations: { this.state.data.requiredObservations }</Text>
 					<Text>Category: { this.state.data.ticketCategory }</Text>
-					<Text>Description: { this.state.data.ticketDescription }</Text>
 					<Text>Name: { this.state.data.ticketName }</Text>
 					<Text>Summary: { this.state.data.ticketSummary }</Text>
+					<Text>Description: { this.state.data.ticketDescription }</Text>
 				</View>
 				<View>
 					<Link to={"/projects/" + this.state.project }>
