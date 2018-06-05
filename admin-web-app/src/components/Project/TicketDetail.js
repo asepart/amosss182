@@ -17,7 +17,7 @@ export default class TicketDetail extends Component {
 		super(props);
 		this.state = {
 			isDataLoading: true,
-			isChatLoading: true
+			isStatisticsLoading: true
 		}
 	}
 
@@ -43,10 +43,21 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
+		var url = URL + '/statistics/' + this.props.match.params.id;
+		fetch(url, {method:'GET', headers: getAuth()})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				isStatisticsLoading: false,
+				statisitcs: responseJson
+			}, function() {});
+		}).catch((error) => {
+			console.error(error);
+		});
 	}
 
 	render() {
-		if (this.state.isDataLoading) {
+		if (this.state.isDataLoading || this.state.isStatisticsLoading ) {
 			return (
 				<View style={{flex: 1,padding: 20}}>
 					<ActivityIndicator/>
@@ -64,6 +75,10 @@ export default class TicketDetail extends Component {
 					<Text>Category: { this.state.data.ticketCategory }</Text>
 					<Text>Name: { this.state.data.ticketName }</Text>
 					<Text>Summary: { this.state.data.ticketSummary }</Text>
+					<Text>Statistic U: { this.state.statisitcs.U }</Text>
+					<Text>Statistic UP: { this.state.statisitcs.UP }</Text>
+					<Text>Statistic ON: { this.state.statisitcs.ON }</Text>
+					<Text>Statistic OP: { this.state.statisitcs.OP }</Text>
 					<Text>Description: { this.state.data.ticketDescription }</Text>
 				</View>
 				<View>
