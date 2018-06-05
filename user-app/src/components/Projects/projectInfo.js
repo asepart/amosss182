@@ -54,7 +54,7 @@ export default class ProjectInfo extends Component {
                 }
                    style={styles.buttonContainer}>
                    <Text style={styles.buttonText}>
-            {item.id}, {item.ticketSummary}, {item.ticketCategory}
+            {item.id}, {item.ticketSummary}, {item.ticketCategory}, {item.ticketStatus}
             </Text>
             </TouchableOpacity>
     );
