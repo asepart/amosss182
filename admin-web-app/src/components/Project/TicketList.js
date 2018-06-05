@@ -1,165 +1,128 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View, Text} from 'react-native';
-import ReactTable from 'react-table';
-import {getAuth} from '../shared/auth';
+import { View, Button, TextInput, Picker } from 'react-native';
+import Popup from "reactjs-popup";
+import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
-import UpdateTicketButton from './UpdateTicketButton';
-import { setState } from '../shared/GlobalState';
-import DeleteTicketButton from './DeleteTicketButton';
-import TicketChatButton from '../Chat/TicketChatButton';
-import TicketDetailButton from './TicketDetailButton';
-import 'react-table/react-table.css';
 import '../../index.css';
-import { Link } from 'react-router-dom';
 
 var pickerPlaceholder = "Category";
 
-export default class TicketList extends Component {
+export default class UpdateTicketButton extends Component {
+
 	constructor(props) {
-		super(props);
-		this.state = {
-			isLoading: true
-		}
+    super(props);
+    this.state = {
+			open: false,
+			ticketName: '',
+			ticketSummary: '',
+			ticketDescription: '',
+			ticketCategory: '',
+			requiredObservations: '',
+			id: '',
+		};
+  }
+  openPopup = () => {
+    this.setState({ open: true });
+		this.getVars();
+  };
+  closePopup = () => {
+    this.setState({ open: false });
+  };
+
+	//needed to get right row values after changes in parent component
+	getVars() {
+		this.setState({
+			ticketName: this.props.tick.row.ticketName,
+			ticketSummary: this.props.tick.row.ticketSummary,
+			ticketDescription: this.props.tick.row.ticketDescription,
+			ticketCategory: this.props.tick.row.ticketCategory,
+			requiredObservations: this.props.tick.row.requiredObservations,
+			id: this.props.tick.row.id
+		})
 	}
 
-	componentDidMount() {
-		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				name: responseJson.projectName,
-				project: this.props.match.params.project
-			}, function() {});
-		}).catch((error) => {
-			console.error(error);
-		});
-		var url = URL;
-		url += '/projects/' + this.props.match.params.project + '/tickets';
-		return fetch(url, {method:'GET', headers: getAuth()})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				dataSource: responseJson
-			}, function() {});
-		}).catch((error) => {
-			console.error(error);
-		});
-	}
-
-	showUserManagement () {
-		setState({
-			isAuth: true,
-			show: 'listUsers',
-			param: this.state.project,
-			name: this.state.name
-		});
-	}
-
-	showCreateTicket () {
-		setState({
-			isAuth: true,
-			show: 'createTicket',
-			param: this.state.project,
-			name: this.state.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
-		});
+	createTicket() {
+		let auth = getAuthForPost();
+		fetch(URL + '/projects/' + this.props.project + '/tickets/', {
+				method: 'POST',
+				headers: auth,
+				body: JSON.stringify({id: this.state.id, ticketName: this.state.ticketName, ticketSummary: this.state.ticketSummary, ticketDescription: this.state.ticketDescription, ticketCategory: this.state.ticketCategory, requiredObservations: this.state.requiredObservations})
+			})
+			.then((response) => response.json())
+			.then((responseJson) => {
+				this.setState({
+					ticketName: "",
+					ticketSummary: "",
+					ticketDescription: "",
+					ticketCategory: "",
+					requiredObservations: "",
+					id: ""
+				}, function() {});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		this.setState({
+		  open: false
+		})
 	}
 
 	render() {
-		if (this.state.isLoading) {
-			return (
-				<View style={{flex: 1,padding: 20}}>
-					<ActivityIndicator/>
-				</View>
-			)
-		}
+		var buttonEnabled = (this.state.ticketName !== '' && this.state.ticketSummary !== '' && this.state.ticketDescription !== '' && this.state.ticketCategory !== pickerPlaceholder && this.state.requiredObservations !== '');
 
-		const columns = [
-			{
-				Header: 'ID',
-				accessor: 'id',
-			}, {
-				Header: 'Name',
-				accessor: 'ticketName',
-				Cell: props => <TicketDetailButton proj={props} keyProj={this.props.match.params.project}/>
-			}, {
-				Header: 'Summary',
-				accessor: 'ticketSummary',
-			}, {
-				Header: 'Description',
-				accessor: 'ticketDescription'
-			}, {
-				Header: 'Category',
-				accessor: 'ticketCategory'
-			}, {
-				Header: 'Required observations',
-				accessor: 'requiredObservations' // String-based value accessors!
-			}, {
-				Header: '',
-				accessor: '',
-				Cell: props => <TicketChatButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
-			}, {
-				Header: '',
-				accessor: '',
-				Cell: props => <UpdateTicketButton tick={props} project={this.state.project} name={this.state.name}/>
-			}, {
-				Header: '',
-				accessor: '',
-				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
-			}
-		]
-
-		return (
-			<View>
+		return (	// TODO: add edit icon instead of text here
+			<div>
+				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
+					EDIT
+				</button>
+				<Popup
+					open={this.state.open}
+					closeOnDocumentClick
+					onClose={this.closePopup}
+				>
 				<View>
-					<Button
-						onPress = { this.showCreateTicket.bind(this) }
-						title = "Add Ticket"
-						color = "#0c3868"
+					<TextInput
+						placeholder = "Name"
+						textAlign={'center'}
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = {(text) => this.setState({ticketName: text})}
+						value = {this.state.ticketName}
 					/>
-				</View>
-				<View style={{flexDirection: 'row'}}>
-					<View style={{flex:1}}>
-						<Button
-							onPress = { function doNothing() {} }
-							disabled = {true}
-							title = {"Tickets of " + this.state.name}
-						/>
-					</View>
-					<View style={{flex:1}}>
-						<Link to={"/projects/" + this.state.project + "/users"} style={{textDecoration: 'none'}}>
-						<Button
-							onPress = { this.showUserManagement.bind(this) }
-							title = {"Users of "  + this.state.name}
-							color = "#0e4a80"
-						/>
-						</Link>
-					</View>
-				</View>
-				<ReactTable data={this.state.dataSource} columns={columns} defaultPageSize={10} showPagination={false}/>
-				<View>
-					<Link to="/">
-					<Button
-						onPress = { this.showProjectList.bind(this) }
-						title = "Back to Projects"
-						color = "#0e4a80"
+					<TextInput
+						placeholder = "Summary"
+						textAlign={'center'}
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = {(text) => this.setState({ticketSummary: text})}
+						value = {this.state.ticketSummary}
 					/>
-					</Link>
+					<TextInput
+						placeholder = "Description"
+						multiline={true}
+						style = {{height: 600, borderColor: 'gray',borderWidth: 1}}
+						onChangeText = {(text) => this.setState({ticketDescription: text})}
+						value = {this.state.ticketDescription}
+					/>
+					<Picker
+						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1, textAlign: 'center'}}
+						onValueChange = {(text) => this.setState({ticketCategory: text})}
+						selectedValue = {this.state.ticketCategory}
+					>
+						<Picker.Item label = {pickerPlaceholder} value = {pickerPlaceholder} />
+						<Picker.Item label = "ONE_TIME_ERROR" value = "ONE_TIME_ERROR" />
+						<Picker.Item label = "TRACE" value = "TRACE" />
+						<Picker.Item label = "BEHAVIOR" value = "BEHAVIOR" />
+					</Picker>
+					<TextInput
+						placeholder = "Required Observations"
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = {(text) => this.setState({requiredObservations: text})}
+						value = {this.state.requiredObservations}
+					/>
+					<Button onPress = { this.createTicket.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
+					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
 				</View>
-			</View>
+				</Popup>
+			</div>
 		);
 	}
 }
