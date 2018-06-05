@@ -42,7 +42,10 @@ export default class ProjectAdd extends Component {
 				console.error(error);
 			});
 		this.setState({
-		  	open: false
+		  	open: false,
+				projectName: "",
+				entryKey: "",
+				owner: ""
 		})
 	}
 
