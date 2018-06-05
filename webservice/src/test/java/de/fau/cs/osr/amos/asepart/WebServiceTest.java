@@ -292,6 +292,8 @@ public class WebServiceTest
 
         try (Response response = getAdminClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
         {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
             Statistics stat = response.readEntity(Statistics.class);
 
             assertEquals(1, stat.U);
@@ -299,6 +301,12 @@ public class WebServiceTest
             assertEquals(1, stat.OP);
             assertEquals(0, stat.ON);
         }
+
+        try (Response response = getUserClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
 
         try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().delete())
         {

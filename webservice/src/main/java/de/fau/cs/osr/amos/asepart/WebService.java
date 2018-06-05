@@ -644,6 +644,7 @@ public class WebService
     public Response getStatistics(@Context SecurityContext sc, @PathParam("ticket") Integer ticketId)
     {
         Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (Session session = Database.openSession())
         {
@@ -653,7 +654,12 @@ public class WebService
             Ticket ticket = Database.getTicket(session, ticketId);
             Project project = Database.getProject(session, ticket.getProjectKey());
 
-            if (!project.getOwner().equals(principal.getName()))
+            if (role.equals("Admin") && !project.getOwner().equals(principal.getName()))
+            {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (role.equals("User") && !Database.isUserMemberOfProject(session, principal.getName(), ticket.getProjectKey()))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
