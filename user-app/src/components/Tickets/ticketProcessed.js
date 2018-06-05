@@ -5,6 +5,8 @@ import {
 	StackNavigator,
   } from 'react-navigation';
 import {URL} from '../Login/const';
+import {ticket} from '../Chat/sendMessages';
+import {key} from '../Projects/keyValid';
 
 var pickerPlaceholder = "Outcome";
 
@@ -30,9 +32,16 @@ export default class TicketProcessing extends Component {
 		}
     }
 
-  //  onSubmitPressed() {
+    async onSubmitPressed() {
+      fetch(URL + '/projects/' + key + '/tickets/'  + ticket + '/observations' ,{
+             method: 'POST',
+             headers: getAuth(),
+             body:  JSON.stringify({outcome: this.state.ticketOutcome, quantity: this.state.observations})
+         })
+       
+     
        //on submit pressed return back to ticket overview
- //   }
+   }
     
     render() {
         return (
@@ -43,8 +52,8 @@ export default class TicketProcessing extends Component {
                         onValueChange = {(text) => this.setState({ticketOutcome: text})}
 						
 					>
-						<Picker.Item label = "Positive" value = "Positive" />
-						<Picker.Item label = "Negative" value = "Negative" />
+						<Picker.Item label = "POSITIVE" value = "POSITIVE" />
+						<Picker.Item label = "NEGATIVE" value = "NEGATIVE" />
 					</Picker>
 					<TextInput
                         placeholder = "Observations"
