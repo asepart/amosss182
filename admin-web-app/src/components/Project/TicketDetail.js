@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import {ActivityIndicator,Button, View, Text} from 'react-native';
-import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
-import UpdateTicketButton from './UpdateTicketButton';
-import { setState } from '../shared/GlobalState';
-import DeleteTicketButton from './DeleteTicketButton';
-import TicketChatButton from '../Chat/TicketChatButton';
-import TicketDetailButton from './TicketDetailButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
@@ -43,7 +37,7 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		var url = URL + '/statistics/' + this.props.match.params.id;
+		url = URL + '/statistics/' + this.props.match.params.id;
 		fetch(url, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
