@@ -8,6 +8,7 @@ import TicketCreate from './TicketCreate';
 import DeleteTicketButton from './DeleteTicketButton';
 import TicketChatButton from '../Chat/TicketChatButton';
 import TicketDetailButton from './TicketDetailButton';
+import TicketStatus from './TicketStatus';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
@@ -87,6 +88,10 @@ export default class TicketList extends Component {
 			}, {
 				Header: 'Required observations',
 				accessor: 'requiredObservations' // String-based value accessors!
+			}, {
+				Header: 'Status',
+				accessor: 'ticketStatus', // String-based value accessors!
+				Cell: props => <TicketStatus state={props}/>
 			}, {
 				Header: '',
 				accessor: '',
