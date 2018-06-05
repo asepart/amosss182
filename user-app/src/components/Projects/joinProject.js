@@ -41,7 +41,7 @@ export default class JoinProject extends Component {
   
         //navigate to different site
        const { navigate } = this.props.navigation;
-        navigate("Ninth", { name: "TabViewExample" })
+        navigate("Fourth", { name: "ProjectInfo" })
   
      } else {
         this.setState({error: "something went wrong"});

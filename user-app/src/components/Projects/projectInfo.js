@@ -52,10 +52,19 @@ export default class ProjectInfo extends Component {
             <TouchableOpacity
                   onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
                 }
-                   style={styles.buttonContainer}>
+                   style={styles.buttonLargeContainer}>
                    <Text style={styles.buttonText}>
-            {item.id}, {item.ticketSummary}, {item.ticketCategory}, {item.ticketStatus}
-            </Text>
+                     id:  {item.id}
+                   </Text>
+                   <Text style={styles.buttonText}>
+                    summary: {item.ticketSummary}
+                   </Text>
+                  <Text style={styles.buttonText}>
+                    category: {item.ticketCategory} 
+                  </Text>
+                    <Text style={styles.buttonText}>
+                  status: {item.ticketStatus}
+                   </Text>
             </TouchableOpacity>
     );
     
