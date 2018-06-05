@@ -83,14 +83,12 @@ export default class UpdateTicketButton extends Component {
 				<View>
 					<TextInput
 						placeholder = "Name"
-						textAlign={'center'}
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({ticketName: text})}
 						value = {this.state.ticketName}
 					/>
 					<TextInput
 						placeholder = "Summary"
-						textAlign={'center'}
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({ticketSummary: text})}
 						value = {this.state.ticketSummary}
@@ -103,7 +101,7 @@ export default class UpdateTicketButton extends Component {
 						value = {this.state.ticketDescription}
 					/>
 					<Picker
-						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1, textAlign: 'center'}}
+						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1}}
 						onValueChange = {(text) => this.setState({ticketCategory: text})}
 						selectedValue = {this.state.ticketCategory}
 					>
@@ -116,7 +114,7 @@ export default class UpdateTicketButton extends Component {
 						placeholder = "Required Observations"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
-						value = {this.state.requiredObservations}
+						value = {`${this.state.requiredObservations}`}
 					/>
 					<Button onPress = { this.createTicket.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
 					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />

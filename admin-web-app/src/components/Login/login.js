@@ -5,7 +5,6 @@ import {
 	View,
 	TextInput,
 	TouchableOpacity,
-	Image
 } from 'react-native';
 import {isAuth, setPSW, setUsername} from '../shared/auth';
 import {setState} from '../shared/GlobalState';
@@ -33,7 +32,7 @@ export default class Login extends Component {
 	}
 
 	handleKeyPress = (event) => {
-	  if(event.key == 'Enter'){
+	  if(event.key === 'Enter'){
 	    this.onLoginPressed();
 	  }
 	}
@@ -41,7 +40,7 @@ export default class Login extends Component {
 	render() {
 		return (
 			<View style={styles.container}>
-				<img src={require('../images/icon.png')}/><p/>
+				<img src={require('../images/icon.png')} alt=""/><p/>
 				<TextInput onKeyPress={this.handleKeyPress} onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" style={styles.input}/>
 				<TextInput onKeyPress={this.handleKeyPress} onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" secureTextEntry={true} style={styles.input}/>
 				<TouchableOpacity onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>

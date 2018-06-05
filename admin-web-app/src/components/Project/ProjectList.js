@@ -85,6 +85,7 @@ export default class ProjectList extends Component {
 					<View style={{flex:1}}>
 						<Link to="/usermanagement" style={{textDecoration: 'none'}}>
 						<Button
+							onPress = {function doNothing() {} }
 							title = "Users"
 							color = "#0e4a80"
 						/>

@@ -82,6 +82,7 @@ export default class UserList extends Component {
 						<View style={{flex:1}}>
 							<Link to={"/projects/" + this.props.match.params.project} style={{textDecoration: 'none'}}>
 							<Button
+								onPress = { function doNothing() {} }
 								title = {"Tickets of " + this.state.name}
 								color = "#0e4a80"
 							/>
@@ -89,6 +90,7 @@ export default class UserList extends Component {
 						</View>
 						<View style={{flex:1}}>
 							<Button
+								onPress = { function doNothing() {} }
 								disabled = {true}
 								title = {"Users of " + this.state.name}
 							/>

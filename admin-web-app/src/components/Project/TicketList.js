@@ -122,6 +122,7 @@ export default class TicketList extends Component {
 					<View style={{flex:1}}>
 						<Link to={"/projects/" + this.state.project + "/users"} style={{textDecoration: 'none'}}>
 						<Button
+							onPress = { function doNothing() {} }
 							title = {"Users of "  + this.state.name}
 							color = "#0e4a80"
 						/>

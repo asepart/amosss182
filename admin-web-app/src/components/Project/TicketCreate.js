@@ -90,7 +90,7 @@ export default class TicketCreate extends Component {
 						value = {this.state.ticketDescription}
 					/>
 					<Picker
-						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1, textAlign: 'center'}}
+						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1}}
 						onValueChange = {(text) => this.setState({ticketCategory: text})}
 						selectedValue = {this.state.ticketCategory}
 					>
