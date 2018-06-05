@@ -86,7 +86,11 @@ export default class TicketDetail extends Component {
 				</View>
 				<View>
 					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>
-						<Text>Chat:</Text>
+					<Button
+						onPress = { function doNothing() {} }
+						title = "Chat"
+						color = "#0c3868"
+					/>
 					</Link>
 				</View>
 			</View>
