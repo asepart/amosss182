@@ -13,20 +13,33 @@ export default class UpdateTicketButton extends Component {
     super(props);
     this.state = {
 			open: false,
+			ticketName: '',
+			ticketSummary: '',
+			ticketDescription: '',
+			ticketCategory: '',
+			requiredObservations: '',
+			id: '',
+		};
+  }
+  openPopup = () => {
+    this.setState({ open: true });
+		this.getVars();
+  };
+  closePopup = () => {
+    this.setState({ open: false });
+  };
+
+	//needed to get right row values after changes in parent component
+	getVars() {
+		this.setState({
 			ticketName: this.props.tick.row.ticketName,
 			ticketSummary: this.props.tick.row.ticketSummary,
 			ticketDescription: this.props.tick.row.ticketDescription,
 			ticketCategory: this.props.tick.row.ticketCategory,
 			requiredObservations: this.props.tick.row.requiredObservations,
 			id: this.props.tick.row.id
-		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+		})
+	}
 
 	createTicket() {
 		let auth = getAuthForPost();
