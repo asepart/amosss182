@@ -7,7 +7,6 @@ import TicketList from './components/Project/TicketList';
 import TicketDetail from './components/Project/TicketDetail';
 import TicketChat from './components/Chat/TicketChat';
 import UserList from './components/Project/UserList';
-import UserAdd from './components/Project/UserAdd';
 import Header from './components/shared/Header';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
