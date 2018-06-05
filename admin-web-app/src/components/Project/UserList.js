@@ -68,51 +68,6 @@ export default class UserList extends Component {
 		});
 	}
 
-	showAddUser () {
-		setState({
-			isAuth: true,
-			show: 'addUser',
-			id: ''
-		});
-	}
-
-	showCreateTicket () {
-		setState({
-			isAuth: true,
-			show: 'createTicket',
-			param: this.state.project,
-			name: this.state.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-
-	showTicketList () {
-		setState({
-			isAuth: true,
-			show: 'showTickets',
-			param: this.state.project,
-			name: this.state.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
-		});
-	}
-
 	render() {
 		if (this.state.isLoading) {
 			return (
@@ -142,7 +97,7 @@ export default class UserList extends Component {
 							/>
 						</View>
 					</View>
-					<ReactTable data={this.state.dataSource} noDataText="No Users found!" defaultPageSize={10} showPagination={false} columns={ [
+					<ReactTable data={this.state.dataSource} noDataText="No Users found!" minRows={this.state.dataSource.length} showPagination={false} columns={ [
 						{
 							Header: 'Given Name',
 							accessor: 'firstName'
@@ -188,7 +143,7 @@ export default class UserList extends Component {
 						/>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} noDataText="No Users found!" defaultPageSize={10} showPagination={false} columns={ [
+				<ReactTable data={this.state.dataSource} noDataText="No Users found!" minRows={this.state.dataSource.length} showPagination={false} columns={ [
 					{
 						Header: 'Given Name',
 						accessor: 'firstName',
