@@ -126,7 +126,7 @@ export default class TicketList extends Component {
 				<ReactTable
 						data={this.state.dataSource}
 						noDataText="No Tickets found!"
-						defaultPageSize={10}
+						minRows={this.state.dataSource.length}
 						showPagination={false}
 						columns={columns}
 				/>
