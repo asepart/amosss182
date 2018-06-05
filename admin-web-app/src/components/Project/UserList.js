@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button,View,Text} from 'react-native';
+import {ActivityIndicator,Button,View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
-import { setState } from '../shared/GlobalState';
 import UpdateUserButton from './UpdateUserButton';
 import DeleteUserButton from './DeleteUserButton';
+import UserAdd from './UserAdd';
+
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
 import {Link} from 'react-router-dom'
 
-var pickerPlaceholder = "Category";
-
 export default class UserList extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -25,6 +25,14 @@ export default class UserList extends Component {
 	}
 
 	componentDidMount() {
+		this.fetchData();
+	}
+
+	componentDidUpdate() {
+		this.updateData();
+	}
+
+	fetchData() {
 		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -35,6 +43,10 @@ export default class UserList extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
+		this.updateData()
+	}
+
+	updateData() {
 		var url = URL;
 		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			url += '/projects/' + this.props.match.params.project + '/users';
@@ -53,51 +65,6 @@ export default class UserList extends Component {
 		});
 	}
 
-	showAddUser () {
-		setState({
-			isAuth: true,
-			show: 'addUser',
-			id: ''
-		});
-	}
-
-	showCreateTicket () {
-		setState({
-			isAuth: true,
-			show: 'createTicket',
-			param: this.state.project,
-			name: this.state.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-
-	showTicketList () {
-		setState({
-			isAuth: true,
-			show: 'showTickets',
-			param: this.state.project,
-			name: this.state.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
-		});
-	}
-
 	render() {
 		if (this.state.isLoading) {
 			return (
@@ -109,18 +76,12 @@ export default class UserList extends Component {
 
 		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			return (
+				//USERS OF SPECIFIC PROJECT
 				<View>
-					<View style={{flex:1}}>
-						<Button
-							title = {" "}
-							color = "#0c3868"
-						/>
-					</View>
 					<View style={{flexDirection: 'row'}}>
 						<View style={{flex:1}}>
 							<Link to={"/projects/" + this.props.match.params.project} style={{textDecoration: 'none'}}>
 							<Button
-								onPress = { this.showTicketList.bind(this) }
 								title = {"Tickets of " + this.state.name}
 								color = "#0e4a80"
 							/>
@@ -128,13 +89,12 @@ export default class UserList extends Component {
 						</View>
 						<View style={{flex:1}}>
 							<Button
-								onPress = { function doNothing() {} }
 								disabled = {true}
 								title = {"Users of " + this.state.name}
 							/>
 						</View>
 					</View>
-					<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={ [
+					<ReactTable data={this.state.dataSource} noDataText="No Users found!" minRows={this.state.dataSource.length} showPagination={false} columns={ [
 						{
 							Header: 'Given Name',
 							accessor: 'firstName'
@@ -155,35 +115,20 @@ export default class UserList extends Component {
 						}, {
 							Header: '',
 							accessor: '',
+							maxWidth: 75,
 							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 						}
 					] }/>
-					<View>
-						<Link to = "/" style={{textDecoration: 'none'}} >
-						<Button
-							onPress = { this.showProjectList.bind(this) }
-							title = "Back to Projects"
-							color = "#0e4a80"
-						/>
-						</Link>
-					</View>
 				</View>
 			);
 		}
 		return(
+			//GLOBAL USER MANAGEMENT
 			<View>
-				<View>
-					<Button
-						onPress = { this.showAddUser.bind(this) }
-						title = "Add User"
-						color = "#0c3868"
-					/>
-				</View>
 				<View style={{flexDirection: 'row'}}>
 					<View style={{flex:1}}>
 						<Link to = "/" style={{textDecoration: 'none'}} >
 						<Button
-							onPress = { this.showProjectList.bind(this) }
 							title = "Projects"
 							color = "#0e4a80"
 						/>
@@ -191,16 +136,16 @@ export default class UserList extends Component {
 					</View>
 					<View style={{flex:1}}>
 						<Button
-							onPress = { function doNothing() {} }
 							disabled = {true}
 							title = {"Users"}
 						/>
 					</View>
 				</View>
-				<ReactTable data={this.state.dataSource} defaultPageSize={10} showPagination={false} columns={ [
+				<ReactTable data={this.state.dataSource} noDataText="No Users found!" minRows={this.state.dataSource.length} showPagination={false} columns={ [
 					{
 						Header: 'Given Name',
-						accessor: 'firstName'
+						accessor: 'firstName',
+						Footer: props => <UserAdd project={this.state.project} name={this.state.name}/>
 					}, {
 						Header: 'Surname',
 						accessor: 'lastName'
@@ -218,10 +163,12 @@ export default class UserList extends Component {
 					}, {
 						Header: '',
 						accessor: '',
+						maxWidth: 55,
 						Cell: props => <UpdateUserButton proj={props}/>
 					}, {
 						Header: '',
 						accessor: '',
+						maxWidth: 75,
 						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 					}
 				] }/>

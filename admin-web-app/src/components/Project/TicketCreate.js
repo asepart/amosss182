@@ -1,65 +1,36 @@
 import React, {Component} from 'react';
-import {Button,TextInput,ActivityIndicator,View,Picker,Text} from 'react-native';
+import {Button,TextInput,View,Picker} from 'react-native';
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
-import { setState } from '../shared/GlobalState';
 import '../../index.css';
+import Popup from "reactjs-popup";
 
-var button = "Add";
 var pickerPlaceholder = "Category";
 
 export default class TicketCreate extends Component {
+
 	constructor(props) {
-		super(props);
-		this.state = {
-			ticketName: this.props.tName,
-			ticketSummary: this.props.tSummary,
-			ticketDescription: this.props.tDescription,
-			ticketCategory: this.props.tCategory,
-			requiredObservations: this.props.tRequiredObservations,
-			id: this.props.tId
+    super(props);
+    this.state = {
+			open: false,
+			ticketName: '',
+			ticketSummary: '',
+			ticketDescription: '',
+			ticketCategory: '',
+			requiredObservations: '',
+			id: '0',
 		};
-		if(this.state.id !== '0') {
-			button = "Update";
-		} else {
-			button = "Add";
-		}
-	}
+  }
+  openPopup = () => {
+    this.setState({ open: true });
+  };
+  closePopup = () => {
+    this.setState({ open: false });
+  };
 
-	showUserList () {
-		setState({
-			isAuth: true,
-			show: 'listUsers',
-			param: this.props.project,
-			name: this.props.name
-		});
-	}
-	
-	showTicketList () {
-		setState({
-			isAuth: true,
-			show: 'showTickets',
-			param: this.props.project,
-			name: this.props.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
-		});
-	}
-	
-	showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
-		});
-	}
-
-	async createTicket() {
+	createTicket() {
 		let auth = getAuthForPost();
-		await fetch(URL + '/projects/' + this.props.project + '/tickets/', {
+		fetch(URL + '/projects/' + this.props.project + '/tickets/', {
 				method: 'POST',
 				headers: auth,
 				body: JSON.stringify({id: this.state.id, ticketName: this.state.ticketName, ticketSummary: this.state.ticketSummary, ticketDescription: this.state.ticketDescription, ticketCategory: this.state.ticketCategory, requiredObservations: this.state.requiredObservations})
@@ -78,19 +49,24 @@ export default class TicketCreate extends Component {
 			.catch((error) => {
 				console.error(error);
 			});
-		this.showTicketList ();
+		this.setState({
+		  open: false
+		})
 	}
 
-	render() {console.log(this.state.ticketName);
+	render() {
 		var buttonEnabled = (this.state.ticketName !== '' && this.state.ticketSummary !== '' && this.state.ticketDescription !== '' && this.state.ticketCategory !== pickerPlaceholder && this.state.requiredObservations !== '');
-		if (this.state.isLoading) {
-			return (
-				<View style = {{flex: 1, padding: 20}}>
-					<ActivityIndicator / >
-				</View>
-			)
-		}
-		return(
+
+		return (	// TODO: add edit icon instead of text here
+			<div>
+				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
+					ADD TICKET
+				</button>
+				<Popup
+					open={this.state.open}
+					closeOnDocumentClick
+					onClose={this.closePopup}
+				>
 				<View>
 					<TextInput
 						placeholder = "Name"
@@ -129,9 +105,11 @@ export default class TicketCreate extends Component {
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {this.state.requiredObservations}
 					/>
-					<Button onPress = { this.createTicket.bind(this) } title = {button} color = "#0c3868" disabled = {!buttonEnabled}/>
-					<Button onPress = { this.showTicketList.bind(this) } title = "Cancel" color = "#0e4a80" />
+					<Button onPress = { this.createTicket.bind(this) } title = "Add" color = "#0c3868" disabled = {!buttonEnabled}/>
+					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
 				</View>
+				</Popup>
+			</div>
 		);
 	}
 }
