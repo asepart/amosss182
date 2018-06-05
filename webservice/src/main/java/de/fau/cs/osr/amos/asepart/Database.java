@@ -18,6 +18,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
 import de.fau.cs.osr.amos.asepart.relationships.*;
+import de.fau.cs.osr.amos.asepart.structures.*;
 
 public class Database
 {
@@ -40,6 +41,7 @@ public class Database
             // Relationships
             configuration.addAnnotatedClass(Membership.class);
             configuration.addAnnotatedClass(Assignment.class);
+            configuration.addAnnotatedClass(Observation.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
             builder.applySettings(configuration.getProperties());
@@ -315,16 +317,110 @@ public class Database
         Assignment assignment = new Assignment();
         assignment.setLoginName(userName);
         assignment.setTicketId(ticketId);
+
+        session.save(assignment);
     }
 
-    static void sendMessage(Session session, Integer ticketId, String message, String sender)
+    static boolean hasUserAcceptedTicket(Session session, String userName, Integer ticketId)
     {
-        Message m = new Message();
-        m.setTicketId(ticketId);
-        m.setSender(sender);
-        m.setContent(message);
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Assignment> criteria = builder.createQuery(Assignment.class);
+        Root<Assignment> columns = criteria.from(Assignment.class);
 
-        session.save(m);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Assignment> resultList = session.createQuery(criteria).getResultList();
+
+        return resultList.size() != 0;
+    }
+
+    static int acceptingUsers(Session session, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Assignment> criteria = builder.createQuery(Assignment.class);
+        Root<Assignment> columns = criteria.from(Assignment.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Assignment> resultList = session.createQuery(criteria).getResultList();
+
+        return resultList.size();
+    }
+
+    static int numberOfUserObservations(Session session, String userName, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Observation> criteria = builder.createQuery(Observation.class);
+        Root<Observation> columns = criteria.from(Observation.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        predicates.add(builder.equal(columns.get("loginName"), userName));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+
+        List<Observation> resultList = session.createQuery(criteria).getResultList();
+
+        int number = 0;
+
+        for (Observation o : resultList)
+        {
+            number += o.getQuantity();
+        }
+
+        return number;
+    }
+
+    static void submitObservation(Session session, Observation observation)
+    {
+        session.save(observation);
+
+        Ticket ticket = getTicket(session, observation.getTicketId());
+        Observation[] observations = listObservations(session, observation.getTicketId());
+
+        int number = 0;
+
+        for (Observation o : observations)
+        {
+            number += o.getQuantity();
+        }
+
+        if (number >= ticket.getRequiredObservations())
+        {
+            ticket.setTicketStatus(TicketStatus.FINISHED);
+            writeTicket(session, ticket);
+        }
+    }
+
+    static Observation[] listObservations(Session session, Integer ticketId)
+    {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Observation> criteria = builder.createQuery(Observation.class);
+        Root<Observation> columns = criteria.from(Observation.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(columns.get("ticketId"), ticketId));
+        criteria.select(columns).where(predicates.toArray(new Predicate[]{}));
+        List<Observation> observationList = session.createQuery(criteria).getResultList();
+
+        Observation[] observations = new Observation[observationList.size()];
+        observations = observationList.toArray(observations);
+
+        return observations;
+    }
+
+    static void sendMessage(Session session, Integer ticketId, String messageText, String sender)
+    {
+        Message message = new Message();
+        message.setTicketId(ticketId);
+        message.setSender(sender);
+        message.setContent(messageText);
+
+        session.save(message);
     }
 
     static Message[] listMessages(Session session, Integer ticketId)
@@ -342,6 +438,32 @@ public class Database
         messages = messageList.toArray(messages);
 
         return messages;
+    }
+
+    static Statistics getStatistics(Session session, Integer ticketId)
+    {
+        Statistics stat = new Statistics();
+
+        Observation[] observations = listObservations(session, ticketId);
+
+        for (Observation o : observations)
+        {
+            if (o.getOutcome() == ObservationOutcome.POSITIVE)
+                stat.OP++;
+            if (o.getOutcome() == ObservationOutcome.NEGATIVE)
+                stat.ON++;
+        }
+
+        stat.U = acceptingUsers(session, ticketId);
+
+        Query upQuery = session.createQuery("select loginName from Observation " +
+                "where ticketId = :ticketId and outcome = :outcome group by loginName");
+
+        upQuery.setParameter("ticketId", ticketId);
+        upQuery.setParameter("outcome", ObservationOutcome.POSITIVE);
+        stat.UP = upQuery.getResultList().size();
+
+        return stat;
     }
 
     static void writeUser(Session session, String loginName, String password, String firstName, String lastName, String phone)

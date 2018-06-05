@@ -84,6 +84,25 @@ export default styles=StyleSheet.create({
       fontWeight: '700'
   
     },
+
+    buttonTextAccepted: {
+      textAlign: 'center',
+      color: '#76ff03',
+      fontWeight: '700'
+    },
+
+    buttonTextInProgress: {
+      textAlign: 'center',
+      color: '#ffff00',
+      fontWeight: '700'
+    },
+
+    buttonTextCompleted: {
+      textAlign: 'center',
+      color: '#dd2c00',
+      fontWeight: '700'
+    },
+
     //add button
     addButton: {
        alignItems:'center',

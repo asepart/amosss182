@@ -10,7 +10,7 @@ import {key} from './keyValid';
 
 window.btoa = require('Base64').btoa;
 
-
+export var ticketstatus = '';
 
 export default class ProjectInfo extends Component {
 
@@ -48,38 +48,107 @@ export default class ProjectInfo extends Component {
     } 
 
 
+    _renderItem({item}) {
+      ticketstatus= item.ticketStatus;
+      if(item.ticketStatus == 'OPEN') {
+        return (
+        <TouchableOpacity
+                  onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
+                }
+                   style={styles.buttonLargeContainer}>
+                   <Text style={styles.buttonText}>
+                     id:  {item.id}
+                   </Text>
+                   <Text style={styles.buttonText}>
+                    summary: {item.ticketSummary}
+                   </Text>
+                  <Text style={styles.buttonText}>
+                    category: {item.ticketCategory} 
+                  </Text>
+                    <Text style={styles.buttonText}>
+                  status: {item.ticketStatus}
+                   </Text>
+            </TouchableOpacity>
+        );
+      } else if(item.ticketStatus == 'ACCEPTED') {
+           return (
+      <TouchableOpacity
+                  onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
+                }
+                   style={styles.buttonLargeContainer}>
+                   <Text style={styles.buttonText}>
+                     id:  {item.id}
+                   </Text>
+                   <Text style={styles.buttonText}>
+                    summary: {item.ticketSummary}
+                   </Text>
+                  <Text style={styles.buttonText}>
+                    category: {item.ticketCategory} 
+                  </Text>
+                    <Text style={styles.buttonTextAccepted}>
+                  status: {item.ticketStatus}
+                   </Text>
+            </TouchableOpacity>
+              );   } 
+              else if(item.ticketStatus == 'IN PROGRESS')  {
+                return (
+           <TouchableOpacity
+                       onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id})}
+                        style={styles.buttonLargeContainer}>
+                        <Text style={styles.buttonText}>
+                          id:  {item.id}
+                        </Text>
+                        <Text style={styles.buttonText}>
+                         summary: {item.ticketSummary}
+                        </Text>
+                       <Text style={styles.buttonText}>
+                         category: {item.ticketCategory} 
+                       </Text>
+                         <Text style={styles.buttonInProgress}>
+                       status: {item.ticketStatus}
+                        </Text>
+                 </TouchableOpacity>
+                   );   } 
+              else  {
+                return (
+           <TouchableOpacity
+                       onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id})}
+                        style={styles.buttonLargeContainer}>
+                        <Text style={styles.buttonText}>
+                          id:  {item.id}
+                        </Text>
+                        <Text style={styles.buttonText}>
+                         summary: {item.ticketSummary}
+                        </Text>
+                       <Text style={styles.buttonText}>
+                         category: {item.ticketCategory} 
+                       </Text>
+                         <Text style={styles.buttonCompleted}>
+                       status: {item.ticketStatus}
+                        </Text>
+                 </TouchableOpacity>
+                   );   }     
+  }
+    
+  
     render() {
-    //  var {params} = this.props.navigation.state;
-     // const { navigate } = this.props.navigation;
-      
       if (this.state.isLoading) {
 			return (
 				<View style={{flex: 1,padding: 20}}>
 					<ActivityIndicator/>
 				</View>
 			)
-		}
-     
-       return (
+		} 
+      return (
         <View style={styles.container}>
                 <FlatList
                   style={styles.textLarge}
                   data={this.state.ticketList}
-                  renderItem={({item}) =>
-                  <TouchableOpacity
-                 onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id})
-                }
-                   style={styles.buttonContainer}>
-                   <Text style={styles.buttonText}>
-            {item.id}, {item.ticketSummary}, {item.ticketCategory}
-            </Text>
-            </TouchableOpacity>}
+                  renderItem={this._renderItem.bind(this)}  
                  keyExtractor={(item, index) => index}
-                  //keyExtractor={item => item.id}
                 />
 
         </View>
-        
-      );
+        );   
     }
   }

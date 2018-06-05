@@ -8,6 +8,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import de.fau.cs.osr.amos.asepart.relationships.Observation;
+import de.fau.cs.osr.amos.asepart.relationships.ObservationOutcome;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.fau.cs.osr.amos.asepart.entities.*;
+import de.fau.cs.osr.amos.asepart.structures.*;
 
 public class WebServiceTest
 {
@@ -259,10 +262,73 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        {
+            Ticket ticket = response.readEntity(Ticket.class);
+
+            assertEquals(TicketStatus.ACCEPTED, ticket.getTicketStatus());
+        }
+
+        Observation o = new Observation();
+        o.setOutcome(ObservationOutcome.POSITIVE);
+        o.setQuantity(4);
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().post(Entity.json(o)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Observation[]> type = new GenericType<Observation[]>() {};
+            Observation[] observations = response.readEntity(type);
+
+            assertEquals(o.getQuantity(), observations[0].getQuantity());
+        }
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            Ticket ticket = response.readEntity(Ticket.class);
+
+            assertEquals(TicketStatus.PROCESSED, ticket.getTicketStatus());
+        }
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Ticket[]> type = new GenericType<Ticket[]>() {};
+            Ticket[] tickets = response.readEntity(type);
+
+            assertEquals(lastTicket.getId(), tickets[tickets.length - 1].getId());
+        }
+
         try (Response response = getUserClient().path("/projects/nonsense/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
+
+        try (Response response = getAdminClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            Statistics stat = response.readEntity(Statistics.class);
+
+            assertEquals(1, stat.U);
+            assertEquals(1, stat.UP);
+            assertEquals(1, stat.OP);
+            assertEquals(0, stat.ON);
+        }
+
+        try (Response response = getUserClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
 
         try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().delete())
         {

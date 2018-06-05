@@ -1,25 +1,91 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
-import { setState } from '../shared/GlobalState';
-import { Link } from 'react-router-dom';
+import { View, Button, TextInput } from 'react-native';
+import Popup from "reactjs-popup";
+import {getAuthForPost, username} from '../shared/auth';
+import {URL} from '../shared/const';
+import '../../index.css';
 
 export default class UpdateProjectButton extends Component {
-	displayProject() {
-		setState({
-			isAuth: true,
-			show: 'addProject',
-			param: this.props.proj.row.entryKey,
-			name: this.props.proj.row.projectName
-		});
+
+	constructor(props) {
+    super(props);
+    this.state = {
+			open: false,
+			projectName: '',
+			entryKey: '',
+		};
+  }
+  openPopup = () => {
+    this.setState({ open: true });
+		this.getVars();
+  };
+  closePopup = () => {
+    this.setState({ open: false });
+  };
+
+	//needed to get right row values after changes in parent component
+	getVars() {
+		this.setState({
+			projectName: this.props.proj.row.projectName,
+			entryKey: this.props.proj.row.entryKey,
+		})
 	}
+
+	putProject() {
+		let auth = getAuthForPost();
+		fetch(URL + '/projects', {
+				method: 'POST',
+				headers: auth,
+				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: username})
+			})
+			.then((response) => response.json())
+			.then((responseJson) => {
+				this.setState({
+					projectName: "",
+					entryKey: "",
+					owner: ""
+				}, function() {});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		this.setState({
+	  	open: false
+	  })
+	}
+
 	render() {
+		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
+
 		return (	// TODO: add edit icon instead of text here
-				<Text
-					onPress = { this.displayProject.bind(this) }
-					style={{color: '#5daedb'}}
-				>
+			<div>
+				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
 					EDIT
-				</Text> 
+				</button>
+				<Popup
+					open={this.state.open}
+					closeOnDocumentClick
+					onClose={this.closePopup}
+				>
+					<View>
+					<TextInput
+						placeholder = "Name"
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = {(text) => this.setState({projectName: text})}
+						value = { this.state.projectName }
+					/>
+					<TextInput
+						placeholder = "Entry Code"
+						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						onChangeText = { (text) => this.setState({entryKey: text})}
+						value = { this.state.entryKey }
+						editable = { false }
+					/>
+					<Button onPress = { this.putProject.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
+					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
+					</View>
+				</Popup>
+			</div>
 		);
 	}
 }

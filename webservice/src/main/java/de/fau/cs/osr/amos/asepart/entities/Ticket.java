@@ -29,6 +29,10 @@ public class Ticket
     @Column(name = "ticket_category", nullable = false)
     private TicketCategory ticketCategory;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ticket_status", nullable = false)
+    private TicketStatus ticketStatus = TicketStatus.OPEN;
+
     @Column(name = "required_observations", nullable = false)
     private Integer requiredObservations;
     
@@ -84,7 +88,17 @@ public class Ticket
     {
         this.ticketCategory = ticketCategory;
     }
-    
+
+    public TicketStatus getTicketStatus()
+    {
+        return ticketStatus;
+    }
+
+    public void setTicketStatus(TicketStatus ticketStatus)
+    {
+        this.ticketStatus = ticketStatus;
+    }
+
     public Integer getRequiredObservations()
     {
         return requiredObservations;
