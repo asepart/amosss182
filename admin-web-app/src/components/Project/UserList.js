@@ -3,7 +3,6 @@ import {ActivityIndicator,Button,View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
-import { setState } from '../shared/GlobalState';
 import UpdateUserButton from './UpdateUserButton';
 import DeleteUserButton from './DeleteUserButton';
 import UserAdd from './UserAdd';
@@ -12,8 +11,6 @@ import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
 import {Link} from 'react-router-dom'
-
-var pickerPlaceholder = "Category";
 
 export default class UserList extends Component {
 
