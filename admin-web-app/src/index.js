@@ -3,21 +3,16 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import Login from './components/Login/login';
 import ProjectList from './components/Project/ProjectList';
-import ProjectAdd from './components/Project/ProjectAdd';
-import DeleteProjectConfirm from './components/Project/DeleteProjectConfirm';
-import DeleteTicketConfirm from './components/Project/DeleteTicketConfirm';
-import TicketCreate from './components/Project/TicketCreate';
 import TicketList from './components/Project/TicketList';
 import TicketDetail from './components/Project/TicketDetail';
 import TicketChat from './components/Chat/TicketChat';
-import DeleteUserConfirm from './components/Project/DeleteUserConfirm';
 import UserList from './components/Project/UserList';
 import UserAdd from './components/Project/UserAdd';
 import Header from './components/shared/Header';
 import registerServiceWorker from './registerServiceWorker';
 import {registerFunc, getState} from './components/shared/GlobalState';
 import {isAuth} from './components/shared/auth';
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 class Page extends Component{
 	handleGlobalState (){
@@ -48,27 +43,8 @@ class Page extends Component{
 		registerFunc (this.handleGlobalState.bind(this));
 	}
 
-
 	render() {
 		switch (this.state.show){
-			case 'addProject':
-				return (<ProjectAdd project={this.state.param} name={this.state.name}/>);
-			case 'deleteProject':
-				return (<DeleteProjectConfirm project={this.state.param} name={this.state.name}/>);
-			case 'deleteTicket':
-				return (<DeleteTicketConfirm project={this.state.param} name={this.state.name} id={this.state.id} tName = {this.state.tName}/>);
-			case 'deleteUser':
-					return (<DeleteUserConfirm project={this.state.param} name={this.state.name} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName}/>);
-			case 'addUser':
-				return (<UserAdd project={this.state.param} id={this.state.id} password={this.state.password} firstName={this.state.firstName} lastName={this.state.lastName} phone={this.state.phone}/>);
-			case 'createTicket':
-				return (<TicketCreate project={this.state.param} name={this.state.name}
-						tName = {this.state.tName}
-						tSummary = {this.state.tSummary}
-						tDescription = {this.state.tDescription}
-						tCategory = {this.state.tCategory}
-						tRequiredObservations = {this.state.tRequiredObservations}
-						tId = {this.state.tId}/>);
 			case 'ticketChat':
 				return (<TicketChat project={this.state.param} name={this.state.name} id={this.state.id} tName={this.state.tName}/>);
 			default:
@@ -76,7 +52,7 @@ class Page extends Component{
 				<Switch>
 					<Route exact path="/" component={ProjectList}/>
 					<Route path="/usermanagement" render={props => <UserList project={this.state.param} name={this.state.name} {...props} />}/>
-					<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name} 
+					<Route exact path='/projects/:project' render={props => <TicketList project={this.state.param} name={this.state.name}
 																				tName = {this.state.tName}
 																				tSummary = {this.state.tSummary}
 																				tDescription = {this.state.tDescription}
@@ -84,7 +60,7 @@ class Page extends Component{
 																				tRequiredObservations = {this.state.tRequiredObservations}
 																				tId = {this.state.tId} {...props} />}/>
 					<Route path='/projects/:project/tickets/:id' component={TicketDetail} />
-					<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name} 
+					<Route path='/projects/:project/users' render={props => <UserList project={this.state.param} name={this.state.name}
 																				tName = {this.state.tName}
 																				tSummary = {this.state.tSummary}
 																				tDescription = {this.state.tDescription}
@@ -93,7 +69,7 @@ class Page extends Component{
 																				tId = {this.state.tId} {...props} />}/>
 				</Switch>
 				)
-		};
+		}
 	}
 }
 
