@@ -24,7 +24,8 @@ const AppNavigation = StackNavigator({
 		color:'#FFF'
 	}
   })},
-  Seventh: {screen: GetMessages}
+  Seventh: {screen: GetMessages},
+    
  
 
 }); 

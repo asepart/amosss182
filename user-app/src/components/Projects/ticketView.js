@@ -8,6 +8,7 @@ import styles from '../Login/Design';
 import { setState } from '../Login/state';
 import { setTicketID } from '../Chat/sendMessages';
 import { StackNavigator } from 'react-navigation'
+import {ticketstatus} from '../Projects/projectInfo';
 
 export default class TicketView extends Component {
 
@@ -38,11 +39,15 @@ export default class TicketView extends Component {
   }
 
   onAcceptPressed() {
+    if(ticketstatus == 'ACCEPTED') {
+      alert("You already accepted the ticket")
+    } else {
     let ticketID = this.props.navigation.state.params.id;    
     var response = fetch(URL + '/projects/' + key + '/tickets/'+ ticketID + '/accept', {
       method: 'POST',
       headers: getAuth()
     })
+  }
   }
 
   async GetTicketInfo() {
@@ -101,6 +106,9 @@ export default class TicketView extends Component {
         </Text>
         <Text style={styles.text}>
           Ticket Name: {this.state.ticketDetail.ticketName}
+        </Text>
+        <Text style={styles.text}>
+          Ticket Status: {this.state.ticketDetail.ticketStatus}
         </Text>
         <Text style={styles.text}>
           Summary: {this.state.ticketDetail.ticketSummary}
