@@ -43,38 +43,16 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-
-		url = URL + '/messages/' + this.props.match.params.id;
-		fetch(url, {method:'GET', headers: getAuth()})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isChatLoading: false,
-				chat: responseJson
-			}, function() {});
-		}).catch((error) => {
-			console.error(error);
-		});
 	}
 
 	render() {
-		if (this.state.isDataLoading || this.state.isChatLoading) {
+		if (this.state.isDataLoading) {
 			return (
 				<View style={{flex: 1,padding: 20}}>
 					<ActivityIndicator/>
 				</View>
 			)
 		}
-
-		const chatColumns = [
-			{
-				Header: 'From',
-				accessor: 'sender',
-			}, {
-				Header: 'Message',
-				accessor: 'content'
-			}
-		]
 
 		return (
 			<View>
@@ -98,8 +76,9 @@ export default class TicketDetail extends Component {
 					</Link>
 				</View>
 				<View>
-					<Text>Chat:</Text>
-					<ReactTable data={this.state.chat} columns={chatColumns} defaultPageSize={100} showPagination={false}/>
+					<Link to={ '/message/' + this.props.match.params.id }>
+						<Text>Chat:</Text>
+					</Link>
 				</View>
 			</View>
 		);
