@@ -48,8 +48,30 @@ export default class ProjectInfo extends Component {
     } 
 
 
-    _renderItem = ({item}) => (
-            <TouchableOpacity
+    _renderItem({item}) {
+      if(item.ticketStatus == 'OPEN') {
+        return (
+        <TouchableOpacity
+                  onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
+                }
+                   style={styles.buttonLargeContainer}>
+                   <Text style={styles.buttonText}>
+                     id:  {item.id}
+                   </Text>
+                   <Text style={styles.buttonText}>
+                    summary: {item.ticketSummary}
+                   </Text>
+                  <Text style={styles.buttonText}>
+                    category: {item.ticketCategory} 
+                  </Text>
+                    <Text style={styles.buttonTextOpen}>
+                  status: {item.ticketStatus}
+                   </Text>
+            </TouchableOpacity>
+        );
+      } else {
+           return (
+      <TouchableOpacity
                   onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
                 }
                    style={styles.buttonLargeContainer}>
@@ -66,8 +88,10 @@ export default class ProjectInfo extends Component {
                   status: {item.ticketStatus}
                    </Text>
             </TouchableOpacity>
-    );
+              );   }
+  }
     
+  
     render() {
       if (this.state.isLoading) {
 			return (
@@ -75,9 +99,8 @@ export default class ProjectInfo extends Component {
 					<ActivityIndicator/>
 				</View>
 			)
-		}
-     
-       return (  
+		} 
+      return (
         <View style={styles.container}>
                 <FlatList
                   style={styles.textLarge}
@@ -88,7 +111,6 @@ export default class ProjectInfo extends Component {
                 />
 
         </View>
-        
-      );
+        );   
     }
   }
