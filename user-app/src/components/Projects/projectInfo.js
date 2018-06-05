@@ -10,7 +10,7 @@ import {key} from './keyValid';
 
 window.btoa = require('Base64').btoa;
 
-
+export var ticketstatus = '';
 
 export default class ProjectInfo extends Component {
 
@@ -49,6 +49,7 @@ export default class ProjectInfo extends Component {
 
 
     _renderItem({item}) {
+      ticketstatus= item.ticketStatus;
       if(item.ticketStatus == 'OPEN') {
         return (
         <TouchableOpacity
@@ -64,7 +65,7 @@ export default class ProjectInfo extends Component {
                   <Text style={styles.buttonText}>
                     category: {item.ticketCategory} 
                   </Text>
-                    <Text style={styles.buttonTextOpen}>
+                    <Text style={styles.buttonText}>
                   status: {item.ticketStatus}
                    </Text>
             </TouchableOpacity>

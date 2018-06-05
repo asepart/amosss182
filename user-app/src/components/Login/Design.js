@@ -85,16 +85,9 @@ export default styles=StyleSheet.create({
   
     },
 
-    buttonTextOpen: {
-      textAlign: 'center',
-      color: '#76ff03',
-      fontWeight: '700'
-  
-    }, 
-
     buttonTextAccepted: {
       textAlign: 'center',
-      color: '#e6962c',
+      color: '#76ff03',
       fontWeight: '700'
     },
 
