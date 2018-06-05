@@ -76,7 +76,7 @@ export default class TicketDetail extends Component {
 					</Link>
 				</View>
 				<View>
-					<Link to={ '/message/' + this.props.match.params.id }>
+					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>
 						<Text>Chat:</Text>
 					</Link>
 				</View>
