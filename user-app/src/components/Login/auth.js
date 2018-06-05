@@ -28,7 +28,7 @@ export function getAuthForPost() {
 	return {
 		'Accept': 'text/plain',
 		'Content-Type': 'application/json; charset=utf-8',
-		'X-ASEPART-Role': 'Admin',
+		'X-ASEPART-Role': 'User',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }

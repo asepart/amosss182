@@ -7,7 +7,7 @@ import {
 import {URL} from '../Login/const';
 import {ticket, setTicketID} from '../Chat/sendMessages';
 import {key} from '../Projects/keyValid';
-import {getAuthForPost} from '../Login/auth';
+import {getAuthForPost, getAuth} from '../Login/auth';
 
 var pickerPlaceholder = "Outcome";
 export var tickID = "";
@@ -30,23 +30,25 @@ export default class TicketProcessing extends Component {
         }
       }
 
-    constructor() {
-		super();
+    constructor(props) {
+		super(props);
 
 		this.state = {
-            ticketOutcome: "",
-            observations: ""
+            outcome: '',
+            quantity: '',
+
 		}
     }
 
 
-    async onSubmitPressed() {
+   onSubmitPressed() {
       console.log(tickID)
+      let auth = getAuthForPost();
       alert("Observations submitted")
       fetch(URL + '/projects/' + key + '/tickets/' + tickID + '/observations' ,{
              method: 'POST',
-             headers: getAuthForPost(),
-             body:  JSON.stringify({outcome: this.state.ticketOutcome, quantity: this.state.observations})
+             headers: auth,
+             body:  JSON.stringify({outcome: this.state.outcome, quantity: this.state.quantity})
          })
        
      
@@ -58,8 +60,8 @@ export default class TicketProcessing extends Component {
             <View style={styles.container}>
 					<Picker
 						style = {{width: 200, borderColor: 'gray', borderWidth: 1,}}
-                        selectedValue = {this.state.ticketOutcome}
-                        onValueChange = {(text) => this.setState({ticketOutcome: text})}
+                        selectedValue = {this.state.outcome}
+                        onValueChange = {(text) => this.setState({outcome: text})}
 						
 					>
 						<Picker.Item label = "POSITIVE" value = "POSITIVE" />
@@ -70,8 +72,8 @@ export default class TicketProcessing extends Component {
                         placeholderTextColor="#FFF" 
                         underlineColorAndroid="transparent"
 						style = {styles.input}
-						onChangeText = {(text) => this.setState({observations: text})}
-						value = {this.state.observations}
+						onChangeText = {(text) => this.setState({quantity: text})}
+						value = {this.state.quantity}
 					/>
                     <TouchableOpacity
                       onPress={this.onSubmitPressed.bind(this)}
