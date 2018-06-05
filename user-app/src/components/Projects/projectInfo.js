@@ -69,7 +69,7 @@ export default class ProjectInfo extends Component {
                    </Text>
             </TouchableOpacity>
         );
-      } else {
+      } else if(item.ticketStatus == 'ACCEPTED') {
            return (
       <TouchableOpacity
                   onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
@@ -84,11 +84,31 @@ export default class ProjectInfo extends Component {
                   <Text style={styles.buttonText}>
                     category: {item.ticketCategory} 
                   </Text>
-                    <Text style={styles.buttonText}>
+                    <Text style={styles.buttonTextAccepted}>
                   status: {item.ticketStatus}
                    </Text>
             </TouchableOpacity>
               );   }
+              else  {
+                return (
+           <TouchableOpacity
+                       onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) 
+                     }
+                        style={styles.buttonLargeContainer}>
+                        <Text style={styles.buttonText}>
+                          id:  {item.id}
+                        </Text>
+                        <Text style={styles.buttonText}>
+                         summary: {item.ticketSummary}
+                        </Text>
+                       <Text style={styles.buttonText}>
+                         category: {item.ticketCategory} 
+                       </Text>
+                         <Text style={styles.buttonText}>
+                       status: {item.ticketStatus}
+                        </Text>
+                 </TouchableOpacity>
+                   );   }     
   }
     
   
@@ -107,7 +127,6 @@ export default class ProjectInfo extends Component {
                   data={this.state.ticketList}
                   renderItem={this._renderItem.bind(this)}  
                  keyExtractor={(item, index) => index}
-                  //keyExtractor={item => item.id}
                 />
 
         </View>

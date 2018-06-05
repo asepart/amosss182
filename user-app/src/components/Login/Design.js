@@ -90,7 +90,20 @@ export default styles=StyleSheet.create({
       color: '#76ff03',
       fontWeight: '700'
   
+    }, 
+
+    buttonTextAccepted: {
+      textAlign: 'center',
+      color: '#e6962c',
+      fontWeight: '700'
     },
+
+    buttonTextInProgress: {
+      textAlign: 'center',
+      color: '#ffff00',
+      fontWeight: '700'
+    },
+
     //add button
     addButton: {
        alignItems:'center',
