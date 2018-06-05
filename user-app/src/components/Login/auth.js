@@ -24,6 +24,15 @@ export function getAuth() {
 	};
 }
 
+export function getAuthForPost() {
+	return {
+		'Accept': 'text/plain',
+		'Content-Type': 'application/json; charset=utf-8',
+		'X-ASEPART-Role': 'Admin',
+		'Authorization': 'Basic ' + btoa(username + ":" + psw)
+	};
+}
+
 async function authenticate() {
 	var response = await fetch(URL + '/login', {
 		method: 'GET',

@@ -5,10 +5,17 @@ import {
 	StackNavigator,
   } from 'react-navigation';
 import {URL} from '../Login/const';
-import {ticket} from '../Chat/sendMessages';
+import {ticket, setTicketID} from '../Chat/sendMessages';
 import {key} from '../Projects/keyValid';
+import {getAuthForPost} from '../Login/auth';
 
 var pickerPlaceholder = "Outcome";
+export var tickID = "";
+
+export function setTicketId(tid) {
+  tickID = tid;
+}
+
 
 export default class TicketProcessing extends Component {
 
@@ -32,10 +39,13 @@ export default class TicketProcessing extends Component {
 		}
     }
 
+
     async onSubmitPressed() {
-      fetch(URL + '/projects/' + key + '/tickets/'  + ticket + '/observations' ,{
+      console.log(tickID)
+      alert("Observations submitted")
+      fetch(URL + '/projects/' + key + '/tickets/' + tickID + '/observations' ,{
              method: 'POST',
-             headers: getAuth(),
+             headers: getAuthForPost(),
              body:  JSON.stringify({outcome: this.state.ticketOutcome, quantity: this.state.observations})
          })
        
@@ -64,7 +74,7 @@ export default class TicketProcessing extends Component {
 						value = {this.state.observations}
 					/>
                     <TouchableOpacity
-                      //  onPress={this.onSubmitPressed.bind(this)}
+                      onPress={this.onSubmitPressed.bind(this)}
                         style={styles.buttonContainer}>
                      <Text 
                         style={styles.buttonText}>Submit</Text>

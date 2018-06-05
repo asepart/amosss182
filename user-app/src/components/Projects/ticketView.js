@@ -7,6 +7,7 @@ import { getAuth } from '../Login/auth';
 import styles from '../Login/Design';
 import { setState } from '../Login/state';
 import { setTicketID } from '../Chat/sendMessages';
+import { setTicketId } from '../Tickets/ticketProcessed';
 import { StackNavigator } from 'react-navigation'
 
 export default class TicketView extends Component {
@@ -48,6 +49,7 @@ export default class TicketView extends Component {
 
   onProcessTicketPressed() {
 
+    setTicketId(this.state.idTicket);
     //if ticket not accepted yet -> alert: "ticket has to be accepted first"
     //alert("Ticket needs to be accepted first")
     const { navigate } = this.props.navigation;
