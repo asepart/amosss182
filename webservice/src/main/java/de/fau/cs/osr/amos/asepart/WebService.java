@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import de.fau.cs.osr.amos.asepart.relationships.Observation;
 import org.hibernate.Session;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -31,6 +30,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import de.fau.cs.osr.amos.asepart.filters.AuthenticationFilter;
 import de.fau.cs.osr.amos.asepart.filters.CORSFilter;
 import de.fau.cs.osr.amos.asepart.entities.*;
+import de.fau.cs.osr.amos.asepart.relationships.*;
 
 @Path("/")
 public class WebService
@@ -377,6 +377,7 @@ public class WebService
 
     @Path("/projects/{key}/tickets/{id}/observations")
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"User"})
     public Response submitObservation(@Context SecurityContext sc,
                                       @PathParam("key") String projectKey,

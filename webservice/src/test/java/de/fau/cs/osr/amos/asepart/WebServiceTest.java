@@ -278,11 +278,33 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Observation[]> type = new GenericType<Observation[]>() {};
+            Observation[] observations = response.readEntity(type);
+
+            assertEquals(o.getQuantity(), observations[0].getQuantity());
+        }
+
         try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
         {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
             Ticket ticket = response.readEntity(Ticket.class);
 
             assertEquals(TicketStatus.PROCESSED, ticket.getTicketStatus());
+        }
+
+        try (Response response = getUserClient().path("/projects/pizza/tickets").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Ticket[]> type = new GenericType<Ticket[]>() {};
+            Ticket[] tickets = response.readEntity(type);
+
+            assertEquals(lastTicket.getId(), tickets[tickets.length - 1].getId());
         }
 
         try (Response response = getUserClient().path("/projects/nonsense/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
