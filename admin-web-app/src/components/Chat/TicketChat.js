@@ -80,7 +80,7 @@ export default class TicketChat extends Component {
           onChangeText = {(text) => this.setState({message: text})} />
 
         <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" />
-				<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id }>
+				<Link to={ '/projects/' + this.props.match.params.project }>
           <Button
             onPress = { function doNothing() {} }
             title = "Back to Tickets"
