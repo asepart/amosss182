@@ -11,19 +11,31 @@ export default class UpdateProjectButton extends Component {
     super(props);
     this.state = {
 			open: false,
-			loginName: this.props.proj.row.loginName,
-			password: this.props.proj.row.password,
-			firstName: this.props.proj.row.firstName,
-			lastName: this.props.proj.row.lastName,
-			phone: this.props.proj.row.phone
+			loginName: '',
+			password: '',
+			firstName: '',
+			lastName: '',
+			phone: '',
 		};
   }
   openPopup = () => {
     this.setState({ open: true });
+		this.getVars();
   };
   closePopup = () => {
     this.setState({ open: false });
   };
+
+	//needed to get right row values after changes in parent component
+	getVars() {
+		this.setState({
+			loginName: this.props.proj.row.loginName,
+			password: this.props.proj.row.password,
+			firstName: this.props.proj.row.firstName,
+			lastName: this.props.proj.row.lastName,
+			phone: this.props.proj.row.phone,
+		})
+	}
 
 	addUser(){
 		let auth = getAuthForPost();
