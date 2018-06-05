@@ -52,7 +52,6 @@ export default class TabViewExample extends Component {
   render() {
     return (   
       <TabView
-      
         navigationState={this.state}
         renderScene={SceneMap({
           first: ProjectInfo,

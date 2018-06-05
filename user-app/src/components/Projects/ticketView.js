@@ -103,6 +103,9 @@ export default class TicketView extends Component {
           Ticket Name: {this.state.ticketDetail.ticketName}
         </Text>
         <Text style={styles.text}>
+          Ticket Status: {this.state.ticketDetail.ticketStatus}
+        </Text>
+        <Text style={styles.text}>
           Summary: {this.state.ticketDetail.ticketSummary}
         </Text>
         <ScrollView style={styles.containerScroll}>
