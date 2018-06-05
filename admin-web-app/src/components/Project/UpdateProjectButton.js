@@ -11,24 +11,32 @@ export default class UpdateProjectButton extends Component {
     super(props);
     this.state = {
 			open: false,
-			projectName: this.props.name,
-			entryKey: this.props.project,
-			owner: username
+			projectName: '',
+			entryKey: '',
 		};
   }
   openPopup = () => {
     this.setState({ open: true });
+		this.getVars();
   };
   closePopup = () => {
     this.setState({ open: false });
   };
+
+	//needed to get right row values after changes in parent component
+	getVars() {
+		this.setState({
+			projectName: this.props.proj.row.projectName,
+			entryKey: this.props.proj.row.entryKey,
+		})
+	}
 
 	putProject() {
 		let auth = getAuthForPost();
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: this.state.owner})
+				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: username})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
