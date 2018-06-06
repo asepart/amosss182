@@ -18,6 +18,7 @@ export function setTicketID(tid) {
 
 
 export async function sendMessage() {
+    console.log(ticket)
      fetch(URL + '/messages/' + ticket ,{
             method: 'POST',
             headers: getAuth(),
@@ -25,5 +26,5 @@ export async function sendMessage() {
         })
       
     }
-    
+     
  

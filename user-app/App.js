@@ -5,6 +5,7 @@ import Login from './src/components/Login/login';
 import JoinProject from '../user-app/src/components/Projects/joinProject';
 import GetMessages from './src/components/Chat/messages';
 import TicketView from '../user-app/src/components/Projects/ticketView';
+import TicketProcessing from './src/components/Tickets/ticketProcessed';
 
 import {
   StackNavigator,
@@ -25,7 +26,8 @@ const AppNavigation = StackNavigator({
 	}
   })},
   Seventh: {screen: GetMessages},
-    
+  Eigth: {screen: TicketProcessing }
+
  
 
 }); 
