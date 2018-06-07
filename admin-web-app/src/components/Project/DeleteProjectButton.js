@@ -3,6 +3,7 @@ import { View, Button } from 'react-native';
 import Popup from "reactjs-popup";
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
+import {setUpdateBoolean} from '../shared/GlobalState';
 
 export default class DeleteProjectButton extends Component {
 
@@ -25,6 +26,9 @@ export default class DeleteProjectButton extends Component {
       .catch((error) => {
         console.error(error);
       });
+
+    this.props.callToParent();
+    setUpdateBoolean(true);
     this.setState({
       open: false
 		})
