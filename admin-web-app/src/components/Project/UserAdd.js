@@ -4,6 +4,7 @@ import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
 import Popup from "reactjs-popup";
+import {setUpdateBoolean} from '../shared/GlobalState';
 
 export default class UserAdd extends Component {
 
@@ -34,19 +35,21 @@ export default class UserAdd extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				this.setState({
-					loginName: "",
-					password: "",
-					firstName: "",
-					lastName: "",
-					phone: ""
-				}, function() {});
+				this.setState({}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
+
+		this.props.callToParent();
+		setUpdateBoolean(true);
 		this.setState({
-		 	open: false
+		 	open: false,
+			loginName: '',
+			password: '',
+			firstName: '',
+			lastName: '',
+			phone: ''
 		})
 	}
 
