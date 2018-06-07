@@ -11,6 +11,7 @@ import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
 import {Link} from 'react-router-dom'
+import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class UserList extends Component {
 
@@ -25,14 +26,18 @@ export default class UserList extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchData();
+		this.fetchMetaData();
+		this.fetchUsers();
 	}
 
 	componentDidUpdate() {
-		this.updateData();
+		if(getUpdateBoolean() === true) {
+      this.fetchUsers();
+      setUpdateBoolean(false);
+    }
 	}
 
-	fetchData() {
+	fetchMetaData() {
 		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -43,10 +48,9 @@ export default class UserList extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		this.updateData()
 	}
 
-	updateData() {
+	fetchUsers() {
 		var url = URL;
 		if (this.props.match.params.project !== '' && typeof this.props.match.params.project !== "undefined") {
 			url += '/projects/' + this.props.match.params.project + '/users';
@@ -118,7 +122,7 @@ export default class UserList extends Component {
 							Header: '',
 							accessor: '',
 							maxWidth: 75,
-							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
+							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 						}
 					] }/>
 				</View>
@@ -147,7 +151,7 @@ export default class UserList extends Component {
 					{
 						Header: 'Given Name',
 						accessor: 'firstName',
-						Footer: props => <UserAdd project={this.state.project} name={this.state.name}/>
+						Footer: props => <UserAdd project={this.state.project} name={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 					}, {
 						Header: 'Surname',
 						accessor: 'lastName'
@@ -166,12 +170,12 @@ export default class UserList extends Component {
 						Header: '',
 						accessor: '',
 						maxWidth: 55,
-						Cell: props => <UpdateUserButton proj={props}/>
+						Cell: props => <UpdateUserButton proj={props} callToParent={this.fetchUsers.bind(this)}/>
 					}, {
 						Header: '',
 						accessor: '',
 						maxWidth: 75,
-						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
+						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 					}
 				] }/>
 			</View>
