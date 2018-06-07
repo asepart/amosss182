@@ -10,6 +10,7 @@ import DeleteProjectButton from './DeleteProjectButton';
 import 'react-table/react-table.css';
 import '../../index.css';
 import {Link} from 'react-router-dom'
+import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class ProjectList extends Component {
 
@@ -21,14 +22,17 @@ export default class ProjectList extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchData();
-	}
-	
-	componentDidUpdate() {
-		this.fetchData();
+		this.fetchProjects();
 	}
 
-	fetchData() {
+	componentDidUpdate() {
+		if(getUpdateBoolean() === true) {
+      this.fetchProjects();
+      setUpdateBoolean(false);
+    }
+	}
+
+	fetchProjects() {
 		return fetch(URL + '/projects', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -55,7 +59,7 @@ export default class ProjectList extends Component {
 				Header: 'Name',
 				accessor: 'projectName',
 				Cell: props => <ProjectButton proj={props}/>,
-				Footer: props => <ProjectAdd project={this.state.param} name={this.state.name}/>
+				Footer: props => <ProjectAdd project={this.state.param} name={this.state.name} callToParent={this.fetchProjects.bind(this)}/>
 			}, {
 				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
@@ -63,12 +67,12 @@ export default class ProjectList extends Component {
 				Header: '',
 				accessor: '',
 				maxWidth: 55,
-				Cell: props => <UpdateProjectButton proj={props}/>
+				Cell: props => <UpdateProjectButton proj={props} callToParent={this.fetchProjects.bind(this)} />
 			}, {
 				Header: '',
 				accessor: '',
 				maxWidth: 75,
-				Cell: props => <DeleteProjectButton proj={props}/>
+				Cell: props => <DeleteProjectButton proj={props} callToParent={this.fetchProjects.bind(this)}/>
 			}
 		]
 
