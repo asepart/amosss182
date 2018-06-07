@@ -4,6 +4,7 @@ import Popup from "reactjs-popup";
 import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
+import {setUpdateBoolean} from '../shared/GlobalState';
 
 export default class UpdateProjectButton extends Component {
 
@@ -40,15 +41,14 @@ export default class UpdateProjectButton extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				this.setState({
-					projectName: "",
-					entryKey: "",
-					owner: ""
-				}, function() {});
+				this.setState({}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
+
+		this.props.callToParent();
+		setUpdateBoolean(true);
 		this.setState({
 	  	open: false
 	  })
@@ -76,7 +76,7 @@ export default class UpdateProjectButton extends Component {
 					/>
 					<TextInput
 						placeholder = "Entry Code"
-						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						style = {{height: 40, borderColor: 'gray', backgroundColor: 'lightgrey', borderWidth: 1, textAlign: 'center'}}
 						onChangeText = { (text) => this.setState({entryKey: text})}
 						value = { this.state.entryKey }
 						editable = { false }
