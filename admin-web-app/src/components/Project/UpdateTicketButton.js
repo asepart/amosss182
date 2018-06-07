@@ -4,6 +4,7 @@ import Popup from "reactjs-popup";
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
+import {setUpdateBoolean} from '../shared/GlobalState';
 
 var pickerPlaceholder = "Category";
 
@@ -50,18 +51,14 @@ export default class UpdateTicketButton extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				this.setState({
-					ticketName: "",
-					ticketSummary: "",
-					ticketDescription: "",
-					ticketCategory: "",
-					requiredObservations: "",
-					id: ""
-				}, function() {});
+				this.setState({}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
+
+		this.props.callToParent();
+		setUpdateBoolean(true);
 		this.setState({
 		  open: false
 		})
