@@ -12,7 +12,7 @@ import {
 	StackNavigator,
   } from 'react-navigation';
 
-export default class GetMessages extends Component {
+export default class Messages extends Component {
 
   static navigationOptions= {
 		title: 'Chat',
@@ -86,7 +86,9 @@ export default class GetMessages extends Component {
               null
             )}
           </View>
-          <Text style={{fontWeight: 'bold'}}>{news.sender} [{news.content.slice(18)}</Text>
+          <Text style={{fontWeight: 'bold'}}>
+						[{news.content.slice(18,27)} {news.sender}: {news.content.slice(29)}
+					</Text>
         </View>
       );
     });
