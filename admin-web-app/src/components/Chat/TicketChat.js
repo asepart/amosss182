@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ActivityIndicator, Text, View, TextInput} from 'react-native';
+import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL} from '../shared/const';
 import {getAuth} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
@@ -75,7 +75,13 @@ export default class TicketChat extends Component {
   }
 
   async onSendPressed() {
-    setMsg(this.state.message);
+    var tmp = new Date();
+		//+1 is needed, since getMonth returns 0-11
+		var date = tmp.toDateString();
+		var time = tmp.toTimeString().slice(0,8);
+		var timestamp = "[" + date + ", " + time + "]";
+
+		setMsg(timestamp + ": " + this.state.message);
     setTicketID(this.state.idTicket);
     sendMessage();
     this.fetchMessages();
@@ -86,10 +92,28 @@ export default class TicketChat extends Component {
   }
 
   renderChat() {
-    return this.state.chatHistory.map(function(news, id){
-      return(
+    var tmp_chat = this.state.chatHistory;
+    var tmp_date;
+
+    return this.state.chatHistory.map(function(news, id) {
+      if(id !== 0) {
+        tmp_date = tmp_chat[id-1].content.slice(1,16);
+      } else {
+        tmp_date = new Date(1993, 3, 20);
+      }
+      return (
         <View key={id}>
-          <Text style={{fontWeight: 'bold'}}>{news.sender} : {news.content}</Text>
+          <div>
+            {tmp_date !== news.content.slice(1,16) ? (
+                <Button
+                  disabled = {true}
+                  title = {news.content.slice(1,16)}
+                />
+            ) : (
+              null
+            )}
+          </div>
+          <Text style={{fontWeight: 'bold'}}>{news.sender} [{news.content.slice(18)}</Text>
         </View>
       );
     });
@@ -107,6 +131,8 @@ export default class TicketChat extends Component {
     var tmp_ticketName;
     var tmp_projectName;
     var buttonEnabled = (this.state.message !== '');
+    //somehow needed to make ScrollView inside a View scrollable - 33 is about the height of the header
+    const screenHeight = Dimensions.get('window').height - 33;
 
     if(this.props.name === undefined || this.props.tName === undefined) {
       tmp_ticketName = this.state.tName;
@@ -125,14 +151,21 @@ export default class TicketChat extends Component {
     }
 
     return(
-		<View>
+		  <View style={{height: screenHeight}}>
         <Button
           onPress = { function doNothing() {} }
           disabled = {true}
           title = {"Chat history of " + tmp_ticketName + " in " + tmp_projectName}
         />
 
-        {this.renderChat()}
+        <ScrollView
+					ref = {ref => this.scrollView = ref}
+				  onContentSizeChange = {(contentWidth, contentHeight) => {
+						this.scrollView.scrollToEnd({animated: false});
+					}}
+				>
+        	{this.renderChat()}
+				</ScrollView>
 
         <TextInput
           placeholder = "Message"
