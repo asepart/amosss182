@@ -66,12 +66,12 @@ export default class ProjectList extends Component {
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 55,
+				maxWidth: 35,
 				Cell: props => <UpdateProjectButton proj={props} callToParent={this.fetchProjects.bind(this)} />
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 75,
+				maxWidth: 35,
 				Cell: props => <DeleteProjectButton proj={props} callToParent={this.fetchProjects.bind(this)}/>
 			}
 		]
