@@ -35,11 +35,9 @@ export default class DeleteProjectButton extends Component {
 	}
 
 	render() {
-		return (	// TODO: add edit icon instead of text here
-        <div>
-          <button onClick={this.openPopup} style={{color: '#5daedb'}}>
-            DELETE
-          </button>
+		return (
+        <View>
+          <img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/delete.png')} alt=""/>
           <Popup
             open={this.state.open}
             closeOnDocumentClick
@@ -55,7 +53,7 @@ export default class DeleteProjectButton extends Component {
             <Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
             </View>
           </Popup>
-        </div>
+        </View>
 		);
 	}
 }
