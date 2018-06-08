@@ -113,7 +113,9 @@ export default class TicketChat extends Component {
               null
             )}
           </div>
-          <Text style={{fontWeight: 'bold'}}>{news.sender} [{news.content.slice(18)}</Text>
+          <Text style={{fontWeight: 'bold'}}>
+            [{news.content.slice(18,27)} {news.sender}: {news.content.slice(29)}
+          </Text>
         </View>
       );
     });
