@@ -57,11 +57,9 @@ export default class UpdateProjectButton extends Component {
 	render() {
 		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
 
-		return (	// TODO: add edit icon instead of text here
+		return (
 			<div>
-				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
-					EDIT
-				</button>
+				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
