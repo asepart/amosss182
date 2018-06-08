@@ -48,9 +48,7 @@ export default class TicketList extends Component {
 	}
 
 	fetchTickets() {
-		var url = URL;
-		url += '/projects/' + this.props.match.params.project + '/tickets';
-		return fetch(url, {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -76,11 +74,11 @@ export default class TicketList extends Component {
 				Header: 'ID',
 				accessor: 'id',
 				maxWidth: 40,
+				Footer: props => <TicketCreate project={this.state.project} name={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}, {
 				Header: 'Name',
 				accessor: 'ticketName',
 				Cell: props => <TicketDetailButton proj={props} keyProj={this.props.match.params.project}/>,
-				Footer: props => <TicketCreate project={this.state.project} name={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}, {
 				Header: 'Summary',
 				accessor: 'ticketSummary',
@@ -103,17 +101,17 @@ export default class TicketList extends Component {
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 55,
+				maxWidth: 35,
 				Cell: props => <TicketChatButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 55,
+				maxWidth: 35,
 				Cell: props => <UpdateTicketButton tick={props} project={this.state.project} name={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 75,
+				maxWidth: 35,
 				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}
 		]
