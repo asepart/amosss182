@@ -45,11 +45,9 @@ export default class DeleteUserButton extends Component {
       projectName = " from " + this.props.nameFromParent;
     }
 
-		return (	// TODO: add edit icon instead of text here
+		return (
       <div>
-        <button onClick={this.openPopup} style={{color: '#5daedb'}}>
-          DELETE
-        </button>
+        <img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/delete.png')} alt=""/>
         <Popup
           open={this.state.open}
           closeOnDocumentClick
