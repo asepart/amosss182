@@ -58,9 +58,7 @@ export default class UserAdd extends Component {
 
 		return(
 			<div>
-				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
-					ADD USER
-				</button>
+				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
