@@ -4,6 +4,7 @@ import Popup from "reactjs-popup";
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
+import {setUpdateBoolean} from '../shared/GlobalState';
 
 var pickerPlaceholder = "Category";
 
@@ -50,18 +51,14 @@ export default class UpdateTicketButton extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				this.setState({
-					ticketName: "",
-					ticketSummary: "",
-					ticketDescription: "",
-					ticketCategory: "",
-					requiredObservations: "",
-					id: ""
-				}, function() {});
+				this.setState({}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
+
+		this.props.callToParent();
+		setUpdateBoolean(true);
 		this.setState({
 		  open: false
 		})
@@ -70,11 +67,9 @@ export default class UpdateTicketButton extends Component {
 	render() {
 		var buttonEnabled = (this.state.ticketName !== '' && this.state.ticketSummary !== '' && this.state.ticketDescription !== '' && this.state.ticketCategory !== pickerPlaceholder && this.state.requiredObservations !== '');
 
-		return (	// TODO: add edit icon instead of text here
+		return (
 			<div>
-				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
-					EDIT
-				</button>
+				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick

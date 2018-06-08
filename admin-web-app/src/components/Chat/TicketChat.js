@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput} from 'react-native';
 import {URL} from '../shared/const';
 import {getAuth} from '../shared/auth';
-import {setState} from '../shared/GlobalState';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
-import { Link } from 'react-router-dom';
+import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class TicketChat extends Component {
 
@@ -19,13 +18,50 @@ export default class TicketChat extends Component {
   }
 
   componentDidMount() {
-    this.makeApiCall();
+    if(this.props.name === undefined || this.props.tName === undefined) {
+      this.fetchTicketName();
+      this.fetchProjectName();
+    }
+    this.fetchMessages();
   }
 
-  async makeApiCall() {
-    var url = URL;
-		url += '/messages/' + this.state.idTicket;
-    await fetch(url, {method:'GET', headers: getAuth()})
+  componentDidUpdate() {
+    if(getUpdateBoolean() === true) {
+      this.fetchMessages();
+      setUpdateBoolean(false);
+    }
+  }
+
+  fetchProjectName() {
+    fetch(URL + '/projects/', {method:'GET', headers: getAuth()})
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({
+        isLoading: false,
+        allProjects: responseJson,
+      }, function(){});
+    })
+    .catch((error) =>{
+      console.error(error);
+    });
+  }
+
+  fetchTicketName() {
+    fetch(URL + '/projects/' + this.props.match.params.project + '/tickets/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({
+        isLoading: false,
+        tName: responseJson.ticketName,
+      }, function(){});
+    })
+    .catch((error) =>{
+      console.error(error);
+    });
+  }
+
+  async fetchMessages() {
+    await fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
     .then((response) => response.json())
     .then((responseJson) => {
       this.setState({
@@ -42,7 +78,11 @@ export default class TicketChat extends Component {
     setMsg(this.state.message);
     setTicketID(this.state.idTicket);
     sendMessage();
-    this.makeApiCall();
+    this.fetchMessages();
+
+    this.textInput.clear();
+    this.state.message = "";
+    setUpdateBoolean(true);
   }
 
   renderChat() {
@@ -64,12 +104,32 @@ export default class TicketChat extends Component {
       )
     }
 
+    var tmp_ticketName;
+    var tmp_projectName;
+    var buttonEnabled = (this.state.message !== '');
+
+    if(this.props.name === undefined || this.props.tName === undefined) {
+      tmp_ticketName = this.state.tName;
+
+      if (this.state.allProjects !== undefined) {
+        for(var i=0; i < this.state.allProjects.length; i++) {
+          if(this.state.allProjects[i].entryKey === this.props.match.params.project) {
+            tmp_projectName = this.state.allProjects[i].projectName;
+          }
+        }
+      }
+    }
+    else {
+      tmp_ticketName = this.props.tName;
+      tmp_projectName = this.props.name;
+    }
+
     return(
 		<View>
         <Button
           onPress = { function doNothing() {} }
           disabled = {true}
-          title = {"Chat history of " + this.props.tName + " in " + this.props.name}
+          title = {"Chat history of " + tmp_ticketName + " in " + tmp_projectName}
         />
 
         {this.renderChat()}
@@ -77,15 +137,16 @@ export default class TicketChat extends Component {
         <TextInput
           placeholder = "Message"
           style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
-          onChangeText = {(text) => this.setState({message: text})} />
+          onChangeText = {(text) => this.setState({message: text})}
+          ref = {input => { this.textInput = input }}
+          onKeyPress = {(event) => {
+            if (event.key === 'Enter') {
+              this.onSendPressed();
+            }
+          }}
+        />
 
-        <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" />
-				<Link to={ '/projects/' + this.props.match.params.project }>
-          <Button
-            onPress = { function doNothing() {} }
-            title = "Back to Tickets"
-            color = "#0e4a80" />
-				</Link>
+        <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" disabled = {!buttonEnabled}/>
       </View>
     );
   }

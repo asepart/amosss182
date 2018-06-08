@@ -26,8 +26,7 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		var url = URL + '/projects/' + this.props.match.params.project + '/tickets/' + this.props.match.params.id;
-		fetch(url, {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -37,13 +36,12 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		url = URL + '/statistics/' + this.props.match.params.id;
-		fetch(url, {method:'GET', headers: getAuth()})
+		fetch(URL + '/statistics/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
 				isStatisticsLoading: false,
-				statisitcs: responseJson
+				statistics: responseJson
 			}, function() {});
 		}).catch((error) => {
 			console.error(error);
@@ -69,20 +67,11 @@ export default class TicketDetail extends Component {
 					<Text>Category: { this.state.data.ticketCategory }</Text>
 					<Text>Name: { this.state.data.ticketName }</Text>
 					<Text>Summary: { this.state.data.ticketSummary }</Text>
-					<Text>Statistic U: { this.state.statisitcs.U }</Text>
-					<Text>Statistic UP: { this.state.statisitcs.UP }</Text>
-					<Text>Statistic ON: { this.state.statisitcs.ON }</Text>
-					<Text>Statistic OP: { this.state.statisitcs.OP }</Text>
+					<Text>Statistic U: { this.state.statistics.U }</Text>
+					<Text>Statistic UP: { this.state.statistics.UP }</Text>
+					<Text>Statistic ON: { this.state.statistics.ON }</Text>
+					<Text>Statistic OP: { this.state.statistics.OP }</Text>
 					<Text>Description: { this.state.data.ticketDescription }</Text>
-				</View>
-				<View>
-					<Link to={"/projects/" + this.state.project }>
-					<Button
-						onPress = { function doNothing() {} }
-						title = "Back to Project"
-						color = "#0e4a80"
-					/>
-					</Link>
 				</View>
 				<View>
 					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>

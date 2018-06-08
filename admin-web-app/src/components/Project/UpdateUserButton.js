@@ -4,8 +4,9 @@ import Popup from "reactjs-popup";
 import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
+import {setUpdateBoolean} from '../shared/GlobalState';
 
-export default class UpdateProjectButton extends Component {
+export default class UpdateUserButton extends Component {
 
 	constructor(props) {
     super(props);
@@ -46,17 +47,14 @@ export default class UpdateProjectButton extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				this.setState({
-					loginName: "",
-					password: "",
-					firstName: "",
-					lastName: "",
-					phone: ""
-				}, function() {});
+				this.setState({}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
+
+		this.props.callToParent();
+		setUpdateBoolean(true);
 		this.setState({
 		 	open: false
 		})
@@ -67,9 +65,7 @@ export default class UpdateProjectButton extends Component {
 
 		return(
 			<div>
-				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
-					EDIT
-				</button>
+				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
@@ -78,7 +74,7 @@ export default class UpdateProjectButton extends Component {
 				<View>
 					<TextInput
 						placeholder = "Login Name"
-						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
+						style = {{height: 40, borderColor: 'gray', backgroundColor: 'lightgrey',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({loginName: text})}
 						value = {this.state.loginName}
 						editable = { false }

@@ -12,6 +12,7 @@ import TicketStatus from './TicketStatus';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
+import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class TicketList extends Component {
 	constructor(props) {
@@ -22,14 +23,18 @@ export default class TicketList extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchData();
+		this.fetchMetaData();
+		this.fetchTickets();
 	}
 
 	componentDidUpdate() {
-		this.updateData();
+		if(getUpdateBoolean() === true) {
+      this.fetchTickets();
+      setUpdateBoolean(false);
+    }
 	}
 
-	fetchData() {
+	fetchMetaData() {
 		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -40,13 +45,10 @@ export default class TicketList extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		this.updateData()
 	}
 
-	updateData() {
-		var url = URL;
-		url += '/projects/' + this.props.match.params.project + '/tickets';
-		return fetch(url, {method:'GET', headers: getAuth()})
+	fetchTickets() {
+		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -71,11 +73,12 @@ export default class TicketList extends Component {
 			{
 				Header: 'ID',
 				accessor: 'id',
-				Footer: props => <TicketCreate project={this.state.project} name={this.state.name}/>
+				maxWidth: 40,
+				Footer: props => <TicketCreate project={this.state.project} name={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}, {
 				Header: 'Name',
 				accessor: 'ticketName',
-				Cell: props => <TicketDetailButton proj={props} keyProj={this.props.match.params.project}/>
+				Cell: props => <TicketDetailButton proj={props} keyProj={this.props.match.params.project}/>,
 			}, {
 				Header: 'Summary',
 				accessor: 'ticketSummary',
@@ -84,28 +87,32 @@ export default class TicketList extends Component {
 				accessor: 'ticketDescription'
 			}, {
 				Header: 'Category',
-				accessor: 'ticketCategory'
+				accessor: 'ticketCategory',
+				maxWidth: 160,
 			}, {
 				Header: 'Required observations',
-				accessor: 'requiredObservations' // String-based value accessors!
+				accessor: 'requiredObservations', // String-based value accessors!
+				maxWidth: 180,
 			}, {
 				Header: 'Status',
 				accessor: 'ticketStatus', // String-based value accessors!
+				maxWidth: 95,
 				Cell: props => <TicketStatus state={props}/>
 			}, {
 				Header: '',
 				accessor: '',
+				maxWidth: 35,
 				Cell: props => <TicketChatButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 55,
-				Cell: props => <UpdateTicketButton tick={props} project={this.state.project} name={this.state.name}/>
+				maxWidth: 35,
+				Cell: props => <UpdateTicketButton tick={props} project={this.state.project} name={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}, {
 				Header: '',
 				accessor: '',
-				maxWidth: 75,
-				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name}/>
+				maxWidth: 35,
+				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}
 		]
 
