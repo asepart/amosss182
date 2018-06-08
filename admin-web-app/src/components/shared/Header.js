@@ -1,31 +1,23 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
-import { View, Text } from 'react-native'
-import { setState } from '../shared/GlobalState';
+import { View } from 'react-native'
 
 export default class Header extends Component {
 
-    showProjectList () {
-		setState({
-			isAuth: true,
-			show: ''
-		});
-    }
+    //TODO add logout button code
 
     render () {
-
         return (
-            // TODO: add home icon instead of text here
-            <View>
-                <Link to="/" style={{textDecoration: 'none'}}>
-                <Text
-                    onPress = { this.showProjectList.bind(this) }
-                    style={{color: '#5daedb', marginLeft: 5}}
-                >
-                    HOME
-                </Text>
-                </Link>
-            </View>
+          <View style={{flexDirection: 'row', marginBottom: -3}}>
+            <div style={{flex: 1}}>
+    					<Link to = "/" style={{textDecoration: 'none'}} >
+    					<img style={{height: 30, width: undefined}} src={require('../images/icon.png')} alt=""/>
+    					</Link>
+    				</div>
+            <div style={{flex: 1, direction: 'rtl'}}>
+              <img style={{height: 30, width: undefined}} src={require('../images/logout.png')} alt=""/>
+            </div>
+          </View>
         )
     }
 }
