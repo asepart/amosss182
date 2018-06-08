@@ -65,9 +65,7 @@ export default class UpdateUserButton extends Component {
 
 		return(
 			<div>
-				<button onClick={this.openPopup} style={{color: '#5daedb'}}>
-					EDIT
-				</button>
+				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
