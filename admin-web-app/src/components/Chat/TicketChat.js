@@ -2,9 +2,7 @@ import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput} from 'react-native';
 import {URL} from '../shared/const';
 import {getAuth} from '../shared/auth';
-import {setState} from '../shared/GlobalState';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
-import { Link } from 'react-router-dom';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class TicketChat extends Component {
@@ -140,7 +138,13 @@ export default class TicketChat extends Component {
           placeholder = "Message"
           style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
           onChangeText = {(text) => this.setState({message: text})}
-          ref={input => { this.textInput = input }}/>
+          ref = {input => { this.textInput = input }}
+          onKeyPress = {(event) => {
+            if (event.key === 'Enter') {
+              this.onSendPressed();
+            }
+          }}
+        />
 
         <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" disabled = {!buttonEnabled}/>
       </View>
