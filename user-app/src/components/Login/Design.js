@@ -1,25 +1,25 @@
 import { StyleSheet} from 'react-native';
 
 export default styles=StyleSheet.create({
-  
+
   container: {
       flex: 1,
       padding: 20,
       backgroundColor: '#0c3868',
-  
+
     },
 
   containerScroll: {
     flex:1,
     backgroundColor: '#0c3868',
-  },  
+  },
 
     container2: {
       flex: 1,
       justifyContent: 'space-between',
       padding: 20,
       backgroundColor: '#0c3868',
-  
+
     },
 
     containerAlign: {
@@ -30,7 +30,7 @@ export default styles=StyleSheet.create({
       alignItems: 'center',
       //justifyContent moves items to center of page
       justifyContent: 'center'
-  
+
     },
     containerBottomAlign: {
       flex: 1,
@@ -40,10 +40,10 @@ export default styles=StyleSheet.create({
       alignItems: 'baseline',
       //justifyContent moves items to center of page
       justifyContent: 'center'
-  
+
     },
 
-    //Text input boxes 
+    //Text input boxes
     input: {
       height: 40,
       width: 200,
@@ -56,6 +56,7 @@ export default styles=StyleSheet.create({
     inputLong: {
       height: 40,
       width:350,
+      flex: 3,
       alignItems: 'baseline',
       color: '#FFF',
       backgroundColor: '#14639e',
@@ -68,21 +69,19 @@ export default styles=StyleSheet.create({
       backgroundColor: '#009fca',
       paddingVertical: 15,
       width: 200,
-      
+
     },
     //button spanning whole horizontal
     buttonLargeContainer: {
       backgroundColor: '#009fca',
       paddingVertical: 15,
       width: 350,
-      
     },
 
     buttonText: {
       textAlign: 'center',
       color: '#FFF',
       fontWeight: '700'
-  
     },
 
     buttonTextAccepted: {
@@ -111,8 +110,9 @@ export default styles=StyleSheet.create({
        height:60,
        backgroundColor:'#009fca',
        borderRadius:60,
-    
+
     },
+
     error: {
       color: 'red'
     },
@@ -136,6 +136,31 @@ export default styles=StyleSheet.create({
     icon: {
       width:200,
       height:100
-    }
-   
+    },
+
+    containerChat: {
+        flex: 1,
+        paddingLeft: 5,
+        paddingRight: 5,
+        backgroundColor: '#0c3868',
+    },
+
+    sendTextInput: {
+      height: 40,
+      flex: 3,
+      alignItems: 'baseline',
+      color: '#FFF',
+      backgroundColor: '#14639e',
+      marginBottom: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 10
+    },
+
+    sendButton: {
+      flex: 1,
+      height: 40,
+      backgroundColor: '#009fca',
+      paddingVertical: 10,
+    },
+
   });
