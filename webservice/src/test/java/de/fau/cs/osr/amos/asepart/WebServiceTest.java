@@ -8,16 +8,12 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
-import de.fau.cs.osr.amos.asepart.relationships.Observation;
-import de.fau.cs.osr.amos.asepart.relationships.ObservationOutcome;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.fau.cs.osr.amos.asepart.entities.*;
-import de.fau.cs.osr.amos.asepart.structures.*;
 
 public class WebServiceTest
 {

@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart.filters;
+package de.fau.cs.osr.amos.asepart;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -11,6 +11,7 @@ import javax.annotation.Priority;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -21,12 +22,6 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
-
-import de.fau.cs.osr.amos.asepart.WebServiceSecurityContext;
-import de.fau.cs.osr.amos.asepart.Database;
-import de.fau.cs.osr.amos.asepart.entities.Admin;
-import de.fau.cs.osr.amos.asepart.entities.User;
-import org.hibernate.Session;
 
 // TODO: (maybe) introduce login limit to avoid brute force attacks
 
@@ -100,7 +95,8 @@ public class AuthenticationFilter implements ContainerRequestFilter
                 return;
             }
 
-            final Response error = checkPassword(accountName, password, roleName);
+            final Response error = authenticate(accountName, password, roleName);
+
             if (error != null)
             {
                 request.abortWith(error);
@@ -112,25 +108,23 @@ public class AuthenticationFilter implements ContainerRequestFilter
         request.setSecurityContext(sc);
     }
 
-    private Response checkPassword(final String loginName, final String password, final String role)
+    private Response authenticate(final String loginName, final String password, final String role)
     {
-        try (Session session = Database.openSession())
+        if (role.equals("Admin") || role.equals("User"))
         {
-            switch (role)
+            try (Broker dbClient = new Broker())
             {
-                case "Admin":
-                    if (Database.authenticate(session, loginName, password, Admin.class))
-                        return null;
-                    else break;
-                case "User":
-                    if (Database.authenticate(session, loginName, password, User.class))
-                        return null;
-                    else break;
-                default:
-                    return Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build();
+                if (dbClient.authenticate(loginName, password, role))
+                    return null;
+                else return Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build();
+            }
+
+            catch (Exception e)
+            {
+                throw new WebApplicationException(e);
             }
         }
 
-        return Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build();
+        else return Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build();
     }
 }
