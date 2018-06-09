@@ -68,7 +68,7 @@ public class WebService
     {
         final String loginName = user.get("loginName");
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (dbClient.isAdmin(loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -96,7 +96,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listUsers(@Context SecurityContext sc)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listUsers()).build();
         }
@@ -120,7 +120,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteUser(@Context SecurityContext sc, @PathParam("name") String user)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -152,7 +152,7 @@ public class WebService
     {
         final String loginName = admin.get("loginName");
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (dbClient.isUser(loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -180,7 +180,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listAdmins(@Context SecurityContext sc)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listAdmins()).build();
         }
@@ -204,7 +204,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteAdmin(@Context SecurityContext sc, @PathParam("name") String admin)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isAdmin(admin))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -234,7 +234,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listProjects(@Context SecurityContext sc)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listProjects(sc.getUserPrincipal().getName())).build();
         }
@@ -251,13 +251,13 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response writeProject(@Context SecurityContext sc, Map<String, String> project)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             String entryKey = project.get("entryKey");
 
             if (dbClient.isProject(entryKey))
             {
-                if (dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
+                if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                     return Response.status(Response.Status.FORBIDDEN).build();
 
                 dbClient.updateProject(entryKey, project.get("name"), project.get("owner"));
@@ -288,7 +288,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isProject(entryKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -307,7 +307,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isProject(entryKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -342,7 +342,7 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             Map<String, String> project = dbClient.getProject(projectKey);
 
@@ -397,6 +397,7 @@ public class WebService
     @Path("/tickets/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin"})
     public Response writeTicket(@Context SecurityContext sc, Map<String, String> ticket)
     {
@@ -405,7 +406,7 @@ public class WebService
 
         String projectKey = ticket.get("projectKey");
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isProject(projectKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -423,13 +424,17 @@ public class WebService
                 dbClient.updateTicket(id, ticket.get("name"), ticket.get("summary"),
                                           ticket.get("description"), ticket.get("category"),
                                           Integer.parseInt(ticket.get("requiredObservations")));
+
+                return Response.ok().build();
             }
 
             else
             {
                 dbClient.insertTicket(ticket.get("name"), ticket.get("summary"),
-                        ticket.get("description"), ticket.get("category"),
-                        Integer.parseInt(ticket.get("requiredObservations")), projectKey);
+                         ticket.get("description"), ticket.get("category"),
+                         Integer.parseInt(ticket.get("requiredObservations")), projectKey);
+
+                return Response.ok().build();
             }
         }
 
@@ -437,8 +442,6 @@ public class WebService
         {
             return Response.serverError().build();
         }
-
-        return Response.ok().build();
     }
 
     @Path("/tickets/{id}")
@@ -457,7 +460,7 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -500,7 +503,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteTicket(@Context SecurityContext sc, @PathParam("id") int ticketId)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -536,7 +539,7 @@ public class WebService
     {
         Principal principal = sc.getUserPrincipal();
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -546,7 +549,8 @@ public class WebService
             if (!dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            dbClient.acceptTicket(principal.getName(), ticketId);
+            if (!dbClient.hasUserAcceptedTicket(principal.getName(), ticketId))
+                dbClient.acceptTicket(principal.getName(), ticketId);
         }
 
         catch (Exception ex)
@@ -573,7 +577,7 @@ public class WebService
     {
         Principal principal = sc.getUserPrincipal();
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -604,7 +608,7 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -641,7 +645,7 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getUsersOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isProject(projectKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -670,9 +674,9 @@ public class WebService
     @Path("/projects/{key}/users/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String entryKey, @PathParam("username") String user)
+    public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String entryKey, @PathParam("name") String user)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isProject(entryKey) || !dbClient.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -708,11 +712,11 @@ public class WebService
     {
         final String user = sc.getUserPrincipal().getName();
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isProject(entryKey) || !dbClient.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
-            if (!dbClient.isUserMemberOfProject(user, entryKey))
+            if (dbClient.isUserMemberOfProject(user, entryKey))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
             dbClient.joinProject(user, entryKey);
@@ -732,7 +736,7 @@ public class WebService
     @RolesAllowed({"User"})
     public Response joinProjectPreview(@Context SecurityContext sc, @QueryParam("key") String entryKey)
     {
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             Map<String, String> project = dbClient.getProject(entryKey);
             return Response.ok(project.get("name")).build();
@@ -761,7 +765,7 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -795,7 +799,7 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (Broker dbClient = new Broker())
+        try (DBClient dbClient = new DBClient())
         {
             if (!dbClient.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();

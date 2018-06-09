@@ -112,7 +112,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
     {
         if (role.equals("Admin") || role.equals("User"))
         {
-            try (Broker dbClient = new Broker())
+            try (DBClient dbClient = new DBClient())
             {
                 if (dbClient.authenticate(loginName, password, role))
                     return null;

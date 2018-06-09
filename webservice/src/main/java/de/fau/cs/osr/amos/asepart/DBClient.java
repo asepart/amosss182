@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.postgresql.ds.PGSimpleDataSource;
 
-class Broker implements AutoCloseable
+class DBClient implements AutoCloseable
 {
     private static DataSource createDataSource()
     {
@@ -30,7 +30,7 @@ class Broker implements AutoCloseable
     private static final DataSource ds = createDataSource();
     private final Connection cn;
 
-    Broker() throws SQLException
+    DBClient() throws SQLException
     {
         cn = ds.getConnection();
     }
@@ -39,6 +39,14 @@ class Broker implements AutoCloseable
     public void close() throws Exception
     {
         cn.close();
+    }
+
+    void wipe() throws SQLException
+    {
+        try (Statement stmt = cn.createStatement())
+        {
+            stmt.executeUpdate("delete from account"); // will cascade through whole database
+        }
     }
 
     boolean authenticate(String loginName, String password, String role) throws SQLException
@@ -54,6 +62,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) passwordCorrect = true;
@@ -85,7 +94,7 @@ class Broker implements AutoCloseable
     void updateUser(String loginName, String password, String firstName, String lastName, String phoneNumber) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                "update admin_account set password = crypt(?, gen_salt('bf', 8)), first_name = ?, last_name = ?, phone_number = ? where login_name = ?;"))
+                "update user_account set password = crypt(?, gen_salt('bf', 8)), first_name = ?, last_name = ?, phone_number = ? where login_name = ?;"))
         {
             stmt.setString(1, password);
             stmt.setString(2, firstName);
@@ -105,6 +114,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -121,6 +131,8 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
+
                 Map<String, String> result = new HashMap<>(4);
                 result.put("loginName", rs.getString(1));
                 result.put("firstName", rs.getString(2));
@@ -189,6 +201,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -205,6 +218,8 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
+
                 Map<String, String> result = new HashMap<>(3);
                 result.put("loginName", rs.getString(1));
                 result.put("firstName", rs.getString(2));
@@ -277,6 +292,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -294,6 +310,8 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
+
                 Map<String, String> result = new HashMap<>(3);
                 result.put("entryKey", rs.getString(1));
                 result.put("name", rs.getString(2));
@@ -341,7 +359,7 @@ class Broker implements AutoCloseable
     List<Map<String, String>> getUsersOfProject(String projectKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                "select login_name, first_name, last_name, phone_number from only user_account u join membership m on u.login_name = m.login_name where m.project_key = ?;"))
+                "select u.login_name, first_name, last_name, phone_number from only user_account u join membership m on u.login_name = m.login_name where m.project_key = ?;"))
         {
             stmt.setString(1, projectKey);
 
@@ -374,6 +392,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -392,6 +411,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -425,7 +445,7 @@ class Broker implements AutoCloseable
 
     int insertTicket(String name, String summary, String description, String category, int requiredObservations, String projectKey) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into ticket(name, summary, description, category, status, required_obversations, project_key) values (?, ?, ?, ?, ?, ?, ?);"))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into ticket(name, summary, description, category, required_obversations, project_key) values (?, ?, ?, cast(? as ticket_category), ?, ?);"))
         {
             stmt.setString(1, name);
             stmt.setString(2, summary);
@@ -434,19 +454,14 @@ class Broker implements AutoCloseable
             stmt.setInt(5, requiredObservations);
             stmt.setString(6, projectKey);
 
-            stmt.execute();
-
-            try (ResultSet rs = stmt.getGeneratedKeys())
-            {
-                return rs.getInt(1);
-            }
+            return stmt.executeUpdate();
         }
     }
 
     void updateTicket(int id, String name, String summary, String description, String category, int requiredObservations) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                "update ticket set name = ?, summary = ?, description = ?, category = ?, required_obversations = ? where id = ?;"))
+                "update ticket set name = ?, summary = ?, description = ?, category = cast(? as ticket_category), required_obversations = ? where id = ?;"))
         {
             stmt.setString(1, name);
             stmt.setString(2, summary);
@@ -467,6 +482,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -484,6 +500,8 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
+
                 Map<String, String> result = new HashMap<>(12);
                 result.put("id", rs.getString(1));
                 result.put("name", rs.getString(2));
@@ -560,6 +578,7 @@ class Broker implements AutoCloseable
                     row.put("category", rs.getString(5));
                     row.put("status", rs.getString(6));
                     row.put("requiredObservations", String.valueOf(rs.getInt(7)));
+                    row.put("projectKey", projectKey);
 
                     row.put("U", String.valueOf(acceptanceCount(id)));
                     row.put("UP", String.valueOf(userCountWithPositiveObservations(id)));
@@ -608,6 +627,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 int count = rs.getInt(1);
 
                 if (count == 1) return true;
@@ -615,32 +635,6 @@ class Broker implements AutoCloseable
         }
 
         return false;
-    }
-
-    int acceptanceCount(int ticketId) throws SQLException
-    {
-        try (PreparedStatement stmt = cn.prepareStatement("select count(*) from assignment where ticket_id = ?;"))
-        {
-            stmt.setInt(1, ticketId);
-
-            try (ResultSet rs = stmt.executeQuery())
-            {
-                return rs.getInt(1);
-            }
-        }
-    }
-
-    int userCountWithPositiveObservations(int ticketId) throws SQLException
-    {
-        try (PreparedStatement stmt = cn.prepareStatement("select count(*) from (select distinct login_name from observation where ticket_id = ? and outcome = 'positive') as users;"))
-        {
-            stmt.setInt(1, ticketId);
-
-            try (ResultSet rs = stmt.executeQuery())
-            {
-                return rs.getInt(1);
-            }
-        }
     }
 
     int observationCount(String loginName, int ticketId) throws SQLException
@@ -652,12 +646,41 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 return rs.getInt(1);
             }
         }
     }
 
-    int positiveObservationCount(int ticketId) throws SQLException
+    private int acceptanceCount(int ticketId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select count(*) from assignment where ticket_id = ?;"))
+        {
+            stmt.setInt(1, ticketId);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
+    private int userCountWithPositiveObservations(int ticketId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select count(*) from (select distinct login_name from observation where ticket_id = ? and outcome = 'positive') as users;"))
+        {
+            stmt.setInt(1, ticketId);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
+    private int positiveObservationCount(int ticketId) throws SQLException
     {
         try (Connection connection = ds.getConnection();
              PreparedStatement stmt = connection.prepareStatement("select count(*) from observation where ticket_id = ? and outcome = 'positive';"))
@@ -666,12 +689,13 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 return rs.getInt(1);
             }
         }
     }
 
-    int negativeObservationCount(int ticketId) throws SQLException
+    private int negativeObservationCount(int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(*) from observation where ticket_id = ? and outcome = 'negative';"))
         {
@@ -679,30 +703,25 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 return rs.getInt(1);
             }
         }
     }
 
-    int submitObservation(String loginName, int ticketId, String outcome, int quantity) throws SQLException
+    void submitObservation(String loginName, int ticketId, String outcome, int quantity) throws SQLException
     {
-        int observation_id = -1;
         int quantity_sum = 0;
         int required_observations = -1;
 
-        try (PreparedStatement stmt = cn.prepareStatement("insert into observation(ticket_id, login_name, outcome, quantity) values (?, ?, ?, ?);"))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into observation(ticket_id, login_name, outcome, quantity) values (?, ?, cast(? as observation_outcome), ?);"))
         {
             stmt.setInt(1, ticketId);
             stmt.setString(2, loginName);
             stmt.setString(3, outcome);
             stmt.setInt(4, quantity);
 
-            stmt.execute();
-
-            try (ResultSet rs = stmt.getGeneratedKeys())
-            {
-                observation_id = rs.getInt(1);
-            }
+            stmt.executeUpdate();
         }
 
         try (PreparedStatement stmt = cn.prepareStatement("select sum(quantity) from observation where ticket_id = ?;"))
@@ -711,6 +730,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 quantity_sum = rs.getInt(1);
             }
         }
@@ -721,6 +741,7 @@ class Broker implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
                 required_observations = rs.getInt(1);
             }
 
@@ -734,8 +755,6 @@ class Broker implements AutoCloseable
                 stmt.executeUpdate();
             }
         }
-
-        return observation_id;
     }
 
     List<Map<String, String>> listObservations(int ticketId) throws SQLException

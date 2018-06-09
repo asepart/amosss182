@@ -36,7 +36,7 @@ create table ticket(
 
 create table message(
   id serial primary key,
-  sender character varying (32) not null references account(login_name),
+  sender character varying (32) not null,
   content text not null,
   ticket_id serial not null references ticket(id) on delete cascade
 );

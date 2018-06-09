@@ -1,6 +1,10 @@
 package de.fau.cs.osr.amos.asepart;
 
 import java.net.URI;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -9,6 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -64,8 +69,26 @@ public class WebServiceTest
     }
 
     @BeforeAll
-    public static void startServer()
+    public static void prepare()
     {
+        try (DBClient dbClient = new DBClient())
+        {
+            dbClient.wipe();
+
+            dbClient.insertAdmin("admin", "admin", "Default", "Admin");
+            dbClient.insertUser("user", "user", "Default", "User", "+4917123456");
+            dbClient.insertProject("pizza", "Pizza Project", "admin");
+            dbClient.insertTicket("Developers are hungry", "There is an insufficient amount of pizza available.",
+                    "A developer is a tool which converts pizza into code.", "behavior", 8, "pizza");
+
+            dbClient.joinProject("user", "pizza");
+        }
+
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         WebService.startBackground(port);
     }
 
@@ -141,28 +164,28 @@ public class WebServiceTest
     {
         try (Response response = getAdminClient().path("/projects").request().get())
         {
-            GenericType<Project[]> type = new GenericType<Project[]>() {};
-            Project[] projects = response.readEntity(type);
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> projects = response.readEntity(type);
 
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-            assertEquals("pizza", projects[0].getEntryKey());
+            assertEquals("pizza", projects.get(0).get("entryKey"));
         }
     }
 
     @Test
     public void testCreateDeleteProject()
     {
-        Project project = new Project();
-        project.setEntryKey("junit_test");
-        project.setOwner("admin");
-        project.setProjectName("JUnit Test Project xxx");
+        Map<String, String> project = new HashMap<>(3);
+        project.put("entryKey", "junit_test");
+        project.put("owner", "admin");
+        project.put("name", "JUnit Test Project xxx");
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        project.setProjectName("JUnit Test Project");
+        project.put("name", "JUnit Test Project");
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
@@ -176,12 +199,12 @@ public class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects/junit_test/users").request().get())
         {
-            GenericType<User[]> type = new GenericType<User[]>() {};
-            User[] users = response.readEntity(type);
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> users = response.readEntity(type);
 
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-            assertEquals(1, users.length);
-            assertEquals("user", users[0].getLoginName());
+            assertEquals(1, users.size());
+            assertEquals("user", users.get(0).get("loginName"));
         }
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
@@ -202,15 +225,15 @@ public class WebServiceTest
     @Test
     public void testCreateTicket()
     {
-        Ticket ticket = new Ticket();
-        ticket.setProjectKey("pizza");
-        ticket.setTicketName("Test Ticket");
-        ticket.setTicketSummary("Test Ticket Summary");
-        ticket.setTicketDescription("Description of Test Ticket");
-        ticket.setTicketCategory(TicketCategory.TRACE);
-        ticket.setRequiredObservations(42);
+        Map<String, String> ticket = new HashMap<>(6);
+        ticket.put("projectKey", "pizza");
+        ticket.put("name", "Test Ticket");
+        ticket.put("summary", "Test Ticket Summary");
+        ticket.put("description", "Description of Test Ticket");
+        ticket.put("category", "trace");
+        ticket.put("requiredObservations", "42");
 
-        try (Response response = getAdminClient().path("/projects/pizza/tickets").request().post(Entity.json(ticket)))
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -219,119 +242,96 @@ public class WebServiceTest
     @Test
     public void testModifyDeleteTicket()
     {
-        Ticket lastTicket;
+        Map<String, String> lastTicket;
+        int lastTicketId;
+        String lastTicketName;
 
         try (Response response = getAdminClient().path("/projects/pizza/tickets").request().get())
         {
-            GenericType<Ticket[]> type = new GenericType<Ticket[]>() {};
-            Ticket[] tickets = response.readEntity(type);
-            lastTicket = tickets[tickets.length - 1];
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> tickets = response.readEntity(type);
+
+            lastTicket = tickets.get(tickets.size() - 1);
+            lastTicketId = Integer.parseInt(lastTicket.get("id"));
+            lastTicketName = lastTicket.get("name");
 
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
         {
-            Ticket ticket = response.readEntity(Ticket.class);
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> ticket = response.readEntity(type);
 
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-            assertEquals(lastTicket.getTicketName(), ticket.getTicketName());
+            assertEquals(lastTicketName, ticket.get("name"));
         }
 
-        lastTicket.setTicketName("Test Ticket Modified");
+        lastTicket.put("name","Test Ticket Modified");
 
-        try (Response response = getAdminClient().path("/projects/pizza/tickets").request().post(Entity.json(lastTicket)))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
-        {
-            Ticket ticket = response.readEntity(Ticket.class);
-
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-            assertEquals("Test Ticket Modified", ticket.getTicketName());
-        }
-
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(lastTicket)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
         {
-            Ticket ticket = response.readEntity(Ticket.class);
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> ticket = response.readEntity(type);
 
-            assertEquals(TicketStatus.ACCEPTED, ticket.getTicketStatus());
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals("Test Ticket Modified", ticket.get("name"));
         }
 
-        Observation o = new Observation();
-        o.setOutcome(ObservationOutcome.POSITIVE);
-        o.setQuantity(4);
-
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().post(Entity.json(o)))
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).path("observations").request().get())
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> ticket = response.readEntity(type);
 
-            GenericType<Observation[]> type = new GenericType<Observation[]>() {};
-            Observation[] observations = response.readEntity(type);
-
-            assertEquals(o.getQuantity(), observations[0].getQuantity());
+            assertEquals("accepted", ticket.get("status"));
         }
 
-        try (Response response = getUserClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().get())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        Map<String, String> observation = new HashMap<>(2);
+        observation.put("outcome", "positive");
+        observation.put("quantity", "4");
 
-            Ticket ticket = response.readEntity(Ticket.class);
-
-            assertEquals(TicketStatus.PROCESSED, ticket.getTicketStatus());
-        }
-
-        try (Response response = getUserClient().path("/projects/pizza/tickets").request().get())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-
-            GenericType<Ticket[]> type = new GenericType<Ticket[]>() {};
-            Ticket[] tickets = response.readEntity(type);
-
-            assertEquals(lastTicket.getId(), tickets[tickets.length - 1].getId());
-        }
-
-        try (Response response = getUserClient().path("/projects/nonsense/tickets").path(lastTicket.getId().toString()).path("accept").request().post(Entity.text("")))
-        {
-            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-
-            Statistics stat = response.readEntity(Statistics.class);
-
-            assertEquals(1, stat.U);
-            assertEquals(1, stat.UP);
-            assertEquals(1, stat.OP);
-            assertEquals(0, stat.ON);
-        }
-
-        try (Response response = getUserClient().path("/statistics/").path(lastTicket.getId().toString()).request().get())
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
 
-        try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().delete())
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> observations = response.readEntity(type);
+
+            assertEquals(observation.get("outcome"), observations.get(0).get("outcome"));
+            assertEquals(observation.get("quantity"), observations.get(0).get("quantity"));
+        }
+
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> ticket = response.readEntity(type);
+
+            assertEquals("processed", ticket.get("status"));
+        }
+
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/projects/pizza/tickets").path(lastTicket.getId().toString()).request().delete())
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -347,16 +347,6 @@ public class WebServiceTest
             assertEquals("Pizza Project", projectName);
         }
 
-        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
         try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
         {
             assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
@@ -367,7 +357,12 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
+        try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
         {
             assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -376,55 +371,56 @@ public class WebServiceTest
     @Test
     public void testMessages()
     {
-        Project project = new Project();
-        project.setEntryKey("junit_test");
-        project.setOwner("admin");
-        project.setProjectName("JUnit Test Project");
+        Map<String, String> project = new HashMap<>(3);
+        project.put("entryKey", "junit_test");
+        project.put("owner", "admin");
+        project.put("name", "JUnit Test Project");
+
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        Ticket ticket = new Ticket();
-        ticket.setProjectKey("junit_test");
-        ticket.setTicketName("Test Ticket");
-        ticket.setTicketSummary("Test Ticket Summary");
-        ticket.setTicketDescription("Description of Test Ticket");
-        ticket.setTicketCategory(TicketCategory.TRACE);
-        ticket.setRequiredObservations(42);
+        Map<String, String> ticket = new HashMap<>(6);
+        ticket.put("projectKey", "junit_test");
+        ticket.put("name", "Test Ticket");
+        ticket.put("summary", "Test Ticket Summary");
+        ticket.put("description", "Description of Test Ticket");
+        ticket.put("category", "trace");
+        ticket.put("requiredObservations", "42");
 
-        try (Response response = getAdminClient().path("/projects/junit_test/tickets").request().post(Entity.json(ticket)))
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        Integer ticketId;
+        int ticketId;
 
         try (Response response = getAdminClient().path("/projects/junit_test/tickets").request().get())
         {
-            GenericType<Ticket[]> type = new GenericType<Ticket[]>() {};
-            Ticket[] tickets = response.readEntity(type);
-            ticketId = tickets[tickets.length - 1].getId();
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> tickets = response.readEntity(type);
+            ticketId = Integer.parseInt(tickets.get(tickets.size() - 1).get("id"));
 
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/messages").path(ticketId.toString()).request().post(Entity.text("Hello, World!")))
+        try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/messages").path(ticketId.toString()).request().get())
+        try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
 
-            GenericType<Message[]> type = new GenericType<Message[]>() {};
-            Message[] messages = response.readEntity(type);
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> messages = response.readEntity(type);
 
-            assertEquals(1, messages.length);
-            assertEquals("Hello, World!", messages[0].getContent());
-            assertEquals("admin", messages[0].getSender());
+            assertEquals(1, messages.size());
+            assertEquals("Hello, World!", messages.get(0).get("content"));
+            assertEquals("admin", messages.get(0).get("sender"));
         }
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
@@ -432,12 +428,12 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/messages").path(ticketId.toString()).request().get())
+        try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
-
+/*
     @Test
     public void testCreateDeleteUser()
     {
@@ -580,5 +576,5 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
         }
-    }
+    }*/
 }
