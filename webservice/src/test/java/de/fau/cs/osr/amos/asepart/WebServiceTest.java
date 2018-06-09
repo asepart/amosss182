@@ -1,10 +1,9 @@
 package de.fau.cs.osr.amos.asepart;
 
 import java.net.URI;
-import java.sql.SQLException;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -13,14 +12,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-public class WebServiceTest
+class WebServiceTest
 {
     private final static int port = 12345;
 
@@ -69,7 +67,7 @@ public class WebServiceTest
     }
 
     @BeforeAll
-    public static void prepare()
+    static void prepare()
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -93,7 +91,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testLogin()
+    void testLogin()
     {
         {
             Response response = getAdminClient().path("/login").request().options();
@@ -110,7 +108,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testUnauthorized()
+    void testUnauthorized()
     {
         try (Response response = getClient().path("/login").request().get())
         {
@@ -121,7 +119,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testMissingRole()
+    void testMissingRole()
     {
         WebTarget client = getClient();
         HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
@@ -135,7 +133,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testInvalidRole()
+    void testInvalidRole()
     {
         WebTarget client = getClient();
         HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
@@ -149,7 +147,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testWrongPassword()
+    void testWrongPassword()
     {
         try (Response response = getAdminClient("invalid", "wrong").path("/login").request().get())
         {
@@ -160,7 +158,151 @@ public class WebServiceTest
     }
 
     @Test
-    public void testListProject()
+    void testCreateDeleteUser()
+    {
+        Map<String, String> newUser = new HashMap<>(3);
+        newUser.put("loginName", "junit_user");
+        newUser.put("password", "secure");
+        newUser.put("firstName", "JUnit");
+        newUser.put("lastName", "User");
+        newUser.put("phoneNumber", "01INVALID");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/join").request().post(Entity.text("pizza")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newUser.put("phoneNumber","+4917123456789");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/users").request().get())
+        {
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> users = response.readEntity(type);
+
+            assertEquals(2, users.size());
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/users/junit_user").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/users/junit_user").request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testCreateAdmin()
+    {
+        Map<String, String> newAdmin = new HashMap<>(3);
+        newAdmin.put("loginName", "junit_admin");
+        newAdmin.put("password", "secure");
+        newAdmin.put("firstName", "JUnit");
+        newAdmin.put("lastName", "Admin");
+
+        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newAdmin.put("password","supergeheim");
+
+        try (Response response = getAdminClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())
+        {
+            assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").request().delete())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").path("tickets").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/admins").request().get())
+        {
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> admins = response.readEntity(type);
+
+            assertEquals(2, admins.size());
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testCreateUserWithExistingAdminName()
+    {
+        Map<String, String> newUser = new HashMap<>(3);
+        newUser.put("loginName", "admin");
+        newUser.put("password", "secure");
+        newUser.put("firstName", "JUnit");
+        newUser.put("lastName", "User");
+        newUser.put("phoneNumber", "01INVALID");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testCreateAdminWithExistingUserName()
+    {
+        Map<String, String> newAdmin = new HashMap<>(3);
+        newAdmin.put("loginName", "user");
+        newAdmin.put("password", "secure");
+        newAdmin.put("firstName", "JUnit");
+        newAdmin.put("lastName", "Admin");
+
+        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testListProject()
     {
         try (Response response = getAdminClient().path("/projects").request().get())
         {
@@ -173,7 +315,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testCreateDeleteProject()
+    void testCreateDeleteProject()
     {
         Map<String, String> project = new HashMap<>(3);
         project.put("entryKey", "junit_test");
@@ -214,7 +356,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testDeleteNonExistingProject()
+    void testDeleteNonExistingProject()
     {
         try (Response response = getAdminClient().path("/projects").path("idonotexist").request().delete())
         {
@@ -223,7 +365,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testCreateTicket()
+    void testCreateTicket()
     {
         Map<String, String> ticket = new HashMap<>(6);
         ticket.put("projectKey", "pizza");
@@ -240,7 +382,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testModifyDeleteTicket()
+    void testModifyDeleteTicket()
     {
         Map<String, String> lastTicket;
         int lastTicketId;
@@ -338,7 +480,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testJoinProject()
+    void testJoinProject()
     {
         try (Response response = getUserClient().path("/join").queryParam("key", "pizza").request().get())
         {
@@ -369,7 +511,7 @@ public class WebServiceTest
     }
 
     @Test
-    public void testMessages()
+    void testMessages()
     {
         Map<String, String> project = new HashMap<>(3);
         project.put("entryKey", "junit_test");
@@ -433,148 +575,4 @@ public class WebServiceTest
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
-/*
-    @Test
-    public void testCreateDeleteUser()
-    {
-        User newUser = new User();
-        newUser.setFirstName("JUnit");
-        newUser.setLastName("User");
-        newUser.setLoginName("junit_user");
-        newUser.setPassword("secure");
-        newUser.setPhone("01INVALID");
-
-        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets/1").request().get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getUserClient("junit_user", "secure").path("/join").request().post(Entity.text("pizza")))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets/1").request().get())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        newUser.setPhone("+4917123456789");
-
-        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/users").request().get())
-        {
-            GenericType<User[]> type = new GenericType<User[]>() {};
-            User[] users = response.readEntity(type);
-
-            assertEquals(2, users.length);
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/users/junit_user").request().delete())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/users/junit_user").request().delete())
-        {
-            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    public void testCreateAdmin()
-    {
-        Admin newAdmin = new Admin();
-        newAdmin.setFirstName("JUnit");
-        newAdmin.setLastName("Admin");
-        newAdmin.setLoginName("junit_admin");
-        newAdmin.setPassword("secure");
-
-        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        newAdmin.setPassword("supergeheim");
-
-        try (Response response = getAdminClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())
-        {
-            assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").request().delete())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").path("tickets").request().get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/admins").request().get())
-        {
-            GenericType<Admin[]> type = new GenericType<Admin[]>() {};
-            Admin[] admins = response.readEntity(type);
-
-            assertEquals(2, admins.length);
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
-        {
-            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    public void testCreateUserWithExistingAdminName()
-    {
-        User newUser = new User();
-        newUser.setFirstName("JUnit");
-        newUser.setLastName("User");
-        newUser.setLoginName("admin");
-        newUser.setPassword("secure");
-        newUser.setPhone("01INVALID");
-
-        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
-        {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    public void testCreateAdminWithExistingUserName()
-    {
-        Admin newAdmin = new Admin();
-        newAdmin.setFirstName("JUnit");
-        newAdmin.setLastName("Admin");
-        newAdmin.setLoginName("user");
-        newAdmin.setPassword("secure");
-
-        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
-        {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }*/
 }
