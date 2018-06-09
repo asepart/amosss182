@@ -32,7 +32,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <check />
+                    <check/>
                 </configuration>
             </plugin>
             <plugin>
@@ -110,7 +110,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.25.2</version>
+                <version>0.26.0</version>
                 <configuration>
                     <images>
                         <image>
