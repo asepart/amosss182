@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
-import {URL} from '../shared/const';
+import {URL, FileSelector} from '../shared/const';
 import {getAuth} from '../shared/auth';
-import {setMsg, sendMessage, setTicketID} from './sendMessages'
+import {setMsg, sendMessage, setTicketID} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class TicketChat extends Component {
@@ -91,6 +91,21 @@ export default class TicketChat extends Component {
     setUpdateBoolean(true);
   }
 
+  handleFile(selectorFiles: FileList) {
+    var files = selectorFiles;
+
+    //TODO: write actual upload after backend is finished 
+    var tmp = new Date();
+		var date = tmp.toDateString();
+		var time = tmp.toTimeString().slice(0,8);
+		var timestamp = "[" + date + ", " + time + "]";
+    setMsg(timestamp + ": Test - You wanted to upload this - " + files[0].name);
+    setTicketID(this.state.idTicket);
+    sendMessage();
+    this.fetchMessages();
+    setUpdateBoolean(true);
+  }
+
   renderChat() {
     var tmp_chat = this.state.chatHistory;
     var tmp_date;
@@ -169,6 +184,10 @@ export default class TicketChat extends Component {
         	{this.renderChat()}
 				</ScrollView>
 
+        <FileSelector
+          onLoadFile = {(files:FileList) => this.handleFile(files)}
+        />
+
         <TextInput
           placeholder = "Message"
           style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
@@ -180,7 +199,6 @@ export default class TicketChat extends Component {
             }
           }}
         />
-
         <Button onPress = { this.onSendPressed.bind(this) } title = "Send" color = "#0c3868" disabled = {!buttonEnabled}/>
       </View>
     );
