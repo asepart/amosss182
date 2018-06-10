@@ -19,29 +19,21 @@ class DBClient implements AutoCloseable
 {
     private static DataSource createDataSource()
     {
+        final String jdbcUrl = System.getenv("JDBC_DATABASE_URL");
+
         PGSimpleDataSource ds = new PGSimpleDataSource();
 
-        try
+        if (jdbcUrl != null)
         {
-            URI dbUri = new URI(System.getenv("DATABASE_URL"));
-
-            String username = dbUri.getUserInfo().split(":")[0];
-            String password = dbUri.getUserInfo().split(":")[1];
-
-            ds.setServerName(dbUri.getHost());
-            ds.setPortNumber(dbUri.getPort());
-            ds.setUser(dbUri.getUserInfo().split(":")[0]);
-            ds.setPassword(dbUri.getUserInfo().split(":")[1]);
+            ds.setUrl(jdbcUrl);
         }
 
-        catch (URISyntaxException | NullPointerException e)
+        else
         {
             ds.setServerName("localhost");
             ds.setUser("postgres");
             ds.setPassword("asepart");
         }
-
-        ds.setApplicationName("ASEPART Web Service");
 
         return ds;
     }
