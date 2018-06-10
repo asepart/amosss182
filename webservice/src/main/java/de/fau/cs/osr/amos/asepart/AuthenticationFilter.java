@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.Priority;
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -43,15 +42,6 @@ public class AuthenticationFilter implements ContainerRequestFilter
     public void filter(ContainerRequestContext request)
     {
         final Method method = resourceInfo.getResourceMethod();
-
-        if (method.isAnnotationPresent(PermitAll.class)) // Authorization not needed for method
-            return;
-
-        if (!method.isAnnotationPresent(RolesAllowed.class)) // Method is blocked for everybody
-        {
-            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
-            return;
-        }
 
         // Get request headers
         final MultivaluedMap<String, String> headers = request.getHeaders();
@@ -88,13 +78,6 @@ public class AuthenticationFilter implements ContainerRequestFilter
 
         // Get role name
         final String roleName = role.get(0);
-        Set<String> rolesSet = new HashSet<>(Arrays.asList(method.getAnnotation(RolesAllowed.class).value()));
-
-        if (!rolesSet.contains(roleName))
-        {
-            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
-            return;
-        }
 
         try (DBClient dbClient = new DBClient())
         {
@@ -106,6 +89,15 @@ public class AuthenticationFilter implements ContainerRequestFilter
         }
 
         catch (Exception e)
+        {
+            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+            return;
+        }
+
+        // Check if role is allowed for method
+        Set<String> rolesSet = new HashSet<>(Arrays.asList(method.getAnnotation(RolesAllowed.class).value()));
+
+        if (!rolesSet.contains(roleName))
         {
             request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
             return;
