@@ -61,12 +61,13 @@ export default class TicketProcessing extends Component {
         return (
             <View style={styles.container}>
 					<Picker
-						style = {{width: 200, borderColor: 'gray', borderWidth: 1,}}
+						style = {{width: 200, color: '#FFF', borderColor: 'gray', borderWidth: 1,}}
                         selectedValue = {this.state.outcome}
                         onValueChange = {(text) => this.setState({outcome: text})}
 						
 					>
-						<Picker.Item label = "POSITIVE" value = "POSITIVE" />
+            <Picker.Item label = { pickerPlaceholder} value = { pickerPlaceholder} />
+           <Picker.Item label = "POSITIVE" value = "POSITIVE" />
 						<Picker.Item label = "NEGATIVE" value = "NEGATIVE" />
 					</Picker>
 					<TextInput
