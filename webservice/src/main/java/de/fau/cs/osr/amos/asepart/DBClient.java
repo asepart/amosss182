@@ -51,11 +51,9 @@ class DBClient implements AutoCloseable
 
     boolean authenticate(String loginName, String password, String role) throws SQLException
     {
-        boolean passwordCorrect = false;
-        boolean roleCorrect = false;
+        boolean usernameAndPasswordCorrect;
 
-        try (PreparedStatement stmt =
-                     cn.prepareStatement("select count(login_name) from account where login_name = ? and password = crypt(?, password);"))
+        try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from account where login_name = ? and password = crypt(?, password);"))
         {
             stmt.setString(1, loginName);
             stmt.setString(2, password);
@@ -63,18 +61,25 @@ class DBClient implements AutoCloseable
             try (ResultSet rs = stmt.executeQuery())
             {
                 rs.next();
-                int count = rs.getInt(1);
-
-                if (count == 1) passwordCorrect = true;
+                usernameAndPasswordCorrect = (rs.getInt(1) == 1);
             }
         }
 
         if ("Admin".equals(role))
-        { roleCorrect = isAdmin(loginName); }
-        else if ("User".equals(role))
-        { roleCorrect = isUser(loginName); }
+        {
+            if (usernameAndPasswordCorrect && !isAdmin(loginName))
+                throw new IllegalArgumentException("Account is not an admin account.");
+        }
 
-        return passwordCorrect && roleCorrect;
+        else if ("User".equals(role))
+        {
+            if (usernameAndPasswordCorrect && !isUser(loginName))
+             throw new IllegalArgumentException("Account is not an user account.");
+        }
+
+        else throw new IllegalArgumentException("Unknown role: " + role);
+
+        return usernameAndPasswordCorrect;
     }
 
     void insertUser(String loginName, String password, String firstName, String lastName, String phoneNumber) throws SQLException
@@ -123,6 +128,7 @@ class DBClient implements AutoCloseable
         return false;
     }
 
+    /*
     Map<String, String> getUser(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select login_name, first_name, last_name, phone_number from only user_account where login_name = ?;");)
@@ -143,6 +149,7 @@ class DBClient implements AutoCloseable
             }
         }
     }
+    */
 
     List<Map<String, String>> listUsers() throws SQLException
     {
@@ -210,6 +217,7 @@ class DBClient implements AutoCloseable
         return false;
     }
 
+    /*
     Map<String, String> getAdmin(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select login_name, first_name, last_name from only admin_account where login_name = ?;");)
@@ -229,6 +237,7 @@ class DBClient implements AutoCloseable
             }
         }
     }
+    */
 
     List<Map<String, String>> listAdmins() throws SQLException
     {
@@ -522,6 +531,7 @@ class DBClient implements AutoCloseable
         }
     }
 
+    /*
     List<Map<String, String>> listTickets() throws SQLException
     {
         try (Statement stmt = cn.createStatement();
@@ -554,6 +564,7 @@ class DBClient implements AutoCloseable
             return result;
         }
     }
+    */
 
     List<Map<String, String>> getTicketsOfProject(String projectKey) throws SQLException
     {
@@ -599,11 +610,6 @@ class DBClient implements AutoCloseable
         {
             stmt.setInt(1, id);
             return stmt.executeUpdate();
-        }
-
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
         }
     }
 

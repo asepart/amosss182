@@ -1,17 +1,12 @@
 package de.fau.cs.osr.amos.asepart;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.Priority;
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -84,47 +79,22 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // Get role name
         final String roleName = role.get(0);
 
-        if (method.isAnnotationPresent(RolesAllowed.class))
+        try (DBClient dbClient = new DBClient())
         {
-            RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
-            Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
-
-            if (!rolesSet.contains(roleName))
+            if (!dbClient.authenticate(accountName, password, roleName))
             {
-                request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+                request.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build());
                 return;
             }
+        }
 
-            final Response error = authenticate(accountName, password, roleName);
-
-            if (error != null)
-            {
-                request.abortWith(error);
-                return;
-            }
+        catch (Exception e)
+        {
+            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+            return;
         }
 
         SecurityContext sc = new WebServiceSecurityContext(accountName, roleName, request.getUriInfo().getRequestUri().getScheme());
         request.setSecurityContext(sc);
-    }
-
-    private Response authenticate(final String loginName, final String password, final String role)
-    {
-        if (role.equals("Admin") || role.equals("User"))
-        {
-            try (DBClient dbClient = new DBClient())
-            {
-                if (dbClient.authenticate(loginName, password, role))
-                    return null;
-                else return Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build();
-            }
-
-            catch (Exception e)
-            {
-                throw new WebApplicationException(e);
-            }
-        }
-
-        else return Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build();
     }
 }

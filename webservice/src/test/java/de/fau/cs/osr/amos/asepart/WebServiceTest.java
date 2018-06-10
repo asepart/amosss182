@@ -373,7 +373,7 @@ class WebServiceTest
         ticket.put("summary", "Test Ticket Summary");
         ticket.put("description", "Description of Test Ticket");
         ticket.put("category", "trace");
-        ticket.put("requiredObservations", "42");
+        ticket.put("requiredObservations", "4");
 
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
@@ -440,7 +440,7 @@ class WebServiceTest
 
         Map<String, String> observation = new HashMap<>(2);
         observation.put("outcome", "positive");
-        observation.put("quantity", "4");
+        observation.put("quantity", "3");
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
@@ -466,6 +466,23 @@ class WebServiceTest
             Map<String, String> ticket = response.readEntity(type);
 
             assertEquals("processed", ticket.get("status"));
+        }
+
+        observation.put("quantity", "1");
+
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> ticket = response.readEntity(type);
+
+            assertEquals("finished", ticket.get("status"));
         }
 
         try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
