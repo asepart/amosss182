@@ -93,11 +93,6 @@ class WebServiceTest
     @Test
     void testLogin()
     {
-        {
-            Response response = getAdminClient().path("/login").request().options();
-            response.close();
-        }
-
         try (Response response = getAdminClient().path("/login").request().get())
         {
             String answer = response.readEntity(String.class);
@@ -323,6 +318,11 @@ class WebServiceTest
         project.put("name", "JUnit Test Project xxx");
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/projects/junit_test").request().get())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }

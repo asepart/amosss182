@@ -7,12 +7,10 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -31,14 +29,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class WebService
 {
     @Path("/login")
-    @OPTIONS
-    @PermitAll
-    public Response login()
-    {
-        return Response.noContent().build();
-    }
-
-    @Path("/login")
     @GET
     @RolesAllowed({"Admin", "User"})
     public Response login(@Context SecurityContext sc)
@@ -49,15 +39,6 @@ public class WebService
          */
 
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
-    }
-
-
-    @Path("/users")
-    @OPTIONS
-    @PermitAll
-    public Response users()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/users")
@@ -98,14 +79,6 @@ public class WebService
     }
 
     @Path("/users/{name}")
-    @OPTIONS
-    @PermitAll
-    public Response deleteUser()
-    {
-        return Response.noContent().build();
-    }
-
-    @Path("/users/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
     public Response deleteUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
@@ -119,14 +92,6 @@ public class WebService
         }
 
         return Response.ok().build();
-    }
-
-    @Path("/admins")
-    @OPTIONS
-    @PermitAll
-    public Response admins()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/admins")
@@ -167,14 +132,6 @@ public class WebService
     }
 
     @Path("/admins/{name}")
-    @OPTIONS
-    @PermitAll
-    public Response deleteAdmin()
-    {
-        return Response.noContent().build();
-    }
-
-    @Path("/admins/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
     public Response deleteAdmin(@Context SecurityContext sc, @PathParam("name") String admin) throws Exception
@@ -188,14 +145,6 @@ public class WebService
         }
 
         return Response.ok().build();
-    }
-
-    @Path("/projects")
-    @OPTIONS
-    @PermitAll
-    public Response projects()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/projects")
@@ -235,14 +184,6 @@ public class WebService
     }
 
     @Path("/projects/{key}")
-    @OPTIONS
-    @PermitAll
-    public Response project()
-    {
-        return Response.noContent().build();
-    }
-
-    @Path("/projects/{key}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
@@ -273,14 +214,6 @@ public class WebService
         }
 
         return Response.ok().build();
-    }
-
-    @Path("/projects/{key}/tickets/")
-    @OPTIONS
-    @PermitAll
-    public Response tickets()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/tickets")
@@ -330,15 +263,6 @@ public class WebService
         }
     }
 
-
-    @Path("/tickets/")
-    @OPTIONS
-    @PermitAll
-    public Response writeTicket()
-    {
-        return Response.noContent().build();
-    }
-
     @Path("/tickets/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -382,14 +306,6 @@ public class WebService
                 return Response.ok().build();
             }
         }
-    }
-
-    @Path("/tickets/{id}")
-    @OPTIONS
-    @PermitAll
-    public Response ticket()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}")
@@ -455,14 +371,6 @@ public class WebService
     }
 
     @Path("/tickets/{id}/accept")
-    @OPTIONS
-    @PermitAll
-    public Response acceptTicket()
-    {
-        return Response.noContent().build();
-    }
-
-    @Path("/tickets/{id}/accept")
     @POST
     @RolesAllowed({"User"})
     public Response acceptTicket(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
@@ -484,14 +392,6 @@ public class WebService
         }
 
         return Response.ok().build();
-    }
-
-    @Path("/tickets/{id}/observations")
-    @OPTIONS
-    @PermitAll
-    public Response observations()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/observations")
@@ -547,14 +447,6 @@ public class WebService
     }
 
     @Path("/projects/{key}/users")
-    @OPTIONS
-    @PermitAll
-    public Response getUsersOfProject()
-    {
-        return Response.noContent().build();
-    }
-
-    @Path("/projects/{key}/users")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
@@ -571,14 +463,6 @@ public class WebService
 
             return Response.ok(users).build();
         }
-    }
-
-    @Path("/projects/{key}/users/{name}")
-    @OPTIONS
-    @PermitAll
-    public Response removeUserFromProject()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/users/{name}")
@@ -599,14 +483,6 @@ public class WebService
         }
 
         return Response.ok().build();
-    }
-
-    @Path("/join")
-    @OPTIONS
-    @PermitAll
-    public Response joinProject()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/join")
@@ -641,14 +517,6 @@ public class WebService
             Map<String, String> project = dbClient.getProject(entryKey);
             return Response.ok(project.get("name")).build();
         }
-    }
-
-    @Path("/messages/{ticket}")
-    @OPTIONS
-    @PermitAll
-    public Response messages()
-    {
-        return Response.noContent().build();
     }
 
     @Path("/messages/{ticket}")
