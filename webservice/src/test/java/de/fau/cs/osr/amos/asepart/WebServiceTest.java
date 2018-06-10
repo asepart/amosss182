@@ -20,11 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WebServiceTest
 {
-    private final static int port = 12345;
-
     private WebTarget getClient()
     {
-        final URI uri = UriBuilder.fromUri("http://localhost/").port(port).build();
+        final URI uri = UriBuilder.fromUri("http://localhost/").port(WebService.port).build();
         WebTarget client = ClientBuilder.newClient().target(uri);
 
         return client;
@@ -67,27 +65,9 @@ class WebServiceTest
     }
 
     @BeforeAll
-    static void prepare()
+    static void start()
     {
-        try (DBClient dbClient = new DBClient())
-        {
-            dbClient.wipe();
-
-            dbClient.insertAdmin("admin", "admin", "Default", "Admin");
-            dbClient.insertUser("user", "user", "Default", "User", "+4917123456");
-            dbClient.insertProject("pizza", "Pizza Project", "admin");
-            dbClient.insertTicket("Developers are hungry", "There is an insufficient amount of pizza available.",
-                    "A developer is a tool which converts pizza into code.", "behavior", 8, "pizza");
-
-            dbClient.joinProject("user", "pizza");
-        }
-
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        WebService.startBackground(port);
+        WebService.main(null);
     }
 
     @Test

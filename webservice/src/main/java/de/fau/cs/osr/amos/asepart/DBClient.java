@@ -52,14 +52,6 @@ class DBClient implements AutoCloseable
         cn.close();
     }
 
-    void wipe() throws SQLException
-    {
-        try (Statement stmt = cn.createStatement())
-        {
-            stmt.executeUpdate("delete from account"); // will cascade through whole database
-        }
-    }
-
     boolean authenticate(String loginName, String password, String role) throws SQLException
     {
         boolean usernameAndPasswordCorrect;

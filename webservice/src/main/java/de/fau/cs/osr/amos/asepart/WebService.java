@@ -578,8 +578,20 @@ public class WebService
         }
     }
 
-    public static void startBackground(int port)
+    public static int port = 12345;
+    
+    public static void main(String[] args)
     {
+        try
+        {
+            port = Integer.parseInt(System.getenv("PORT"));
+        }
+
+        catch (NumberFormatException e)
+        {
+            System.err.println("Environment variable PORT not set, using default: " + port);
+        }
+
         try
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
@@ -600,22 +612,5 @@ public class WebService
             System.err.println("Failed to get server's own ip address.");
             e.printStackTrace();
         }
-    }
-    
-    public static void main(String[] args)
-    {
-        int port = 12345;
-
-        try
-        {
-            port = Integer.parseInt(System.getenv("PORT"));
-        }
-
-        catch (NumberFormatException e)
-        {
-            System.err.println("Environment variable PORT not set, using default: " + port);
-        }
-
-        startBackground(port);
     }
 }
