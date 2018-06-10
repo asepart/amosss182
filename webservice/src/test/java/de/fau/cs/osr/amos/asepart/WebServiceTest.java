@@ -142,12 +142,20 @@ class WebServiceTest
     }
 
     @Test
+    void testWrongRole()
+    {
+        try (Response response = getUserClient().path("/users").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+
+    @Test
     void testWrongPassword()
     {
         try (Response response = getAdminClient("invalid", "wrong").path("/login").request().get())
         {
-            String answer = response.readEntity(String.class);
-
             assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
@@ -233,6 +241,16 @@ class WebServiceTest
         try (Response response = getAdminClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())
         {
             assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Map<String, String> pizza = new HashMap<>(3);
+        pizza.put("entryKey", "pizza");
+        pizza.put("owner", "junit_admin");
+        pizza.put("name", "Pizza Project");
+
+        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").request().post(Entity.json(pizza)))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").request().delete())
@@ -356,6 +374,20 @@ class WebServiceTest
     }
 
     @Test
+    void testGetNonExistingProject()
+    {
+        try (Response response = getAdminClient().path("/projects").path("idonotexist").request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/projects").path("idonotexist").path("tickets").request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
     void testDeleteNonExistingProject()
     {
         try (Response response = getAdminClient().path("/projects").path("idonotexist").request().delete())
@@ -440,7 +472,7 @@ class WebServiceTest
 
         Map<String, String> observation = new HashMap<>(2);
         observation.put("outcome", "positive");
-        observation.put("quantity", "3");
+        observation.put("quantity", "2");
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
@@ -468,7 +500,22 @@ class WebServiceTest
             assertEquals("processed", ticket.get("status"));
         }
 
+        try (Response response = getUserClient().path("/projects").path("pizza").path("tickets").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         observation.put("quantity", "1");
+
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/projects").path("pizza").path("tickets").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
@@ -483,6 +530,11 @@ class WebServiceTest
             Map<String, String> ticket = response.readEntity(type);
 
             assertEquals("finished", ticket.get("status"));
+        }
+
+        try (Response response = getUserClient().path("/projects").path("pizza").path("tickets").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())

@@ -227,6 +227,9 @@ public class WebService
 
         try (DBClient dbClient = new DBClient())
         {
+            if (!dbClient.isProject(projectKey))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
             Map<String, String> project = dbClient.getProject(projectKey);
 
             if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
