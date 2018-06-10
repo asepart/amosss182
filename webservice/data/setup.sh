@@ -1,16 +1,9 @@
 #!/bin/sh
 
-if [ $USER != "postgres" ]; then
-    echo "Script must be executed as user postgres!"
-    exit 1
-fi
-
-createuser asepart
-createdb asepartdb
-
-psql -c "alter user asepart with encrypted password 'asepart';"
-psql -c "grant all privileges on database asepartdb to asepart;"
-
-psql -d asepartdb -c "create extension pgcrypto;"
+psql -c "create database asepartdb;" -U postgres
+psql -c "create user asepart with encrypted password 'asepart';" -U postgres
+psql -c "grant all privileges on database asepartdb to asepart;" -U postgres
+psql -d asepartdb -c "create extension pgcrypto;" -U postgres
+psql -d asepartdb -f schema.sql -U postgres
 
 exit 0

@@ -20,9 +20,9 @@ class DBClient implements AutoCloseable
         PGSimpleDataSource ds = new PGSimpleDataSource();
         ds.setServerName("localhost");
         ds.setDatabaseName("asepartdb");
+        ds.setApplicationName("ASEPART Web Service");
         ds.setUser("asepart");
         ds.setPassword("asepart");
-        ds.setApplicationName("ASEPART Web Service");
 
         return ds;
     }
