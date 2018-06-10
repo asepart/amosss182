@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart.filters;
+package de.fau.cs.osr.amos.asepart;
 
 import java.io.IOException;
 
