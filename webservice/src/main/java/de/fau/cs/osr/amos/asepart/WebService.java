@@ -57,14 +57,14 @@ public class WebService
     @PermitAll
     public Response users()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/users")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response writeUser(@Context SecurityContext sc, Map<String, String> user)
+    public Response writeUser(@Context SecurityContext sc, Map<String, String> user) throws Exception
     {
         final String loginName = user.get("loginName");
 
@@ -82,11 +82,6 @@ public class WebService
             }
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -94,16 +89,11 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response listUsers(@Context SecurityContext sc)
+    public Response listUsers(@Context SecurityContext sc) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listUsers()).build();
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
     }
 
@@ -112,13 +102,13 @@ public class WebService
     @PermitAll
     public Response deleteUser()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/users/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteUser(@Context SecurityContext sc, @PathParam("name") String user)
+    public Response deleteUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -126,11 +116,6 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             dbClient.deleteAccount(user);
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
 
         return Response.ok().build();
@@ -141,14 +126,14 @@ public class WebService
     @PermitAll
     public Response admins()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/admins")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response writeAdmin(@Context SecurityContext sc, Map<String, String> admin)
+    public Response writeAdmin(@Context SecurityContext sc, Map<String, String> admin) throws Exception
     {
         final String loginName = admin.get("loginName");
 
@@ -166,11 +151,6 @@ public class WebService
             }
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -178,16 +158,11 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response listAdmins(@Context SecurityContext sc)
+    public Response listAdmins(@Context SecurityContext sc) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listAdmins()).build();
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
     }
 
@@ -196,13 +171,13 @@ public class WebService
     @PermitAll
     public Response deleteAdmin()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/admins/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("name") String admin)
+    public Response deleteAdmin(@Context SecurityContext sc, @PathParam("name") String admin) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -210,11 +185,6 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             dbClient.deleteAccount(admin);
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
 
         return Response.ok().build();
@@ -232,16 +202,11 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response listProjects(@Context SecurityContext sc)
+    public Response listProjects(@Context SecurityContext sc) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listProjects(sc.getUserPrincipal().getName())).build();
-        }
-        
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
     }
 
@@ -249,7 +214,7 @@ public class WebService
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response writeProject(@Context SecurityContext sc, Map<String, String> project)
+    public Response writeProject(@Context SecurityContext sc, Map<String, String> project) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -264,11 +229,6 @@ public class WebService
             }
 
             else dbClient.insertProject(entryKey, project.get("name"), project.get("owner")); 
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
 
         return Response.ok().build();
@@ -286,7 +246,7 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response getProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
+    public Response getProject(@Context SecurityContext sc, @PathParam("key") String entryKey) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -295,17 +255,12 @@ public class WebService
 
             return Response.ok(dbClient.getProject(entryKey)).build();
         }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
     }
     
     @Path("/projects/{key}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteProject(@Context SecurityContext sc, @PathParam("key") String entryKey)
+    public Response deleteProject(@Context SecurityContext sc, @PathParam("key") String entryKey) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -317,11 +272,6 @@ public class WebService
             dbClient.deleteProject(entryKey);
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -330,14 +280,14 @@ public class WebService
     @PermitAll
     public Response tickets()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/tickets")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin", "User"})
-    public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey)
+    public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -378,11 +328,6 @@ public class WebService
 
             return Response.ok(tickets).build();
         }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
     }
 
 
@@ -391,7 +336,7 @@ public class WebService
     @PermitAll
     public Response writeTicket()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/")
@@ -399,7 +344,7 @@ public class WebService
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin"})
-    public Response writeTicket(@Context SecurityContext sc, Map<String, String> ticket)
+    public Response writeTicket(@Context SecurityContext sc, Map<String, String> ticket) throws Exception
     {
         if (!ticket.containsKey("projectKey"))
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -437,11 +382,6 @@ public class WebService
                 return Response.ok().build();
             }
         }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
     }
 
     @Path("/tickets/{id}")
@@ -449,13 +389,13 @@ public class WebService
     @PermitAll
     public Response ticket()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}")
     @GET
     @RolesAllowed({"Admin", "User"})
-    public Response getTicket(@Context SecurityContext sc, @PathParam("id") int ticketId)
+    public Response getTicket(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -491,17 +431,12 @@ public class WebService
 
             return Response.ok(ticket).build();
         }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
     }
 
     @Path("/tickets/{id}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response deleteTicket(@Context SecurityContext sc, @PathParam("id") int ticketId)
+    public Response deleteTicket(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -516,11 +451,6 @@ public class WebService
             dbClient.deleteTicket(ticketId);
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -529,13 +459,13 @@ public class WebService
     @PermitAll
     public Response acceptTicket()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/accept")
     @POST
     @RolesAllowed({"User"})
-    public Response acceptTicket(@Context SecurityContext sc, @PathParam("id") int ticketId)
+    public Response acceptTicket(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
 
@@ -553,11 +483,6 @@ public class WebService
                 dbClient.acceptTicket(principal.getName(), ticketId);
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -566,14 +491,14 @@ public class WebService
     @PermitAll
     public Response observations()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/observations")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"User"})
-    public Response submitObservation(@Context SecurityContext sc, @PathParam("id") int ticketId, Map<String, String> observation)
+    public Response submitObservation(@Context SecurityContext sc, @PathParam("id") int ticketId, Map<String, String> observation) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
 
@@ -591,11 +516,6 @@ public class WebService
                     observation.get("outcome"), Integer.parseInt(observation.get("quantity")));
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -603,7 +523,7 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin", "User"})
-    public Response listObservations(@Context SecurityContext sc, @PathParam("id") int ticketId)
+    public Response listObservations(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -624,11 +544,6 @@ public class WebService
 
             return Response.ok(dbClient.listObservations(ticketId)).build();
         }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
     }
 
     @Path("/projects/{key}/users")
@@ -636,14 +551,14 @@ public class WebService
     @PermitAll
     public Response getUsersOfProject()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/users")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin"})
-    public Response getUsersOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey)
+    public Response getUsersOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -656,11 +571,6 @@ public class WebService
 
             return Response.ok(users).build();
         }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
     }
 
     @Path("/projects/{key}/users/{name}")
@@ -668,13 +578,13 @@ public class WebService
     @PermitAll
     public Response removeUserFromProject()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/users/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String entryKey, @PathParam("name") String user)
+    public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String entryKey, @PathParam("name") String user) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
@@ -688,11 +598,6 @@ public class WebService
             dbClient.leaveProject(user, entryKey);
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -701,14 +606,14 @@ public class WebService
     @PermitAll
     public Response joinProject()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/join")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"User"})
-    public Response joinProject(@Context SecurityContext sc, String entryKey)
+    public Response joinProject(@Context SecurityContext sc, String entryKey) throws Exception
     {
         final String user = sc.getUserPrincipal().getName();
 
@@ -722,11 +627,6 @@ public class WebService
             dbClient.joinProject(user, entryKey);
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -734,17 +634,12 @@ public class WebService
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @RolesAllowed({"User"})
-    public Response joinProjectPreview(@Context SecurityContext sc, @QueryParam("key") String entryKey)
+    public Response joinProjectPreview(@Context SecurityContext sc, @QueryParam("key") String entryKey) throws Exception
     {
         try (DBClient dbClient = new DBClient())
         {
             Map<String, String> project = dbClient.getProject(entryKey);
             return Response.ok(project.get("name")).build();
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
     }
 
@@ -753,14 +648,14 @@ public class WebService
     @PermitAll
     public Response messages()
     {
-        return Response.serverError().build();
+        return Response.noContent().build();
     }
 
     @Path("/messages/{ticket}")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin", "User"})
-    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") int ticketId, String message)
+    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") int ticketId, String message) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -782,11 +677,6 @@ public class WebService
             dbClient.sendMessage(principal.getName(), message, ticketId);
         }
 
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
-        }
-
         return Response.ok().build();
     }
 
@@ -794,7 +684,7 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin", "User"})
-    public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") int ticketId)
+    public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -814,11 +704,6 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(dbClient.listMessages(ticketId)).build();
-        }
-
-        catch (Exception ex)
-        {
-            return Response.serverError().build();
         }
     }
 
