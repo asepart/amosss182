@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
+import { View, Button, TextInput } from 'react-native';
 
 export default class TicketStatus extends Component {
 	render() {
-		if(this.props.state === 'FINISHED'){
+		if(this.props.state.value === 'FINISHED'){
 			return (
-				<Text  style={{color: '#5daedb'}}>
+				<button  style={{color: '#5daedb'}}>
 					FINISHED
-				</Text>
+				</button>
 			);
 		} else {
 			return (
-				<Text  style={{color: '#A25124'}}>
-					Open
-				</Text>
+				<button  style={{color: '#A25124'}}>
+					OPEN
+				</button>
 			);
 		}
 	}
