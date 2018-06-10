@@ -1,6 +1,8 @@
 package de.fau.cs.osr.amos.asepart;
 
 import javax.sql.DataSource;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
@@ -18,10 +20,27 @@ class DBClient implements AutoCloseable
     private static DataSource createDataSource()
     {
         PGSimpleDataSource ds = new PGSimpleDataSource();
-        ds.setServerName("localhost");
-        ds.setUser("postgres");
-        ds.setPassword("asepart");
-        ds.setDatabaseName("asepartdb");
+
+        try
+        {
+            URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+            String username = dbUri.getUserInfo().split(":")[0];
+            String password = dbUri.getUserInfo().split(":")[1];
+
+            ds.setServerName(dbUri.getHost());
+            ds.setPortNumber(dbUri.getPort());
+            ds.setUser(dbUri.getUserInfo().split(":")[0]);
+            ds.setPassword(dbUri.getUserInfo().split(":")[1]);
+        }
+
+        catch (URISyntaxException | NullPointerException e)
+        {
+            ds.setServerName("localhost");
+            ds.setUser("postgres");
+            ds.setPassword("asepart");
+        }
+
         ds.setApplicationName("ASEPART Web Service");
 
         return ds;
