@@ -95,7 +95,7 @@ export default class TicketList extends Component {
 				maxWidth: 180,
 			}, {
 				Header: 'Status',
-				accessor: 'ticketStatus', // String-based value accessors!
+				accessor: 'status', // String-based value accessors!
 				maxWidth: 95,
 				Cell: props => <TicketStatus state={props}/>
 			}, {
