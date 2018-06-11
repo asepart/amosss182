@@ -57,7 +57,7 @@ export default class ProjectList extends Component {
 		const columns = [
 			{
 				Header: 'Name',
-				accessor: 'projectName',
+				accessor: 'name',
 				Cell: props => <ProjectButton proj={props}/>,
 				Footer: props => <ProjectAdd project={this.state.param} name={this.state.name} callToParent={this.fetchProjects.bind(this)}/>
 			}, {
