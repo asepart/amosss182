@@ -9,20 +9,22 @@ import {setUpdateBoolean} from '../shared/GlobalState';
 export default class UpdateProjectButton extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
 			projectName: '',
 			entryKey: '',
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
+	}
+
+	openPopup = () => {
+		this.setState({ open: true });
 		this.getVars();
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	};
+
+	closePopup = () => {
+		this.setState({ open: false });
+	};
 
 	//needed to get right row values after changes in parent component
 	getVars() {
@@ -50,8 +52,8 @@ export default class UpdateProjectButton extends Component {
 		this.props.callToParent();
 		setUpdateBoolean(true);
 		this.setState({
-	  	open: false
-	  })
+			open: false
+		})
 	}
 
 	render() {
