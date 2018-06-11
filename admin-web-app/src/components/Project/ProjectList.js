@@ -27,9 +27,9 @@ export default class ProjectList extends Component {
 
 	componentDidUpdate() {
 		if(getUpdateBoolean() === true) {
-      this.fetchProjects();
-      setUpdateBoolean(false);
-    }
+			this.fetchProjects();
+			setUpdateBoolean(false);
+		}
 	}
 
 	fetchProjects() {
@@ -57,7 +57,7 @@ export default class ProjectList extends Component {
 		const columns = [
 			{
 				Header: 'Name',
-				accessor: 'projectName',
+				accessor: '',
 				Cell: props => <ProjectButton proj={props}/>,
 				Footer: props => <ProjectAdd project={this.state.param} name={this.state.name} callToParent={this.fetchProjects.bind(this)}/>
 			}, {
