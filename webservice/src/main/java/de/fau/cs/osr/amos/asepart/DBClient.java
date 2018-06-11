@@ -30,7 +30,13 @@ class DBClient implements AutoCloseable
 
         else
         {
-            ds.setServerName("localhost");
+            final String postgresHost = System.getenv("ASEPART_POSTGRES_HOST");
+
+            if (postgresHost != null)
+                ds.setServerName(postgresHost);
+            else
+                ds.setServerName("localhost");
+
             ds.setUser("postgres");
             ds.setPassword("asepart");
         }

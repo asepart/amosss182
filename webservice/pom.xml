@@ -115,7 +115,7 @@
                     <images>
                         <image>
                             <alias>webservice</alias>
-                            <name>asepart-webservice:${project.version}</name>
+                            <name>asepart-webservice</name>
 
                             <build>
                                 <from>openjdk:8</from>
