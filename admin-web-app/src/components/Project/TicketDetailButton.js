@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom';
 
 export default class TicketDetailButton extends Component {
 
-  showTicketDetails() {
+	showTicketDetails() {
 		setState({
 			isAuth: true,
 			show: 'ticketDetail',
 			param: this.props.keyProj,
-			id: this.props.proj.row.id
+			id: this.props.proj.row.id,
 		});
 	}
 
@@ -21,7 +21,7 @@ export default class TicketDetailButton extends Component {
 					onPress = { this.showTicketDetails.bind(this) }
 					style={{color: '#5daedb'}}
 				>
-					{ this.props.proj.row.ticketName }
+					{ this.props.proj.row.name }
 				</Text>
 			</Link>
 		);
