@@ -11,7 +11,7 @@ export default class ProjectButton extends Component {
 			isAuth: true,
 			show: 'showTickets',
 			param: this.props.proj.row.entryKey,
-			name: this.props.proj.row.projectName,
+			name: this.props.proj.row.name,
 			tName: '',
 			tSummary: '',
 			tDescription: '',
@@ -27,7 +27,7 @@ export default class ProjectButton extends Component {
 					onPress = { this.displayProject.bind(this) }
 					style={{color: '#5daedb'}}
 				>
-					{this.props.proj.row.projectName}
+					{this.props.proj.row.name}
 				</Text>
 			</Link>
 		);
