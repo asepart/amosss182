@@ -38,8 +38,8 @@ Your browser will be opened displaying the web app.
 
 To build the app you have to change the directory to `user-app` and run
 
-`npm install`
+`$ npm install`
 
-`npm start`
+`$ npm start`
 
 The console outputs an QR code which can be scanned using the "Expo" app which must be installed from the Play Store.
