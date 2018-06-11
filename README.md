@@ -22,6 +22,8 @@ We use PostgreSQL as our database. To run the webservice locally, a PostgreSQL i
 
 `# systemctl start postgresql`
 
+`# launchctl start postgresql` (on mac os)
+
 The backend for the mobile and the web app is implemented as a REST service, which can be build and executed using:
 
 `$ cd webservice`
