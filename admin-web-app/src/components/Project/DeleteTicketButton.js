@@ -19,9 +19,7 @@ export default class DeleteTicketButton extends Component {
 	};
 
 	deleteTicket() {
-		var url = URL;
-		url += + '/tickets/' + this.props.proj.row.id;
-		fetch(url, {method:'DELETE', headers: getAuth()})
+		fetch(URL + '/tickets/' + this.props.proj.row.id, {method:'DELETE', headers: getAuth()})
 			.then((response) => response.json())
 			.catch((error) => {
 				console.error(error);
