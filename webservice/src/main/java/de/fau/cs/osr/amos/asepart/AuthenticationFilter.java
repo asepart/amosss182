@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.Priority;
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -42,6 +43,9 @@ public class AuthenticationFilter implements ContainerRequestFilter
     public void filter(ContainerRequestContext request)
     {
         final Method method = resourceInfo.getResourceMethod();
+
+        if (!method.isAnnotationPresent(RolesAllowed.class)) // Method is not restricted
+            return;
 
         // Get request headers
         final MultivaluedMap<String, String> headers = request.getHeaders();
