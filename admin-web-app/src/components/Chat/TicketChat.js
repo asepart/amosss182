@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
 import {getAuth} from '../shared/auth';
-import {setMsg, sendMessage, setTicketID, testUpload} from './sendMessages';
+import {setMsg, sendMessage, setTicketID} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class TicketChat extends Component {
@@ -182,7 +182,7 @@ export default class TicketChat extends Component {
 			}
 		}
 		else {
-			tmp_ticketName = this.props.tName;
+			tmp_ticketName = this.state.tName;
 			tmp_projectName = this.props.name;
 		}
 
