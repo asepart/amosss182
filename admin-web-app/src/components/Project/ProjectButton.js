@@ -12,12 +12,6 @@ export default class ProjectButton extends Component {
 			show: 'showTickets',
 			param: this.props.proj.row.entryKey,
 			name: this.props.proj.row.name,
-			tName: '',
-			tSummary: '',
-			tDescription: '',
-			tCategory: pickerPlaceholder,
-			tRequiredObservations: '',
-			tId: '0'
 		});
 	}
 	render() {
