@@ -137,7 +137,7 @@ class DBClient implements AutoCloseable
         return false;
     }
 
-    /*
+
     Map<String, String> getUser(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select login_name, first_name, last_name, phone_number from only user_account where login_name = ?;");)
@@ -158,7 +158,7 @@ class DBClient implements AutoCloseable
             }
         }
     }
-    */
+
 
     List<Map<String, String>> listUsers() throws SQLException
     {
@@ -226,7 +226,7 @@ class DBClient implements AutoCloseable
         return false;
     }
 
-    /*
+
     Map<String, String> getAdmin(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select login_name, first_name, last_name from only admin_account where login_name = ?;");)
@@ -246,7 +246,6 @@ class DBClient implements AutoCloseable
             }
         }
     }
-    */
 
     List<Map<String, String>> listAdmins() throws SQLException
     {
@@ -539,41 +538,6 @@ class DBClient implements AutoCloseable
             }
         }
     }
-
-    /*
-    List<Map<String, String>> listTickets() throws SQLException
-    {
-        try (Statement stmt = cn.createStatement();
-             ResultSet rs = stmt.executeQuery("select id, name, summary, description, category, status, required_obversations, project_key from ticket;"))
-        {
-            List<Map<String, String>> result = new LinkedList<>();
-
-            while (rs.next())
-            {
-                Map<String, String> row = new HashMap<>(12);
-                int id = rs.getInt(1);
-
-                row.put("id", String.valueOf(id));
-                row.put("name", rs.getString(2));
-                row.put("summary", rs.getString(3));
-                row.put("description", rs.getString(4));
-                row.put("category", rs.getString(5));
-                row.put("status", rs.getString(6));
-                row.put("requiredObservations", String.valueOf(rs.getInt(7)));
-                row.put("projectKey", rs.getString(8));
-
-                row.put("U", String.valueOf(acceptanceCount(id)));
-                row.put("UP", String.valueOf(userCountWithPositiveObservations(id)));
-                row.put("OP", String.valueOf(positiveObservationCount(id)));
-                row.put("ON", String.valueOf(negativeObservationCount(id)));
-
-                result.add(row);
-            }
-
-            return result;
-        }
-    }
-    */
 
     List<Map<String, String>> getTicketsOfProject(String projectKey) throws SQLException
     {

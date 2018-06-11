@@ -79,6 +79,20 @@ public class WebService
     }
 
     @Path("/users/{name}")
+    @GET
+    @RolesAllowed({"Admin"})
+    public Response getUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
+    {
+        try (DBClient dbClient = new DBClient())
+        {
+            if (!dbClient.isUser(user))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            return Response.ok(dbClient.getUser(user)).build();
+        }
+    }
+
+    @Path("/users/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
     public Response deleteUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
@@ -128,6 +142,20 @@ public class WebService
         try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listAdmins()).build();
+        }
+    }
+
+    @Path("/admins/{name}")
+    @GET
+    @RolesAllowed({"Admin"})
+    public Response getAdmin(@Context SecurityContext sc, @PathParam("name") String admin) throws Exception
+    {
+        try (DBClient dbClient = new DBClient())
+        {
+            if (!dbClient.isAdmin(admin))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            return Response.ok(dbClient.getAdmin(admin)).build();
         }
     }
 

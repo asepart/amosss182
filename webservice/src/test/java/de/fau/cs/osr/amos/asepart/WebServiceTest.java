@@ -73,6 +73,11 @@ class WebServiceTest
     @Test
     void testLogin()
     {
+        try (Response response = getAdminClient().path("/login").request().options())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getAdminClient().path("/login").request().get())
         {
             String answer = response.readEntity(String.class);
@@ -141,6 +146,24 @@ class WebServiceTest
     }
 
     @Test
+    void testUserAsAdmin()
+    {
+        try (Response response = getAdminClient("user", "user").path("/login").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testAdminAsUser()
+    {
+        try (Response response = getUserClient("admin", "admin").path("/login").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
     void testCreateDeleteUser()
     {
         Map<String, String> newUser = new HashMap<>(3);
@@ -155,7 +178,27 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getAdminClient().path("/users/junit_user").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> currentUser = response.readEntity(type);
+
+            assertEquals(newUser.get("loginName"), currentUser.get("loginName"));
+        }
+
+        try (Response response = getAdminClient().path("/users/invalid").request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("junit_user", "secure").path("/tickets").path("1").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -209,6 +252,21 @@ class WebServiceTest
         try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/admins/junit_admin").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+            Map<String, String> currentAdmin = response.readEntity(type);
+
+            assertEquals(newAdmin.get("loginName"), currentAdmin.get("loginName"));
+        }
+
+        try (Response response = getAdminClient().path("/admins/invalid").request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         newAdmin.put("password","supergeheim");
@@ -295,7 +353,7 @@ class WebServiceTest
     }
 
     @Test
-    void testListProject()
+    void testListProjects()
     {
         try (Response response = getAdminClient().path("/projects").request().get())
         {
@@ -390,6 +448,23 @@ class WebServiceTest
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testCreateTicketWithInvalidProjectKey()
+    {
+        Map<String, String> ticket = new HashMap<>(6);
+        ticket.put("projectKey", "invalid-key");
+        ticket.put("name", "Test Ticket");
+        ticket.put("summary", "Test Ticket Summary");
+        ticket.put("description", "Description of Test Ticket");
+        ticket.put("category", "trace");
+        ticket.put("requiredObservations", "500");
+
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -523,6 +598,11 @@ class WebServiceTest
         }
 
         try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
