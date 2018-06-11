@@ -14,7 +14,17 @@ The app has the following main features:
 
 ### Web Service Backend
 
-The backend for the mobile and the web app is implemented in a REST service, which can be build and executed using:
+We use PostgreSQL as our database. To run the webservice locally, a PostgreSQL instance must be installed on the developers machine. Use your distribution's package manager or a docker container for that. Then, run the database setup script with root privileges.
+
+`# cd webservice/data`
+
+`# ./setup-postgres.sh`
+
+`# systemctl start postgresql`
+
+`# launchctl start postgresql` (on mac os)
+
+The backend for the mobile and the web app is implemented as a REST service, which can be build and executed using:
 
 `$ cd webservice`
 

@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart.filters;
+package de.fau.cs.osr.amos.asepart;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -22,12 +22,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
 
-import de.fau.cs.osr.amos.asepart.WebServiceSecurityContext;
-import de.fau.cs.osr.amos.asepart.Database;
-import de.fau.cs.osr.amos.asepart.entities.Admin;
-import de.fau.cs.osr.amos.asepart.entities.User;
-import org.hibernate.Session;
-
 // TODO: (maybe) introduce login limit to avoid brute force attacks
 
 @Provider
@@ -50,7 +44,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
     {
         final Method method = resourceInfo.getResourceMethod();
 
-        if (method.isAnnotationPresent(PermitAll.class)) // Authorization not needed for method
+        if (!method.isAnnotationPresent(RolesAllowed.class)) // Method is not restricted
             return;
 
         // Get request headers
@@ -89,48 +83,31 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // Get role name
         final String roleName = role.get(0);
 
-        if (method.isAnnotationPresent(RolesAllowed.class))
+        try (DBClient dbClient = new DBClient())
         {
-            RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
-            Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
-
-            if (!rolesSet.contains(roleName))
+            if (!dbClient.authenticate(accountName, password, roleName))
             {
-                request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+                request.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build());
                 return;
             }
+        }
 
-            final Response error = checkPassword(accountName, password, roleName);
-            if (error != null)
-            {
-                request.abortWith(error);
-                return;
-            }
+        catch (Exception e)
+        {
+            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+            return;
+        }
+
+        // Check if role is allowed for method
+        Set<String> rolesSet = new HashSet<>(Arrays.asList(method.getAnnotation(RolesAllowed.class).value()));
+
+        if (!rolesSet.contains(roleName))
+        {
+            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+            return;
         }
 
         SecurityContext sc = new WebServiceSecurityContext(accountName, roleName, request.getUriInfo().getRequestUri().getScheme());
         request.setSecurityContext(sc);
-    }
-
-    private Response checkPassword(final String loginName, final String password, final String role)
-    {
-        try (Session session = Database.openSession())
-        {
-            switch (role)
-            {
-                case "Admin":
-                    if (Database.authenticate(session, loginName, password, Admin.class))
-                        return null;
-                    else break;
-                case "User":
-                    if (Database.authenticate(session, loginName, password, User.class))
-                        return null;
-                    else break;
-                default:
-                    return Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build();
-            }
-        }
-
-        return Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build();
     }
 }

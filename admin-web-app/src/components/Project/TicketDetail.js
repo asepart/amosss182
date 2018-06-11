@@ -6,6 +6,8 @@ import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
 
+var tmp_ticket;
+
 export default class TicketDetail extends Component {
 	constructor(props) {
 		super(props);
@@ -20,13 +22,13 @@ export default class TicketDetail extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
-				name: responseJson.projectName,
+				name: responseJson.name,
 				project: this.props.match.params.project
 			}, function() {});
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
+		fetch(URL + '/tickets/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -36,12 +38,21 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/statistics/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
-				isStatisticsLoading: false,
 				statistics: responseJson
+			}, function() {});
+			if (this.state.statistics !== undefined) {
+				for(var i=0; i < this.state.statistics.length; i++) {
+					if(this.state.statistics[i].id === this.props.match.params.id) {
+						tmp_ticket = i;
+					}
+				}
+			}
+			this.setState({
+				isStatisticsLoading: false,
 			}, function() {});
 		}).catch((error) => {
 			console.error(error);
@@ -49,14 +60,13 @@ export default class TicketDetail extends Component {
 	}
 
 	render() {
-		if (this.state.isDataLoading || this.state.isStatisticsLoading ) {
+		if (this.state.isDataLoading || this.state.isStatisticsLoading) {
 			return (
 				<View style={{flex: 1,padding: 20}}>
 					<ActivityIndicator/>
 				</View>
 			)
 		}
-
 		return (
 			<View>
 				<View>
@@ -64,14 +74,14 @@ export default class TicketDetail extends Component {
 					<Text>Project:	 { this.state.name }</Text>
 					<Text>Project key: {this.state.project} </Text>
 					<Text>Required observations: { this.state.data.requiredObservations }</Text>
-					<Text>Category: { this.state.data.ticketCategory }</Text>
-					<Text>Name: { this.state.data.ticketName }</Text>
-					<Text>Summary: { this.state.data.ticketSummary }</Text>
-					<Text>Statistic U: { this.state.statistics.U }</Text>
-					<Text>Statistic UP: { this.state.statistics.UP }</Text>
-					<Text>Statistic ON: { this.state.statistics.ON }</Text>
-					<Text>Statistic OP: { this.state.statistics.OP }</Text>
-					<Text>Description: { this.state.data.ticketDescription }</Text>
+					<Text>Category: { this.state.data.category }</Text>
+					<Text>Name: { this.state.data.name }</Text>
+					<Text>Summary: { this.state.data.summary }</Text>
+					<Text>Statistic U: { this.state.statistics[tmp_ticket].U }</Text>
+					<Text>Statistic UP: { this.state.statistics[tmp_ticket].UP }</Text>
+					<Text>Statistic ON: { this.state.statistics[tmp_ticket].ON }</Text>
+					<Text>Statistic OP: { this.state.statistics[tmp_ticket].OP }</Text>
+					<Text>Description: { this.state.data.description }</Text>
 				</View>
 				<View>
 					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>

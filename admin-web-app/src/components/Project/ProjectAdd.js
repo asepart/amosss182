@@ -12,7 +12,7 @@ export default class ProjectAdd extends Component {
 		super(props);
 		this.state = {
 			open: false,
-			projectName: this.props.name,
+			name: this.props.name,
 			entryKey: this.props.project,
 			owner: username
 		};
@@ -29,7 +29,7 @@ export default class ProjectAdd extends Component {
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: this.state.owner})
+				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: this.state.owner})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -43,14 +43,14 @@ export default class ProjectAdd extends Component {
 	  setUpdateBoolean(true);
 		this.setState({
 		  	open: false,
-				projectName: undefined,
+				name: undefined,
 				entryKey: undefined,
 		})
 
 	}
 
 	render() {
-		var buttonEnabled = (this.state.entryKey !== undefined && this.state.projectName !== undefined);
+		var buttonEnabled = (this.state.entryKey !== undefined && this.state.name !== undefined);
 
 		return (
 			<div>
@@ -64,8 +64,8 @@ export default class ProjectAdd extends Component {
 					<TextInput
 						placeholder = "Name"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({projectName: text})}
-						value = { this.state.projectName }
+						onChangeText = {(text) => this.setState({name: text})}
+						value = { this.state.name }
 					/>
 					<TextInput
 						placeholder = "Entry Code"

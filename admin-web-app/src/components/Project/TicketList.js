@@ -29,9 +29,9 @@ export default class TicketList extends Component {
 
 	componentDidUpdate() {
 		if(getUpdateBoolean() === true) {
-      this.fetchTickets();
-      setUpdateBoolean(false);
-    }
+			this.fetchTickets();
+			setUpdateBoolean(false);
+		}
 	}
 
 	fetchMetaData() {
@@ -39,7 +39,7 @@ export default class TicketList extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
-				name: responseJson.projectName,
+				name: responseJson.name,
 				project: this.props.match.params.project
 			}, function() {});
 		}).catch((error) => {
@@ -77,17 +77,17 @@ export default class TicketList extends Component {
 				Footer: props => <TicketCreate project={this.state.project} name={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}, {
 				Header: 'Name',
-				accessor: 'ticketName',
+				accessor: 'name',
 				Cell: props => <TicketDetailButton proj={props} keyProj={this.props.match.params.project}/>,
 			}, {
 				Header: 'Summary',
-				accessor: 'ticketSummary',
+				accessor: 'summary',
 			}, {
 				Header: 'Description',
-				accessor: 'ticketDescription'
+				accessor: 'description'
 			}, {
 				Header: 'Category',
-				accessor: 'ticketCategory',
+				accessor: 'category',
 				maxWidth: 160,
 			}, {
 				Header: 'Required observations',
@@ -95,7 +95,7 @@ export default class TicketList extends Component {
 				maxWidth: 180,
 			}, {
 				Header: 'Status',
-				accessor: 'ticketStatus', // String-based value accessors!
+				accessor: 'status', // String-based value accessors!
 				maxWidth: 95,
 				Cell: props => <TicketStatus state={props}/>
 			}, {

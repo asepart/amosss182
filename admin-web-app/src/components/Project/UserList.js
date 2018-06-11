@@ -117,7 +117,7 @@ export default class UserList extends Component {
 							show: false
 						}, {
 							Header: 'Phone Number',
-							accessor: 'phone' // String-based value accessors!
+							accessor: 'phoneNumber' // String-based value accessors!
 						}, {
 							Header: '',
 							accessor: '',
@@ -165,7 +165,7 @@ export default class UserList extends Component {
 						show: false
 					}, {
 						Header: 'Phone Number',
-						accessor: 'phone' // String-based value accessors!
+						accessor: 'phoneNumber' // String-based value accessors!
 					}, {
 						Header: '',
 						accessor: '',

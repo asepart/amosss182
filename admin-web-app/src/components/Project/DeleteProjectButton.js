@@ -47,7 +47,7 @@ export default class DeleteProjectButton extends Component {
             <Button
               onPress = { function doNothing() {} }
               disabled = {true}
-              title = {"Delete " + this.props.proj.row.projectName + "?"}
+              title = {"Delete " + this.props.proj.row.name + "?"}
             />
             <Button onPress = { this.deleteProject.bind(this) } title = "Delete" color = "#0c3868"/>
             <Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
