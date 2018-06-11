@@ -12,7 +12,7 @@ export default class UpdateProjectButton extends Component {
     super(props);
     this.state = {
 			open: false,
-			projectName: '',
+			name: '',
 			entryKey: '',
 		};
   }
@@ -27,7 +27,7 @@ export default class UpdateProjectButton extends Component {
 	//needed to get right row values after changes in parent component
 	getVars() {
 		this.setState({
-			projectName: this.props.proj.row.projectName,
+			name: this.props.proj.row.name,
 			entryKey: this.props.proj.row.entryKey,
 		})
 	}
@@ -37,7 +37,7 @@ export default class UpdateProjectButton extends Component {
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: username})
+				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -55,7 +55,7 @@ export default class UpdateProjectButton extends Component {
 	}
 
 	render() {
-		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
+		var buttonEnabled = (this.state.entryKey !== '' && this.state.name !== '');
 
 		return (
 			<div>
@@ -69,8 +69,8 @@ export default class UpdateProjectButton extends Component {
 					<TextInput
 						placeholder = "Name"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({projectName: text})}
-						value = { this.state.projectName }
+						onChangeText = {(text) => this.setState({name: text})}
+						value = { this.state.name }
 					/>
 					<TextInput
 						placeholder = "Entry Code"
