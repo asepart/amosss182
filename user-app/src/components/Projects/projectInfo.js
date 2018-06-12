@@ -78,23 +78,23 @@ export default class ProjectInfo extends Component {
 		_getTicketStatus({item}) {
 			ticketstatus = item.status;
 			switch (ticketstatus){
-				case 'OPEN':
+				case 'open':
 					return (	<Text style={styles.buttonText}>
 										status: {item.status}
 				 						</Text> );
-				case 'ACCEPTED':
+				case 'accepted':
 					return (	<Text style={styles.buttonTextAccepted}>
 										status: {item.status}
 				 						</Text> );
-				case 'IN PROGRESS':
+				case 'in progress':
 					return (	<Text style={styles.buttonInProgress}>
 										status: {item.status}
 										</Text> );
-				case 'PROCESSED':
+				case 'processed':
 					return (	<Text style={styles.buttonCompleted}>
 										status: {item.status}
 										</Text> );
-				case 'FINISHED':
+				case 'finished':
 					return (	<Text style={styles.buttonCompleted}>
 										status: {item.status}
 										</Text> );
