@@ -247,7 +247,7 @@ class WebServiceTest
             GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
             List<Map<String, String>> users = response.readEntity(type);
 
-            assertEquals(2, users.size());
+            assertEquals(3, users.size());
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
@@ -341,7 +341,7 @@ class WebServiceTest
             GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
             List<Map<String, String>> admins = response.readEntity(type);
 
-            assertEquals(2, admins.size());
+            assertEquals(3, admins.size());
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
@@ -440,6 +440,11 @@ class WebServiceTest
             assertEquals("user", users.get(0).get("loginName"));
         }
 
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/projects/junit_test/users").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getAdminClient().path("/projects/doesnotexist/users").request().get())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
@@ -488,6 +493,11 @@ class WebServiceTest
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").request().post(Entity.json(ticket)))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -558,9 +568,24 @@ class WebServiceTest
             assertEquals("Test Ticket Modified", ticket.get("name"));
         }
 
+        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("accept").request().post(Entity.text("")))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(99999999)).path("accept").request().post(Entity.text("")))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
@@ -575,9 +600,24 @@ class WebServiceTest
         observation.put("outcome", "positive");
         observation.put("quantity", "2");
 
+        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
@@ -636,6 +676,11 @@ class WebServiceTest
         try (Response response = getUserClient().path("/projects").path("pizza").path("tickets").request().get())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
@@ -715,6 +760,10 @@ class WebServiceTest
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/projects/pizza/users/user").request().delete())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
 
         try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
         {
@@ -785,6 +834,21 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/messages").path(String.valueOf(10000000)).request().post(Entity.text("Hello, World!")))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
@@ -795,6 +859,16 @@ class WebServiceTest
             assertEquals(1, messages.size());
             assertEquals("Hello, World!", messages.get(0).get("content"));
             assertEquals("admin", messages.get(0).get("sender"));
+        }
+
+        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/messages").path(String.valueOf(ticketId)).request().get())
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
