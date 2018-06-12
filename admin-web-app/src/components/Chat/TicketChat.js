@@ -213,7 +213,7 @@ export default class TicketChat extends Component {
 					onChangeText = {(text) => this.setState({message: text})}
 					ref = {input => { this.textInput = input }}
 					onKeyPress = {(event) => {
-						if (event.key === 'Enter') {
+						if (event.key === 'Enter' && this.state.message !== '') {
 							this.onSendPressed();
 						}
 					}}
