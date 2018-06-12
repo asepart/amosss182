@@ -18,11 +18,15 @@ export default class ProjectAdd extends Component {
 		};
 	}
 	openPopup = () => {
-    this.setState({ open: true });
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+		this.setState({ open: true });
+	};
+	closePopup = () => {
+		this.setState({
+				open: false,
+				name: undefined,
+				entryKey: undefined,
+		})
+	};
 
 	putProject() {
 		let auth = getAuthForPost();
@@ -40,17 +44,12 @@ export default class ProjectAdd extends Component {
 			});
 
 		this.props.callToParent();
-	  setUpdateBoolean(true);
-		this.setState({
-		  	open: false,
-				name: undefined,
-				entryKey: undefined,
-		})
-
+		setUpdateBoolean(true);
+		this.closePopup();
 	}
 
 	render() {
-		var buttonEnabled = (this.state.entryKey !== undefined && this.state.name !== undefined);
+		var buttonEnabled = (this.state.entryKey !== undefined && this.state.name !== undefined && this.state.entryKey !== '' && this.state.name !== '');
 
 		return (
 			<div>
