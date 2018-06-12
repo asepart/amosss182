@@ -4,6 +4,7 @@ import Popup from "reactjs-popup";
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class DeleteTicketButton extends Component {
 
@@ -35,7 +36,9 @@ export default class DeleteTicketButton extends Component {
 	render() {
 		return (
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/delete.png')} alt=""/>
+				<Link to = {"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
+					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/delete.png')} alt=""/>
+				</Link>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
