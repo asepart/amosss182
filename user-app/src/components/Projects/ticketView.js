@@ -41,7 +41,7 @@ export default class TicketView extends Component {
   onAcceptPressed() {
       alert("Ticket successfully accepted")
       let ticketID = this.props.navigation.state.params.id;
-      var response = fetch(URL + '/projects/' + key + '/tickets/'+ ticketID + '/accept', {
+      var response = fetch(URL + '/tickets/'+ ticketID + '/accept', {
         method: 'POST',
         headers: getAuth()
       })
@@ -58,7 +58,7 @@ export default class TicketView extends Component {
     this.setState({
       idTicket: ticketID
     })
-    fetch(URL + '/projects/' + key + '/tickets/' + ticketID, { method: 'GET', headers: getAuth() })
+    fetch(URL + '/tickets/' + ticketID, { method: 'GET', headers: getAuth() })
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
@@ -92,7 +92,7 @@ export default class TicketView extends Component {
         </TouchableOpacity>
 
         <View>
-          {ticketstatus === 'OPEN' ? (
+          {ticketstatus === 'open' ? (
             <TouchableOpacity
               onPress={this.onAcceptPressed.bind(this)}
               style={styles.buttonContainer}>
@@ -117,23 +117,23 @@ export default class TicketView extends Component {
           Required Observations: {this.state.ticketDetail.requiredObservations}
         </Text>
         <Text style={styles.text}>
-          Category: {this.state.ticketDetail.ticketCategory}
+          Category: {this.state.ticketDetail.category}
         </Text>
         <Text style={styles.text}>
-          Ticket Name: {this.state.ticketDetail.ticketName}
+          Ticket Name: {this.state.ticketDetail.name}
         </Text>
         <Text style={styles.text}>
-          Ticket Status: {this.state.ticketDetail.ticketStatus}
+          Ticket Status: {this.state.ticketDetail.status}
         </Text>
         <Text style={styles.text}>
-          Summary: {this.state.ticketDetail.ticketSummary}
+          Summary: {this.state.ticketDetail.summary}
         </Text>
         <ScrollView style={styles.containerScroll}>
           <Text style={styles.textLarge}>
             Description:
         </Text>
           <Text style={styles.text} >
-            {this.state.ticketDetail.ticketDescription}
+            {this.state.ticketDetail.description}
           </Text>
         </ScrollView>
       </View>
