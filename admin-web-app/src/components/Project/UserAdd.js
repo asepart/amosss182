@@ -9,8 +9,8 @@ import {setUpdateBoolean} from '../shared/GlobalState';
 export default class UserAdd extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
 			loginName: '',
 			password: '',
@@ -18,13 +18,20 @@ export default class UserAdd extends Component {
 			lastName: '',
 			phoneNumber: ''
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	}
+	openPopup = () => {
+		this.setState({ open: true });
+	};
+	closePopup = () => {
+		this.setState({
+		 	open: false,
+			loginName: '',
+			password: '',
+			firstName: '',
+			lastName: '',
+			phoneNumber: ''
+		})
+	};
 
 	addUser(){
 		let auth = getAuthForPost();
@@ -43,14 +50,7 @@ export default class UserAdd extends Component {
 
 		this.props.callToParent();
 		setUpdateBoolean(true);
-		this.setState({
-		 	open: false,
-			loginName: '',
-			password: '',
-			firstName: '',
-			lastName: '',
-			phoneNumber: ''
-		})
+		this.closePopup();
 	}
 
 	render() {
