@@ -9,29 +9,36 @@ import {setUpdateBoolean} from '../shared/GlobalState';
 export default class UserAdd extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
 			loginName: '',
 			password: '',
 			firstName: '',
 			lastName: '',
-			phone: ''
+			phoneNumber: ''
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	}
+	openPopup = () => {
+		this.setState({ open: true });
+	};
+	closePopup = () => {
+		this.setState({
+		 	open: false,
+			loginName: '',
+			password: '',
+			firstName: '',
+			lastName: '',
+			phoneNumber: ''
+		})
+	};
 
 	addUser(){
 		let auth = getAuthForPost();
 		fetch(URL + '/users', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({loginName: this.state.loginName, password: this.state.password, firstName: this.state.firstName, lastName: this.state.lastName, phone: this.state.phone})
+				body: JSON.stringify({loginName: this.state.loginName, password: this.state.password, firstName: this.state.firstName, lastName: this.state.lastName, phoneNumber: this.state.phoneNumber})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -43,18 +50,11 @@ export default class UserAdd extends Component {
 
 		this.props.callToParent();
 		setUpdateBoolean(true);
-		this.setState({
-		 	open: false,
-			loginName: '',
-			password: '',
-			firstName: '',
-			lastName: '',
-			phone: ''
-		})
+		this.closePopup();
 	}
 
 	render() {
-		var buttonEnabled = (this.state.loginName !== '' && this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phone !== '');
+		var buttonEnabled = (this.state.loginName !== '' && this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phoneNumber !== '');
 
 		return(
 			<div>
@@ -92,8 +92,8 @@ export default class UserAdd extends Component {
 					<TextInput
 						placeholder = "Phone Number"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({phone: text})}
-						value = {this.state.phone}
+						onChangeText = {(text) => this.setState({phoneNumber: text})}
+						value = {this.state.phoneNumber}
 					/>
 					<Button onPress = { this.addUser.bind(this) } title = "Add" color = "#0c3868" disabled = {!buttonEnabled}/>
 					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
