@@ -19,8 +19,7 @@ export default class ProjectInfo extends Component {
 		this.state = {
 			isLoading: true,
             tickets: [],
-						stats: [],
-						ticketsWithStats: [],
+						
 		};
 	}
 
@@ -30,36 +29,15 @@ export default class ProjectInfo extends Component {
         .then((response) => response.json())
           .then((responseJson) => {
             this.setState({
+							isLoading: false,
               tickets: responseJson
             }, function() {});
-						for (var i=0; i < this.state.tickets.length; i++) {
-							this.fetchStatOfTicket(i);
-						}
+						
 		}).catch((error) => {
 			console.error(error);
 		});
 	}
 
-	fetchStatOfTicket(i) {
-		fetch(URL + '/statistics/' + this.state.tickets[i].id, {method:'GET', headers: getAuth()})
-					.then((response) => response.json())
-					.then((responseJson) => {
-						this.setState({
-							isLoading: false,
-							stats: responseJson
-						}, function() { });
-						this.state.ticketsWithStats[this.state.ticketsWithStats.length] = {
-							id: this.state.tickets[i].id,
-							ticketSummary: this.state.tickets[i].ticketSummary,
-							ticketCategory: this.state.tickets[i].ticketCategory,
-							ticketStatus: this.state.tickets[i].ticketStatus,
-							U: this.state.stats.U,
-							UP: this.state.stats.UP,
-						};
-					}).catch((error) => {
-						 console.error(error);
-					});
-	}
 
     static navigationOptions= {
 			title: 'Tickets',
@@ -81,10 +59,10 @@ export default class ProjectInfo extends Component {
 										 id:  {item.id}
 									 </Text>
 									 <Text style={styles.buttonText}>
-										summary: {item.ticketSummary}
+										summary: {item.summary}
 									 </Text>
 									<Text style={styles.buttonText}>
-										category: {item.ticketCategory}
+										category: {item.category}
 									</Text>
 									{this._getTicketStatus({item})}
 									 <Text style={styles.buttonText}>
@@ -98,32 +76,32 @@ export default class ProjectInfo extends Component {
   	}
 
 		_getTicketStatus({item}) {
-			ticketstatus = item.ticketStatus;
-			switch (item.ticketStatus){
+			ticketstatus = item.status;
+			switch (item.status){
 				case 'OPEN':
 					return (	<Text style={styles.buttonText}>
-										status: {item.ticketStatus}
+										status: {item.ticketstatus}
 				 						</Text> );
 				case 'ACCEPTED':
 					return (	<Text style={styles.buttonTextAccepted}>
-										status: {item.ticketStatus}
+										status: {item.ticketstatus}
 				 						</Text> );
 				case 'IN PROGRESS':
 					return (	<Text style={styles.buttonInProgress}>
-										status: {item.ticketStatus}
+										status: {item.ticketstatus}
 										</Text> );
 				case 'PROCESSED':
 					return (	<Text style={styles.buttonCompleted}>
-										status: {item.ticketStatus}
+										status: {item.ticketstatus}
 										</Text> );
 				case 'FINISHED':
 					return (	<Text style={styles.buttonCompleted}>
-										status: {item.ticketStatus}
+										status: {item.ticketstatus}
 										</Text> );
 				default:
 					return(
 									<Text style={styles.buttonText}>
-									status: {item.ticketStatus}
+									status: {item.ticketstatus}
 									</Text>
 					);
 			}
@@ -143,7 +121,7 @@ export default class ProjectInfo extends Component {
 
                 <FlatList
                   style={styles.textLarge}
-                  data={this.state.ticketsWithStats}
+                  data={this.state.tickets}
                   renderItem={this._renderItem.bind(this)}
                  keyExtractor={(item, index) => index}
                 />
