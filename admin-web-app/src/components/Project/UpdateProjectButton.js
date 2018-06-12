@@ -5,24 +5,25 @@ import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class UpdateProjectButton extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
 			name: '',
 			entryKey: '',
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
+	}
+	openPopup = () => {
+		this.setState({ open: true });
 		this.getVars();
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	};
+	closePopup = () => {
+		this.setState({ open: false });
+	};
 
 	//needed to get right row values after changes in parent component
 	getVars() {
@@ -50,8 +51,8 @@ export default class UpdateProjectButton extends Component {
 		this.props.callToParent();
 		setUpdateBoolean(true);
 		this.setState({
-	  	open: false
-	  })
+			open: false
+		})
 	}
 
 	render() {
@@ -59,7 +60,9 @@ export default class UpdateProjectButton extends Component {
 
 		return (
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				<Link to = "/" style={{textDecoration: 'none'}}>
+					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				</Link>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
