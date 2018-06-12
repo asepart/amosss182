@@ -121,7 +121,7 @@ export default class UserList extends Component {
 							Header: '',
 							accessor: '',
 							maxWidth: 35,
-							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
+							Cell: props => <DeleteUserButton proj={props} project={this.state.project} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 						}
 					] }/>
 				</View>
@@ -169,12 +169,12 @@ export default class UserList extends Component {
 						Header: '',
 						accessor: '',
 						maxWidth: 35,
-						Cell: props => <UpdateUserButton proj={props} callToParent={this.fetchUsers.bind(this)}/>
+						Cell: props => <UpdateUserButton proj={props} project={this.state.project} callToParent={this.fetchUsers.bind(this)}/>
 					}, {
 						Header: '',
 						accessor: '',
 						maxWidth: 35,
-						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
+						Cell: props => <DeleteUserButton proj={props} project={this.state.project} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 					}
 				] }/>
 			</View>
