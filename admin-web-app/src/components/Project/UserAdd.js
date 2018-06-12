@@ -5,6 +5,7 @@ import {URL} from '../shared/const';
 import '../../index.css';
 import Popup from "reactjs-popup";
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class UserAdd extends Component {
 
@@ -58,7 +59,17 @@ export default class UserAdd extends Component {
 
 		return(
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
+				<div>
+					{window.location.href.indexOf("usermanagement") !== -1 ? (
+						<Link to = "/usermanagement" style={{textDecoration: 'none'}}>
+							<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
+						</Link>
+					) : (
+						<Link to = {"/projects/" + this.props.project + "/users"} style={{textDecoration: 'none'}}>
+							<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
+						</Link>
+					)}
+				</div>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
