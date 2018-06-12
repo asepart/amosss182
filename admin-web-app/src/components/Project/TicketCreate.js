@@ -26,7 +26,14 @@ export default class TicketCreate extends Component {
 		this.setState({ open: true });
 	};
 	closePopup = () => {
-		this.setState({ open: false });
+		this.setState({
+			open: false,
+			name: '',
+			summary: '',
+			description: '',
+			category: '',
+			requiredObservations: '',
+		})
 	};
 
 	createTicket() {
@@ -46,14 +53,7 @@ export default class TicketCreate extends Component {
 
 		this.props.callToParent();
 		setUpdateBoolean(true);
-		this.setState({
-			open: false,
-			name: '',
-			summary: '',
-			description: '',
-			category: '',
-			requiredObservations: '',
-		})
+		this.closePopup();
 	}
 
 	render() {
@@ -85,7 +85,7 @@ export default class TicketCreate extends Component {
 					<TextInput
 						placeholder = "Description"
 						multiline={true}
-						style = {{height: 600, borderColor: 'gray',borderWidth: 1}}
+						style = {{height: 450, borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({description: text})}
 						value = {this.state.description}
 					/>
