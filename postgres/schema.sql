@@ -1,6 +1,6 @@
 create table account(
   login_name character varying (32) primary key,
-  password text not null,
+  password text default null,
   first_name character varying (64) not null,
   last_name character varying (64) not null
 );

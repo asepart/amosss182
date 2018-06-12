@@ -169,10 +169,31 @@ class WebServiceTest
     {
         Map<String, String> newUser = new HashMap<>(3);
         newUser.put("loginName", "junit_user");
-        newUser.put("password", "secure");
         newUser.put("firstName", "JUnit");
         newUser.put("lastName", "User");
         newUser.put("phoneNumber", "01INVALID");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newUser.put("password", "foobar");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newUser.put("password", "secure");
+
+        try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newUser.remove("password");
+        newUser.put("phoneNumber", "+4900000");
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
@@ -246,9 +267,15 @@ class WebServiceTest
     {
         Map<String, String> newAdmin = new HashMap<>(3);
         newAdmin.put("loginName", "junit_admin");
-        newAdmin.put("password", "secure");
         newAdmin.put("firstName", "JUnit");
         newAdmin.put("lastName", "Admin");
+
+        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newAdmin.put("password", "secure");
 
         try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
         {
@@ -275,6 +302,13 @@ class WebServiceTest
         try (Response response = getAdminClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        newAdmin.put("password","hostile_attack");
+
+        try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
+        {
+            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())

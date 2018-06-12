@@ -1,8 +1,6 @@
 package de.fau.cs.osr.amos.asepart;
 
 import javax.sql.DataSource;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
@@ -58,10 +56,8 @@ class DBClient implements AutoCloseable
         cn.close();
     }
 
-    boolean authenticate(String loginName, String password, String role) throws SQLException
+    boolean authenticate(String loginName, String password) throws SQLException
     {
-        boolean usernameAndPasswordCorrect;
-
         try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from account where login_name = ? and password = crypt(?, password);"))
         {
             stmt.setString(1, loginName);
@@ -70,51 +66,62 @@ class DBClient implements AutoCloseable
             try (ResultSet rs = stmt.executeQuery())
             {
                 rs.next();
-                usernameAndPasswordCorrect = (rs.getInt(1) == 1);
+                return (rs.getInt(1) == 1);
             }
         }
-
-        if ("Admin".equals(role))
-        {
-            if (usernameAndPasswordCorrect && !isAdmin(loginName))
-                throw new IllegalArgumentException("Account is not an admin account.");
-        }
-
-        else if ("User".equals(role))
-        {
-            if (usernameAndPasswordCorrect && !isUser(loginName))
-             throw new IllegalArgumentException("Account is not an user account.");
-        }
-
-        else throw new IllegalArgumentException("Unknown role: " + role);
-
-        return usernameAndPasswordCorrect;
     }
 
-    void insertUser(String loginName, String password, String firstName, String lastName, String phoneNumber) throws SQLException
+    boolean authenticate(String loginName, String password, String role) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into user_account values (?, crypt(?, gen_salt('bf', 8)), ?, ?, ?);"))
+        if (!authenticate(loginName, password))
+            return false;
+
+        switch (role)
+        {
+            case "Admin": if (!isAdmin(loginName)) throw new IllegalArgumentException("Account is not an admin account."); else break;
+            case "User": if (!isUser(loginName)) throw new IllegalArgumentException("Account is not an user account."); else break;
+            default: throw new IllegalArgumentException("Unknown role: " + role);
+        }
+
+        return true;
+    }
+
+    int changePassword(String loginName, String password) throws SQLException
+    {
+        if (password == null || password.isEmpty())
+            throw new IllegalArgumentException("Password must not be empty");
+
+        try (PreparedStatement stmt = cn.prepareStatement("update account set password = crypt(?, gen_salt('bf', 8)) where login_name = ?"))
+        {
+            stmt.setString(1, password);
+            stmt.setString(2, loginName);
+
+            return stmt.executeUpdate();
+        }
+    }
+
+    void insertUser(String loginName, String firstName, String lastName, String phoneNumber) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("insert into user_account(login_name, first_name, last_name, phone_number) values (?, ?, ?, ?);"))
         {
             stmt.setString(1, loginName);
-            stmt.setString(2, password);
-            stmt.setString(3, firstName);
-            stmt.setString(4, lastName);
-            stmt.setString(5, phoneNumber);
+            stmt.setString(2, firstName);
+            stmt.setString(3, lastName);
+            stmt.setString(4, phoneNumber);
 
             stmt.execute();
         }
     }
 
-    void updateUser(String loginName, String password, String firstName, String lastName, String phoneNumber) throws SQLException
+    void updateUser(String loginName, String firstName, String lastName, String phoneNumber) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                "update user_account set password = crypt(?, gen_salt('bf', 8)), first_name = ?, last_name = ?, phone_number = ? where login_name = ?;"))
+                "update user_account set first_name = ?, last_name = ?, phone_number = ? where login_name = ?;"))
         {
-            stmt.setString(1, password);
-            stmt.setString(2, firstName);
-            stmt.setString(3, lastName);
-            stmt.setString(4, phoneNumber);
-            stmt.setString(5, loginName);
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.setString(3, phoneNumber);
+            stmt.setString(4, loginName);
 
             stmt.executeUpdate();
         }
@@ -182,28 +189,26 @@ class DBClient implements AutoCloseable
         }
     }
 
-    void insertAdmin(String loginName, String password, String firstName, String lastName) throws SQLException
+    void insertAdmin(String loginName, String firstName, String lastName) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into admin_account values (?, crypt(?, gen_salt('bf', 8)), ?, ?);");)
+        try (PreparedStatement stmt = cn.prepareStatement("insert into admin_account(login_name, first_name, last_name) values (?, ?, ?);");)
         {
             stmt.setString(1, loginName);
-            stmt.setString(2, password);
-            stmt.setString(3, firstName);
-            stmt.setString(4, lastName);
+            stmt.setString(2, firstName);
+            stmt.setString(3, lastName);
 
             stmt.execute();
         }
     }
 
-    void updateAdmin(String loginName, String password, String firstName, String lastName) throws SQLException
+    void updateAdmin(String loginName, String firstName, String lastName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                "update admin_account set password = crypt(?, gen_salt('bf', 8)), first_name = ?, last_name = ? where login_name = ?;"))
+                "update admin_account set first_name = ?, last_name = ? where login_name = ?;"))
         {
-            stmt.setString(1, password);
-            stmt.setString(2, firstName);
-            stmt.setString(3, lastName);
-            stmt.setString(4, loginName);
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.setString(3, loginName);
 
             stmt.executeUpdate();
         }
