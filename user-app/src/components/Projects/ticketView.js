@@ -10,6 +10,7 @@ import { setTicketID } from '../Chat/sendMessages';
 import { setTicketId } from '../Tickets/ticketProcessed';
 import { StackNavigator } from 'react-navigation'
 import {ticketstatus} from '../Projects/projectInfo';
+import {setUpdateBoolean} from '../Login/state';
 
 export default class TicketView extends Component {
 
@@ -45,6 +46,7 @@ export default class TicketView extends Component {
 			method: 'POST',
 			headers: getAuth()
 		})
+		setUpdateBoolean(true);
 	}
 
 	onProcessTicketPressed() {
