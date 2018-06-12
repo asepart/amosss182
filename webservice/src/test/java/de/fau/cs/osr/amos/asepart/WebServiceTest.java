@@ -95,6 +95,7 @@ class WebServiceTest
             String answer = response.readEntity(String.class);
 
             assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals("Your identification is invalid.", answer);
         }
     }
 
