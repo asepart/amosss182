@@ -94,14 +94,6 @@ export default class TicketList extends Component {
 				accessor: 'requiredObservations', // String-based value accessors!
 				maxWidth: 180,
 			}, {
-				Header: 'U',
-				accessor: 'U', // String-based value accessors!
-				maxWidth: 180,
-			}, {
-				Header: 'UP',
-				accessor: 'UP', // String-based value accessors!
-				maxWidth: 180,
-			}, {
 				Header: 'Status',
 				accessor: 'status', // String-based value accessors!
 				maxWidth: 95,
@@ -120,7 +112,7 @@ export default class TicketList extends Component {
 				Header: '',
 				accessor: '',
 				maxWidth: 35,
-				Cell: props => <DeleteTicketButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
+				Cell: props => <DeleteTicketButton proj={props} project={this.state.project} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchTickets.bind(this)}/>
 			}
 		]
 
