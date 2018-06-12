@@ -405,6 +405,11 @@ class WebServiceTest
             assertEquals("user", users.get(0).get("loginName"));
         }
 
+        try (Response response = getAdminClient().path("/projects/doesnotexist/users").request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
@@ -455,12 +460,18 @@ class WebServiceTest
     void testCreateTicketWithInvalidProjectKey()
     {
         Map<String, String> ticket = new HashMap<>(6);
-        ticket.put("projectKey", "invalid-key");
         ticket.put("name", "Test Ticket");
         ticket.put("summary", "Test Ticket Summary");
         ticket.put("description", "Description of Test Ticket");
         ticket.put("category", "trace");
         ticket.put("requiredObservations", "500");
+
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        ticket.put("projectKey", "invalid-key");
 
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
@@ -609,6 +620,47 @@ class WebServiceTest
     }
 
     @Test
+    void testModifyTicketWithInvalidId()
+    {
+        Map<String, String> ticket = new HashMap<>(7);
+        ticket.put("projectKey", "pizza");
+        ticket.put("name", "Test Ticket");
+        ticket.put("summary", "Test Ticket Summary");
+        ticket.put("description", "Description of Test Ticket");
+        ticket.put("category", "trace");
+        ticket.put("requiredObservations", "500");
+        ticket.put("id", "500000");
+
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testSubmitObservationWithInvalidId()
+    {
+        Map<String, String> observation = new HashMap<>(2);
+        observation.put("outcome", "negative");
+        observation.put("quantity", "2");
+
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(1000000)).path("observations").request().post(Entity.json(observation)))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testListObservationsWithInvalidId()
+    {
+        try (Response response = getUserClient().path("/tickets").path(String.valueOf(1000000)).path("observations").request().get())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+
+    @Test
     void testJoinProject()
     {
         try (Response response = getUserClient().path("/join").queryParam("key", "pizza").request().get())
@@ -623,9 +675,25 @@ class WebServiceTest
             assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getUserClient().path("/join").request().post(Entity.text("doesnotexist")))
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+
         try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = getAdminClient().path("/projects/pizza/users/invaliduser").request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
