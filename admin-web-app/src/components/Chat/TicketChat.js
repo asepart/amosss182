@@ -189,7 +189,6 @@ export default class TicketChat extends Component {
 
 		return(
 			<View style={{height: screenHeight}}>
-				<ChatMessage>{tmp_projectName}</ChatMessage>
 				<Button
 					onPress = { function doNothing() {} }
 					disabled = {true}
