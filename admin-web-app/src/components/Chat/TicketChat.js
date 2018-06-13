@@ -4,6 +4,7 @@ import {URL, FileSelector} from '../shared/const';
 import {getAuth} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
+import ChatMessage from './ChatMessage';
 
 export default class TicketChat extends Component {
 
@@ -138,14 +139,14 @@ export default class TicketChat extends Component {
 					<div>
 						{news.content.search("http") === -1 ? (
 							<Text style={{fontWeight: 'bold'}}>
-								[{news.content.slice(18,27)} {news.sender}: {news.content.slice(29)}
+								[{news.content.slice(18,27)} {news.sender}: <ChatMessage>{news.content.slice(29)}</ChatMessage>
 							</Text>
 						) : (
 							<div>
 								<Text style={{fontWeight: 'bold'}}>
 									[{news.content.slice(18,27)} {news.sender}:
 								</Text>
-								<a href={news.content.slice(29)}> {news.content.slice(29)}</a>
+								<ChatMessage><a href={news.content.slice(29)}> {news.content.slice(29)}</a></ChatMessage>
 							</div>
 						)}
 					</div>
@@ -188,6 +189,7 @@ export default class TicketChat extends Component {
 
 		return(
 			<View style={{height: screenHeight}}>
+				<ChatMessage>{tmp_projectName}</ChatMessage>
 				<Button
 					onPress = { function doNothing() {} }
 					disabled = {true}
