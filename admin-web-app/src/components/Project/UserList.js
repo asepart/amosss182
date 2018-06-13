@@ -6,7 +6,6 @@ import {URL} from '../shared/const';
 import UpdateUserButton from './UpdateUserButton';
 import DeleteUserButton from './DeleteUserButton';
 import UserAdd from './UserAdd';
-
 import 'react-table/react-table.css';
 import '../../index.css';
 import Cookies from 'universal-cookie';
@@ -32,9 +31,9 @@ export default class UserList extends Component {
 
 	componentDidUpdate() {
 		if(getUpdateBoolean() === true) {
-      this.fetchUsers();
-      setUpdateBoolean(false);
-    }
+			this.fetchUsers();
+			setUpdateBoolean(false);
+		}
 	}
 
 	fetchMetaData() {
@@ -42,7 +41,7 @@ export default class UserList extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
-				name: responseJson.projectName,
+				name: responseJson.name,
 				project: this.props.match.params.project
 			}, function() {});
 		}).catch((error) => {
@@ -117,12 +116,12 @@ export default class UserList extends Component {
 							show: false
 						}, {
 							Header: 'Phone Number',
-							accessor: 'phone' // String-based value accessors!
+							accessor: 'phoneNumber' // String-based value accessors!
 						}, {
 							Header: '',
 							accessor: '',
 							maxWidth: 35,
-							Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
+							Cell: props => <DeleteUserButton proj={props} project={this.state.project} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 						}
 					] }/>
 				</View>
@@ -165,17 +164,17 @@ export default class UserList extends Component {
 						show: false
 					}, {
 						Header: 'Phone Number',
-						accessor: 'phone' // String-based value accessors!
+						accessor: 'phoneNumber' // String-based value accessors!
 					}, {
 						Header: '',
 						accessor: '',
 						maxWidth: 35,
-						Cell: props => <UpdateUserButton proj={props} callToParent={this.fetchUsers.bind(this)}/>
+						Cell: props => <UpdateUserButton proj={props} project={this.state.project} callToParent={this.fetchUsers.bind(this)}/>
 					}, {
 						Header: '',
 						accessor: '',
 						maxWidth: 35,
-						Cell: props => <DeleteUserButton proj={props} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
+						Cell: props => <DeleteUserButton proj={props} project={this.state.project} keyFromParent={this.state.project} nameFromParent={this.state.name} callToParent={this.fetchUsers.bind(this)}/>
 					}
 				] }/>
 			</View>

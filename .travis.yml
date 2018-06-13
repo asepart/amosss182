@@ -7,7 +7,7 @@ matrix:
       services:
         - postgresql
       before_script:
-        - cd webservice/data && ./setup-postgres.sh && cd ../..
+        - cd postgres && ./setup-travis.sh && cd ..
       script:
         - cd webservice && mvn clean verify && mvn test && mvn cobertura:cobertura
       after_success:

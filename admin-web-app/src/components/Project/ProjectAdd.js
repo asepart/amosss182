@@ -5,6 +5,7 @@ import {URL} from '../shared/const';
 import '../../index.css';
 import Popup from "reactjs-popup";
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class ProjectAdd extends Component {
 
@@ -12,24 +13,28 @@ export default class ProjectAdd extends Component {
 		super(props);
 		this.state = {
 			open: false,
-			projectName: this.props.name,
+			name: this.props.name,
 			entryKey: this.props.project,
 			owner: username
 		};
 	}
 	openPopup = () => {
-    this.setState({ open: true });
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+		this.setState({ open: true });
+	};
+	closePopup = () => {
+		this.setState({
+				open: false,
+				name: undefined,
+				entryKey: undefined,
+		})
+	};
 
 	putProject() {
 		let auth = getAuthForPost();
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: this.state.owner})
+				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: this.state.owner})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -40,21 +45,18 @@ export default class ProjectAdd extends Component {
 			});
 
 		this.props.callToParent();
-	  setUpdateBoolean(true);
-		this.setState({
-		  	open: false,
-				projectName: undefined,
-				entryKey: undefined,
-		})
-
+		setUpdateBoolean(true);
+		this.closePopup();
 	}
 
 	render() {
-		var buttonEnabled = (this.state.entryKey !== undefined && this.state.projectName !== undefined);
+		var buttonEnabled = (this.state.entryKey !== undefined && this.state.name !== undefined && this.state.entryKey !== '' && this.state.name !== '');
 
 		return (
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
+				<Link to = "/" style={{textDecoration: 'none'}} >
+					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
+				</Link>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
@@ -64,8 +66,8 @@ export default class ProjectAdd extends Component {
 					<TextInput
 						placeholder = "Name"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({projectName: text})}
-						value = { this.state.projectName }
+						onChangeText = {(text) => this.setState({name: text})}
+						value = { this.state.name }
 					/>
 					<TextInput
 						placeholder = "Entry Code"

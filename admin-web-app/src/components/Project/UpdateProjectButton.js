@@ -5,29 +5,30 @@ import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class UpdateProjectButton extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
-			projectName: '',
+			name: '',
 			entryKey: '',
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
+	}
+	openPopup = () => {
+		this.setState({ open: true });
 		this.getVars();
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	};
+	closePopup = () => {
+		this.setState({ open: false });
+	};
 
 	//needed to get right row values after changes in parent component
 	getVars() {
 		this.setState({
-			projectName: this.props.proj.row.projectName,
+			name: this.props.proj.row.name,
 			entryKey: this.props.proj.row.entryKey,
 		})
 	}
@@ -37,7 +38,7 @@ export default class UpdateProjectButton extends Component {
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: username})
+				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -50,16 +51,18 @@ export default class UpdateProjectButton extends Component {
 		this.props.callToParent();
 		setUpdateBoolean(true);
 		this.setState({
-	  	open: false
-	  })
+			open: false
+		})
 	}
 
 	render() {
-		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
+		var buttonEnabled = (this.state.entryKey !== '' && this.state.name !== '');
 
 		return (
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				<Link to = "/" style={{textDecoration: 'none'}}>
+					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				</Link>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
@@ -69,8 +72,8 @@ export default class UpdateProjectButton extends Component {
 					<TextInput
 						placeholder = "Name"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({projectName: text})}
-						value = { this.state.projectName }
+						onChangeText = {(text) => this.setState({name: text})}
+						value = { this.state.name }
 					/>
 					<TextInput
 						placeholder = "Entry Code"

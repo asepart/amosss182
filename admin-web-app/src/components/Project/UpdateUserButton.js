@@ -5,27 +5,28 @@ import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class UpdateUserButton extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
 			loginName: '',
 			password: '',
 			firstName: '',
 			lastName: '',
-			phone: '',
+			phoneNumber: '',
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
+	}
+	openPopup = () => {
+		this.setState({ open: true });
 		this.getVars();
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	};
+	closePopup = () => {
+		this.setState({ open: false });
+	};
 
 	//needed to get right row values after changes in parent component
 	getVars() {
@@ -34,7 +35,7 @@ export default class UpdateUserButton extends Component {
 			password: this.props.proj.row.password,
 			firstName: this.props.proj.row.firstName,
 			lastName: this.props.proj.row.lastName,
-			phone: this.props.proj.row.phone,
+			phoneNumber: this.props.proj.row.phoneNumber,
 		})
 	}
 
@@ -43,7 +44,7 @@ export default class UpdateUserButton extends Component {
 		fetch(URL + '/users', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({loginName: this.state.loginName, password: this.state.password, firstName: this.state.firstName, lastName: this.state.lastName, phone: this.state.phone})
+				body: JSON.stringify({loginName: this.state.loginName, password: this.state.password, firstName: this.state.firstName, lastName: this.state.lastName, phoneNumber: this.state.phoneNumber})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -61,11 +62,21 @@ export default class UpdateUserButton extends Component {
 	}
 
 	render() {
-		var buttonEnabled = (this.state.loginName !== '' && this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phone !== '');
+		var buttonEnabled = (this.state.loginName !== '' && this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phoneNumber !== '');
 
 		return(
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				<div>
+					{window.location.href.indexOf("usermanagement") !== -1 ? (
+						<Link to = "/usermanagement" style={{textDecoration: 'none'}}>
+							<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+						</Link>
+					) : (
+						<Link to = {"/projects/" + this.props.project + "/users"} style={{textDecoration: 'none'}}>
+							<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+						</Link>
+					)}
+				</div>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
@@ -100,8 +111,8 @@ export default class UpdateUserButton extends Component {
 					<TextInput
 						placeholder = "Phone Number"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({phone: text})}
-						value = {this.state.phone}
+						onChangeText = {(text) => this.setState({phoneNumber: text})}
+						value = {this.state.phoneNumber}
 					/>
 					<Button onPress = { this.addUser.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
 					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />

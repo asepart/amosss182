@@ -9,3 +9,7 @@ insert into ticket(name, summary, description, category, status, required_obvers
                     'behavior', 'open', 8, 'pizza');
 
 insert into membership values ('pizza', 'user');
+
+-- these accounts should own nothing/should not be part of any projects etc., useful for test cases
+insert into admin_account values ('nobodyadmin', crypt('nobodyadmin', gen_salt('bf', 8)), 'Nobody', 'Admin');
+insert into user_account values ('nobodyuser', crypt('nobodyuser', gen_salt('bf', 8)), 'Nobody', 'User', '000');

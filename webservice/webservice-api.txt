@@ -31,7 +31,7 @@ The following REST operations are available:
   Roles:          Admin
   Request-Body:   User information as JSON object (loginName, password, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if admin with same name exists.
+                  [400 Bad Request]  if admin with same name exists or password for new user is missing.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 - List users
@@ -40,9 +40,20 @@ The following REST operations are available:
   Path:           /users
   Roles:          Admin
   Returns:        JSON array of users (loginName, password, firstName, lastName, phoneNumber).
-                  [200 OK]           in case of success.
+  Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
+
+- Get user
+
+  HTTP operation: GET
+  Path:           /users/{name}
+  Roles:          Admin
+  Returns:        User information as JSON object (loginName, password, firstName, lastName, phoneNumber).
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not an admin account.
+                  [404 Not found]    if user does not exist.
 
 - Delete user
 
@@ -59,9 +70,9 @@ The following REST operations are available:
   HTTP operation: POST
   Path:           /admins
   Roles:          Admin
-  Request-Body:   Admin information as JSON object (see Admin class).
+  Request-Body:   Admin information as JSON object (loginName, password, firstName, lastName).
   Status code:    [200 OK]           in case of success.
-                  [400 Bad Request]  if user with same name exists.
+                  [400 Bad Request]  if user with same name exists or password for new admin is missing.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
@@ -75,6 +86,17 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
+- Get admin
+
+  HTTP operation: GET
+  Path:           /admins/{name}
+  Roles:          Admin
+  Returns:        Admin information as JSON object (loginName, password, firstName, lastName).
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not an admin account.
+                  [404 Not found]    if admin does not exist.
+
 - Delete admin
 
   HTTP operation: DELETE
@@ -84,7 +106,6 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not found]    if admin does not exist.
-
 
 - List existing projects the admin is able to view
 

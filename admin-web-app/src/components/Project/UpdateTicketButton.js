@@ -5,38 +5,39 @@ import {getAuthForPost} from '../shared/auth';
 import {URL} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 var pickerPlaceholder = "Category";
 
 export default class UpdateTicketButton extends Component {
 
 	constructor(props) {
-    super(props);
-    this.state = {
+		super(props);
+		this.state = {
 			open: false,
-			ticketName: '',
-			ticketSummary: '',
-			ticketDescription: '',
-			ticketCategory: '',
+			name: '',
+			summary: '',
+			description: '',
+			category: '',
 			requiredObservations: '',
 			id: '',
 		};
-  }
-  openPopup = () => {
-    this.setState({ open: true });
+	}
+	openPopup = () => {
+		this.setState({ open: true });
 		this.getVars();
-  };
-  closePopup = () => {
-    this.setState({ open: false });
-  };
+	};
+	closePopup = () => {
+		this.setState({ open: false });
+	};
 
 	//needed to get right row values after changes in parent component
 	getVars() {
 		this.setState({
-			ticketName: this.props.tick.row.ticketName,
-			ticketSummary: this.props.tick.row.ticketSummary,
-			ticketDescription: this.props.tick.row.ticketDescription,
-			ticketCategory: this.props.tick.row.ticketCategory,
+			name: this.props.tick.row.name,
+			summary: this.props.tick.row.summary,
+			description: this.props.tick.row.description,
+			category: this.props.tick.row.category,
 			requiredObservations: this.props.tick.row.requiredObservations,
 			id: this.props.tick.row.id
 		})
@@ -44,10 +45,10 @@ export default class UpdateTicketButton extends Component {
 
 	createTicket() {
 		let auth = getAuthForPost();
-		fetch(URL + '/projects/' + this.props.project + '/tickets/', {
+		fetch(URL + '/tickets/', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({id: this.state.id, ticketName: this.state.ticketName, ticketSummary: this.state.ticketSummary, ticketDescription: this.state.ticketDescription, ticketCategory: this.state.ticketCategory, requiredObservations: this.state.requiredObservations})
+				body: JSON.stringify({id: this.state.id, name: this.state.name, summary: this.state.summary, description: this.state.description, category: this.state.category, requiredObservations: this.state.requiredObservations, projectKey: this.props.project})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -65,11 +66,13 @@ export default class UpdateTicketButton extends Component {
 	}
 
 	render() {
-		var buttonEnabled = (this.state.ticketName !== '' && this.state.ticketSummary !== '' && this.state.ticketDescription !== '' && this.state.ticketCategory !== pickerPlaceholder && this.state.requiredObservations !== '');
+		var buttonEnabled = (this.state.name !== '' && this.state.summary !== '' && this.state.description !== '' && this.state.category !== pickerPlaceholder && this.state.requiredObservations !== '');
 
 		return (
 			<div>
-				<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				<Link to = {"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
+					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/edit.png')} alt=""/>
+				</Link>
 				<Popup
 					open={this.state.open}
 					closeOnDocumentClick
@@ -79,31 +82,31 @@ export default class UpdateTicketButton extends Component {
 					<TextInput
 						placeholder = "Name"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({ticketName: text})}
-						value = {this.state.ticketName}
+						onChangeText = {(text) => this.setState({name: text})}
+						value = {this.state.name}
 					/>
 					<TextInput
 						placeholder = "Summary"
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({ticketSummary: text})}
-						value = {this.state.ticketSummary}
+						onChangeText = {(text) => this.setState({summary: text})}
+						value = {this.state.summary}
 					/>
 					<TextInput
 						placeholder = "Description"
 						multiline={true}
 						style = {{height: 600, borderColor: 'gray',borderWidth: 1}}
-						onChangeText = {(text) => this.setState({ticketDescription: text})}
-						value = {this.state.ticketDescription}
+						onChangeText = {(text) => this.setState({description: text})}
+						value = {this.state.description}
 					/>
 					<Picker
 						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1}}
-						onValueChange = {(text) => this.setState({ticketCategory: text})}
-						selectedValue = {this.state.ticketCategory}
+						onValueChange = {(text) => this.setState({category: text})}
+						selectedValue = {this.state.category}
 					>
 						<Picker.Item label = {pickerPlaceholder} value = {pickerPlaceholder} />
-						<Picker.Item label = "ONE_TIME_ERROR" value = "ONE_TIME_ERROR" />
-						<Picker.Item label = "TRACE" value = "TRACE" />
-						<Picker.Item label = "BEHAVIOR" value = "BEHAVIOR" />
+						<Picker.Item label = "ONE_TIME_ERROR" value = "one-time-error" />
+						<Picker.Item label = "TRACE" value = "trace" />
+						<Picker.Item label = "BEHAVIOR" value = "behavior" />
 					</Picker>
 					<TextInput
 						placeholder = "Required Observations"

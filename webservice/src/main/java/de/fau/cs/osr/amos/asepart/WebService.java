@@ -55,11 +55,20 @@ public class WebService
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
             if (dbClient.isUser(loginName))
-                dbClient.updateUser(loginName, user.get("password"), user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
+            {
+                dbClient.updateUser(loginName, user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
+
+                if (user.containsKey("password"))
+                    dbClient.changePassword(loginName, user.get("password"));
+            }
 
             else
             {
-                dbClient.insertUser(loginName, user.get("password"), user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
+                if (!user.containsKey("password"))
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+
+                dbClient.insertUser(loginName, user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
+                dbClient.changePassword(loginName, user.get("password"));
             }
         }
 
@@ -75,6 +84,20 @@ public class WebService
         try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listUsers()).build();
+        }
+    }
+
+    @Path("/users/{name}")
+    @GET
+    @RolesAllowed({"Admin"})
+    public Response getUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
+    {
+        try (DBClient dbClient = new DBClient())
+        {
+            if (!dbClient.isUser(user))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            return Response.ok(dbClient.getUser(user)).build();
         }
     }
 
@@ -108,11 +131,24 @@ public class WebService
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
             if (dbClient.isAdmin(loginName))
-                dbClient.updateAdmin(loginName, admin.get("password"), admin.get("firstName"), admin.get("lastName"));
+            {
+                dbClient.updateAdmin(loginName, admin.get("firstName"), admin.get("lastName"));
+
+                if (admin.containsKey("password"))
+                {
+                    if (sc.getUserPrincipal().getName().equals(loginName))
+                        dbClient.changePassword(loginName, admin.get("password"));
+                    else return Response.status(Response.Status.FORBIDDEN).build();
+                }
+            }
 
             else
             {
-                dbClient.insertAdmin(loginName, admin.get("password"), admin.get("firstName"), admin.get("lastName"));
+                if (!admin.containsKey("password"))
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+
+                dbClient.insertAdmin(loginName, admin.get("firstName"), admin.get("lastName"));
+                dbClient.changePassword(loginName, admin.get("password"));
             }
         }
 
@@ -128,6 +164,20 @@ public class WebService
         try (DBClient dbClient = new DBClient())
         {
             return Response.ok(dbClient.listAdmins()).build();
+        }
+    }
+
+    @Path("/admins/{name}")
+    @GET
+    @RolesAllowed({"Admin"})
+    public Response getAdmin(@Context SecurityContext sc, @PathParam("name") String admin) throws Exception
+    {
+        try (DBClient dbClient = new DBClient())
+        {
+            if (!dbClient.isAdmin(admin))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            return Response.ok(dbClient.getAdmin(admin)).build();
         }
     }
 
