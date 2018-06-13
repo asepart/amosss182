@@ -95,11 +95,11 @@ export default class TicketList extends Component {
 				maxWidth: 180,
 			}, {
 				Header: 'U',
-				accessor: 'U', // String-based value accessors!
+				accessor: 'U',
 				maxWidth: 180,
 			}, {
 				Header: 'UP',
-				accessor: 'UP', // String-based value accessors!
+				accessor: 'UP',
 				maxWidth: 180,
 			}, {
 				Header: 'Status',
