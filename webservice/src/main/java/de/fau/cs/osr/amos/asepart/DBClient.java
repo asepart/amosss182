@@ -667,7 +667,7 @@ class DBClient implements AutoCloseable
     private int positiveObservationCount(int ticketId) throws SQLException
     {
         try (Connection connection = ds.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("select count(*) from observation where ticket_id = ? and outcome = 'positive';"))
+             PreparedStatement stmt = connection.prepareStatement("select sum(quantity) from observation where ticket_id = ? and outcome = 'positive';"))
         {
             stmt.setInt(1, ticketId);
 
@@ -681,7 +681,7 @@ class DBClient implements AutoCloseable
 
     private int negativeObservationCount(int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("select count(*) from observation where ticket_id = ? and outcome = 'negative';"))
+        try (PreparedStatement stmt = cn.prepareStatement("select sum(quantity) from observation where ticket_id = ? and outcome = 'negative';"))
         {
             stmt.setInt(1, ticketId);
 

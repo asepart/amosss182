@@ -462,7 +462,7 @@ public class WebService
 
             Map<String, String> ticket = dbClient.getTicket(ticketId);
 
-            if (!dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (!dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !dbClient.hasUserAcceptedTicket(principal.getName(), ticketId))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             dbClient.submitObservation(principal.getName(), ticketId,
