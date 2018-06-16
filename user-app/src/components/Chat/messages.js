@@ -35,8 +35,13 @@ export default class Messages extends Component {
   }
 
 	componentDidMount(){
-    this.makeApiCall();
-  }
+		this.makeApiCall();
+		this.interval = setInterval(() => this.listenForNewMessages(), 500);
+	}
+	
+	componentWillUnmount() {
+		clearInterval(this.interval);
+	}
 
 	async makeApiCall() {
 	  return fetch(URL + '/messages/' + ticket , {method:'GET', headers: getAuth()})
@@ -51,6 +56,21 @@ export default class Messages extends Component {
 	    console.error(error);
 	  });
 	}
+
+	async listenForNewMessages() {
+	  return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
+	  .then((response) => response.json())
+	  .then((responseJson) => {
+	    this.setState({
+	      isLoading: false,
+	      dataSource: responseJson,
+	    }, function(){});
+	  })
+	  .catch((error) =>{
+	    console.error(error);
+	  });
+	}
+
 
   async onSendPressed() {
 		var tmp = new Date();
