@@ -22,7 +22,7 @@ class WebServiceTest
 {
     private WebTarget getClient()
     {
-        final URI uri = UriBuilder.fromUri("http://localhost/").port(WebService.port).build();
+        final URI uri = UriBuilder.fromUri(WebService.address).port(WebService.port).build();
         WebTarget client = ClientBuilder.newClient().target(uri);
 
         return client;

@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ManagedAsync;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -671,6 +672,7 @@ public class WebService
         }
     }
 
+    static String address = "http://localhost/";
     static int port = 12345;
     
     public static void main(String[] args) throws Exception
@@ -688,7 +690,7 @@ public class WebService
         try
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
-            final String address = "http://" + ip + "/";
+            address = "http://" + ip + "/";
 
             final URI uri = UriBuilder.fromUri(address).port(port).build();
 
@@ -697,7 +699,7 @@ public class WebService
             config.register(AuthenticationFilter.class);
             config.register(DebugExceptionMapper.class);
 
-            GrizzlyHttpServerFactory.createHttpServer(uri, config);
+            HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, config);
         }
 
         catch (UnknownHostException e)
