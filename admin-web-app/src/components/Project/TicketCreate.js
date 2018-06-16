@@ -18,7 +18,7 @@ export default class TicketCreate extends Component {
 			name: '',
 			summary: '',
 			description: '',
-			category: '',
+			category: pickerPlaceholder,
 			requiredObservations: '',
 			projectKey: this.props.project,
 		};
