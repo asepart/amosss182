@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.security.Principal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,13 +17,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ManagedAsync;
 import org.glassfish.jersey.server.ResourceConfig;
 
 @Path("/")
@@ -49,17 +54,17 @@ public class WebService
     {
         final String loginName = user.get("loginName");
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (dbClient.isAdmin(loginName))
+            if (db.isAdmin(loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
-            if (dbClient.isUser(loginName))
+            if (db.isUser(loginName))
             {
-                dbClient.updateUser(loginName, user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
+                db.updateUser(loginName, user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
 
                 if (user.containsKey("password"))
-                    dbClient.changePassword(loginName, user.get("password"));
+                    db.changePassword(loginName, user.get("password"));
             }
 
             else
@@ -67,8 +72,8 @@ public class WebService
                 if (!user.containsKey("password"))
                     return Response.status(Response.Status.BAD_REQUEST).build();
 
-                dbClient.insertUser(loginName, user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
-                dbClient.changePassword(loginName, user.get("password"));
+                db.insertUser(loginName, user.get("firstName"), user.get("lastName"), user.get("phoneNumber"));
+                db.changePassword(loginName, user.get("password"));
             }
         }
 
@@ -81,9 +86,9 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listUsers(@Context SecurityContext sc) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            return Response.ok(dbClient.listUsers()).build();
+            return Response.ok(db.listUsers()).build();
         }
     }
 
@@ -92,12 +97,12 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isUser(user))
+            if (!db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            return Response.ok(dbClient.getUser(user)).build();
+            return Response.ok(db.getUser(user)).build();
         }
     }
 
@@ -106,12 +111,12 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isUser(user))
+            if (!db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            dbClient.deleteAccount(user);
+            db.deleteAccount(user);
         }
 
         return Response.ok().build();
@@ -125,19 +130,19 @@ public class WebService
     {
         final String loginName = admin.get("loginName");
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (dbClient.isUser(loginName))
+            if (db.isUser(loginName))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
-            if (dbClient.isAdmin(loginName))
+            if (db.isAdmin(loginName))
             {
-                dbClient.updateAdmin(loginName, admin.get("firstName"), admin.get("lastName"));
+                db.updateAdmin(loginName, admin.get("firstName"), admin.get("lastName"));
 
                 if (admin.containsKey("password"))
                 {
                     if (sc.getUserPrincipal().getName().equals(loginName))
-                        dbClient.changePassword(loginName, admin.get("password"));
+                        db.changePassword(loginName, admin.get("password"));
                     else return Response.status(Response.Status.FORBIDDEN).build();
                 }
             }
@@ -147,8 +152,8 @@ public class WebService
                 if (!admin.containsKey("password"))
                     return Response.status(Response.Status.BAD_REQUEST).build();
 
-                dbClient.insertAdmin(loginName, admin.get("firstName"), admin.get("lastName"));
-                dbClient.changePassword(loginName, admin.get("password"));
+                db.insertAdmin(loginName, admin.get("firstName"), admin.get("lastName"));
+                db.changePassword(loginName, admin.get("password"));
             }
         }
 
@@ -161,9 +166,9 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listAdmins(@Context SecurityContext sc) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            return Response.ok(dbClient.listAdmins()).build();
+            return Response.ok(db.listAdmins()).build();
         }
     }
 
@@ -172,12 +177,12 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getAdmin(@Context SecurityContext sc, @PathParam("name") String admin) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isAdmin(admin))
+            if (!db.isAdmin(admin))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            return Response.ok(dbClient.getAdmin(admin)).build();
+            return Response.ok(db.getAdmin(admin)).build();
         }
     }
 
@@ -186,12 +191,12 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteAdmin(@Context SecurityContext sc, @PathParam("name") String admin) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isAdmin(admin))
+            if (!db.isAdmin(admin))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            dbClient.deleteAccount(admin);
+            db.deleteAccount(admin);
         }
 
         return Response.ok().build();
@@ -203,9 +208,9 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response listProjects(@Context SecurityContext sc) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            return Response.ok(dbClient.listProjects(sc.getUserPrincipal().getName())).build();
+            return Response.ok(db.listProjects(sc.getUserPrincipal().getName())).build();
         }
     }
 
@@ -215,19 +220,19 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response writeProject(@Context SecurityContext sc, Map<String, String> project) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
             String entryKey = project.get("entryKey");
 
-            if (dbClient.isProject(entryKey))
+            if (db.isProject(entryKey))
             {
-                if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
+                if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                     return Response.status(Response.Status.FORBIDDEN).build();
 
-                dbClient.updateProject(entryKey, project.get("name"), project.get("owner"));
+                db.updateProject(entryKey, project.get("name"), project.get("owner"));
             }
 
-            else dbClient.insertProject(entryKey, project.get("name"), project.get("owner")); 
+            else db.insertProject(entryKey, project.get("name"), project.get("owner")); 
         }
 
         return Response.ok().build();
@@ -239,12 +244,12 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getProject(@Context SecurityContext sc, @PathParam("key") String entryKey) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(entryKey))
+            if (!db.isProject(entryKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            return Response.ok(dbClient.getProject(entryKey)).build();
+            return Response.ok(db.getProject(entryKey)).build();
         }
     }
     
@@ -253,14 +258,14 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteProject(@Context SecurityContext sc, @PathParam("key") String entryKey) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(entryKey))
+            if (!db.isProject(entryKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
-            if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            dbClient.deleteProject(entryKey);
+            db.deleteProject(entryKey);
         }
 
         return Response.ok().build();
@@ -275,24 +280,24 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(projectKey))
+            if (!db.isProject(projectKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> project = dbClient.getProject(projectKey);
+            Map<String, String> project = db.getProject(projectKey);
 
             if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            else if (role.equals("User") && !dbClient.isUserMemberOfProject(principal.getName(), projectKey))
+            else if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), projectKey))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            List<Map<String, String>> tickets = dbClient.getTicketsOfProject(projectKey);
+            List<Map<String, String>> tickets = db.getTicketsOfProject(projectKey);
 
             if (role.equals("User"))
             {
@@ -300,11 +305,11 @@ public class WebService
                 {
                     int ticketId = Integer.parseInt(ticket.get("id"));
 
-                    if (ticket.get("status").equals("open") && dbClient.hasUserAcceptedTicket(principal.getName(), ticketId))
+                    if (ticket.get("status").equals("open") && db.hasUserAcceptedTicket(principal.getName(), ticketId))
                     {
                         ticket.put("status", "accepted");
 
-                        if (dbClient.observationCount(principal.getName(), ticketId) > 0)
+                        if (db.observationCount(principal.getName(), ticketId) > 0)
                         {
                             ticket.put("status", "processed");
                         }
@@ -328,22 +333,22 @@ public class WebService
 
         String projectKey = ticket.get("projectKey");
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(projectKey))
+            if (!db.isProject(projectKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), projectKey))
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), projectKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             if (ticket.containsKey("id"))
             {
                 int id = Integer.parseInt(ticket.get("id"));
 
-                if (!dbClient.isTicket(id))
+                if (!db.isTicket(id))
                     return Response.status(Response.Status.NOT_FOUND).build();
 
-                dbClient.updateTicket(id, ticket.get("name"), ticket.get("summary"),
+                db.updateTicket(id, ticket.get("name"), ticket.get("summary"),
                                           ticket.get("description"), ticket.get("category"),
                                           Integer.parseInt(ticket.get("requiredObservations")));
 
@@ -352,7 +357,7 @@ public class WebService
 
             else
             {
-                dbClient.insertTicket(ticket.get("name"), ticket.get("summary"),
+                db.insertTicket(ticket.get("name"), ticket.get("summary"),
                          ticket.get("description"), ticket.get("category"),
                          Integer.parseInt(ticket.get("requiredObservations")), projectKey);
 
@@ -369,29 +374,29 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
-            Map<String, String> project = dbClient.getProject(ticket.get("projectKey"));
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
             if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             else if (role.equals("User"))
             {
-                if (!dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 {
                     return Response.status(Response.Status.FORBIDDEN).build();
                 }
 
-                if (ticket.get("status").equals("open") && dbClient.hasUserAcceptedTicket(principal.getName(), ticketId))
+                if (ticket.get("status").equals("open") && db.hasUserAcceptedTicket(principal.getName(), ticketId))
                 {
                     ticket.put("status", "accepted");
 
-                    if (dbClient.observationCount(principal.getName(), ticketId) > 0)
+                    if (db.observationCount(principal.getName(), ticketId) > 0)
                     {
                         ticket.put("status", "processed");
                     }
@@ -407,17 +412,17 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response deleteTicket(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
+            Map<String, String> ticket = db.getTicket(ticketId);
 
-            if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            dbClient.deleteTicket(ticketId);
+            db.deleteTicket(ticketId);
         }
 
         return Response.ok().build();
@@ -430,18 +435,18 @@ public class WebService
     {
         Principal principal = sc.getUserPrincipal();
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
+            Map<String, String> ticket = db.getTicket(ticketId);
 
-            if (!dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (!dbClient.hasUserAcceptedTicket(principal.getName(), ticketId))
-                dbClient.acceptTicket(principal.getName(), ticketId);
+            if (!db.hasUserAcceptedTicket(principal.getName(), ticketId))
+                db.acceptTicket(principal.getName(), ticketId);
         }
 
         return Response.ok().build();
@@ -455,17 +460,17 @@ public class WebService
     {
         Principal principal = sc.getUserPrincipal();
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
+            Map<String, String> ticket = db.getTicket(ticketId);
 
-            if (!dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !dbClient.hasUserAcceptedTicket(principal.getName(), ticketId))
+            if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !db.hasUserAcceptedTicket(principal.getName(), ticketId))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            dbClient.submitObservation(principal.getName(), ticketId,
+            db.submitObservation(principal.getName(), ticketId,
                     observation.get("outcome"), Integer.parseInt(observation.get("quantity")));
         }
 
@@ -481,21 +486,21 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
-            Map<String, String> project = dbClient.getProject(ticket.get("projectKey"));
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
             if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (role.equals("User") && !dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            return Response.ok(dbClient.listObservations(ticketId)).build();
+            return Response.ok(db.listObservations(ticketId)).build();
         }
     }
 
@@ -505,14 +510,14 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response getUsersOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(projectKey))
+            if (!db.isProject(projectKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
-            if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), projectKey))
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), projectKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            List<Map<String, String>> users = dbClient.getUsersOfProject(projectKey);
+            List<Map<String, String>> users = db.getUsersOfProject(projectKey);
 
             return Response.ok(users).build();
         }
@@ -523,16 +528,16 @@ public class WebService
     @RolesAllowed({"Admin"})
     public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String entryKey, @PathParam("name") String user) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(entryKey) || !dbClient.isUser(user))
+            if (!db.isProject(entryKey) || !db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
-            if (!dbClient.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
-            if (!dbClient.isUserMemberOfProject(user, entryKey))
+            if (!db.isUserMemberOfProject(user, entryKey))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
-            dbClient.leaveProject(user, entryKey);
+            db.leaveProject(user, entryKey);
         }
 
         return Response.ok().build();
@@ -546,14 +551,14 @@ public class WebService
     {
         final String user = sc.getUserPrincipal().getName();
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isProject(entryKey) || !dbClient.isUser(user))
+            if (!db.isProject(entryKey) || !db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
-            if (dbClient.isUserMemberOfProject(user, entryKey))
+            if (db.isUserMemberOfProject(user, entryKey))
                 return Response.status(Response.Status.BAD_REQUEST).build();
 
-            dbClient.joinProject(user, entryKey);
+            db.joinProject(user, entryKey);
         }
 
         return Response.ok().build();
@@ -565,9 +570,9 @@ public class WebService
     @RolesAllowed({"User"})
     public Response joinProjectPreview(@Context SecurityContext sc, @QueryParam("key") String entryKey) throws Exception
     {
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            Map<String, String> project = dbClient.getProject(entryKey);
+            Map<String, String> project = db.getProject(entryKey);
             return Response.ok(project.get("name")).build();
         }
     }
@@ -581,21 +586,21 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
-            Map<String, String> project = dbClient.getProject(ticket.get("projectKey"));
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
             if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (role.equals("User") && !dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            dbClient.sendMessage(principal.getName(), message, ticketId);
+            db.sendMessage(principal.getName(), message, ticketId);
         }
 
         return Response.ok().build();
@@ -610,27 +615,66 @@ public class WebService
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient db = new DatabaseClient())
         {
-            if (!dbClient.isTicket(ticketId))
+            if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = dbClient.getTicket(ticketId);
-            Map<String, String> project = dbClient.getProject(ticket.get("projectKey"));
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
             if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (role.equals("User") && !dbClient.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            return Response.ok(dbClient.listMessages(ticketId)).build();
+            return Response.ok(db.listMessages(ticketId)).build();
         }
     }
 
-    public static int port = 12345;
+    @Path("/listen/{ticket}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"Admin", "User"})
+    @ManagedAsync
+    public void listenChannel(@Suspended final AsyncResponse response, @Context SecurityContext sc,
+                              @PathParam("ticket") int ticketId) throws Exception
+    {
+
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                response.resume(Response.status(Response.Status.NOT_FOUND).build());
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+                response.resume(Response.status(Response.Status.FORBIDDEN).build());
+
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                response.resume(Response.status(Response.Status.FORBIDDEN).build());
+
+            try
+            {
+                List<Map<String, String>> messages = db.listenChannel(ticketId);
+                response.resume(Response.ok(messages).build());
+            }
+
+            catch (SQLException e)
+            {
+                response.resume(Response.serverError().build());
+            }
+        }
+    }
+
+    static int port = 12345;
     
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         try
         {
@@ -654,7 +698,9 @@ public class WebService
             config.register(AuthenticationFilter.class);
             config.register(DebugExceptionMapper.class);
 
-            JdkHttpServerFactory.createHttpServer(uri, config);
+            final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, config, false);
+            Runtime.getRuntime().addShutdownHook(new Thread(server::shutdownNow));
+            server.start();
         }
 
         catch (UnknownHostException e)

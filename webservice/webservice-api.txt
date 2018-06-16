@@ -279,12 +279,25 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not found]    if ticket does not exist.
 
-- Lists messages of a ticket group chat
+- Lists current messages of a ticket group chat
 
   HTTP operation: GET
   Path:           /messages/{ticket}
   Roles:          Admin, User
-  Returns:        JSON array of chat messages (id, sender, content, ticketId).
+  Returns:        JSON array of chat messages (id, sender, timestamp, content).
+  Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not a member of the associated project.
+                  [404 Not found]    if ticket does not exist.
+
+- Listens until new messages arrive in group chat, then returns current messages.
+
+  HTTP operation: GET
+  Path:           /listen/{ticket}
+  Roles:          Admin, User
+  Returns:        JSON array of chat messages (id, sender, timestamp, content).
+  Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not a member of the associated project.

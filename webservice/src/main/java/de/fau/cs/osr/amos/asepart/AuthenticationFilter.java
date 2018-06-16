@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.Priority;
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -83,7 +82,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         // Get role name
         final String roleName = role.get(0);
 
-        try (DBClient dbClient = new DBClient())
+        try (DatabaseClient dbClient = new DatabaseClient())
         {
             if (!dbClient.authenticate(accountName, password, roleName))
             {

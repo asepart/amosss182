@@ -65,7 +65,7 @@ class WebServiceTest
     }
 
     @BeforeAll
-    static void start()
+    static void start() throws Exception
     {
         WebService.main(null);
     }
