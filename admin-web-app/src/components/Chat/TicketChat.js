@@ -30,6 +30,7 @@ export default class TicketChat extends Component {
 			this.fetchMessages();
 			setUpdateBoolean(false);
 		}
+		this.textInput.focus();
 	}
 
 	fetchProjectName() {
@@ -208,6 +209,7 @@ export default class TicketChat extends Component {
 				/>
 
 				<TextInput
+					autoFocus = {true}
 					placeholder = "Message"
 					style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
 					onChangeText = {(text) => this.setState({message: text})}
