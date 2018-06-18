@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 export default class TicketStatus extends Component {
 	render() {
-		if(this.props.state.value === 'FINISHED'){
+		if(this.props.state.value === 'finished'){
 			return (
 				<Text  style={{color: '#5daedb'}}>
 					FINISHED
