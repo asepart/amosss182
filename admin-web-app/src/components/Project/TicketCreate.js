@@ -98,9 +98,9 @@ export default class TicketCreate extends Component {
 						selectedValue = {this.state.category}
 					>
 						<Picker.Item label = {pickerPlaceholder} value = {pickerPlaceholder} />
-						<Picker.Item label = "ONE_TIME_ERROR" value = "one-time-error" />
-						<Picker.Item label = "TRACE" value = "trace" />
-						<Picker.Item label = "BEHAVIOR" value = "behavior" />
+						<Picker.Item label = "one-time-error" value = "one-time-error" />
+						<Picker.Item label = "trace" value = "trace" />
+						<Picker.Item label = "behavior" value = "behavior" />
 					</Picker>
 					<TextInput
 						placeholder = "Required Observations"
