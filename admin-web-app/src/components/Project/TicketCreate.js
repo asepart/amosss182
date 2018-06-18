@@ -88,7 +88,7 @@ export default class TicketCreate extends Component {
 					<TextInput
 						placeholder = "Description"
 						multiline={true}
-						style = {{height: 450, borderColor: 'gray',borderWidth: 1}}
+						style = {{height: window.innerHeight*0.4, borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({description: text})}
 						value = {this.state.description}
 					/>
