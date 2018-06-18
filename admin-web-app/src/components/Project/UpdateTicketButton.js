@@ -94,7 +94,7 @@ export default class UpdateTicketButton extends Component {
 					<TextInput
 						placeholder = "Description"
 						multiline={true}
-						style = {{height: 600, borderColor: 'gray',borderWidth: 1}}
+						style = {{height: window.innerHeight*0.4, borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({description: text})}
 						value = {this.state.description}
 					/>
