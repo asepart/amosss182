@@ -1,5 +1,6 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -9,14 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -25,8 +19,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ManagedAsync;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -672,10 +668,42 @@ public class WebService
         }
     }
 
+    @Path("/files/{ticket}")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @RolesAllowed({"Admin", "User"})
+    public Response uploadFile(@Context SecurityContext sc, @PathParam("ticket") int ticketId,
+                               @FormDataParam("file") InputStream stream,
+                               @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        FileStorageClient fs = new FileStorageClient();
+        fs.upload(ticketId, fileDetail.getFileName(), stream);
+
+        return Response.ok().build();
+    }
+
     static String address = "http://localhost/";
     static int port = 12345;
     
-    public static void main(String[] args) throws Exception
+    public static void main(String[] args)
     {
         try
         {
@@ -691,15 +719,17 @@ public class WebService
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
             address = "http://" + ip + "/";
-
             final URI uri = UriBuilder.fromUri(address).port(port).build();
 
             ResourceConfig config = new ResourceConfig(WebService.class);
-            config.register(CORSFilter.class);
-            config.register(AuthenticationFilter.class);
-            config.register(DebugExceptionMapper.class);
 
-            HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, config);
+            config.register(CORSFilter.class); // allow cross-origin requests
+            config.register(AuthenticationFilter.class); // enable authentication
+
+            config.register(DebugExceptionMapper.class); // display exceptions in server log
+            config.register(MultiPartFeature.class); // enable file upload
+
+            GrizzlyHttpServerFactory.createHttpServer(uri, config);
         }
 
         catch (UnknownHostException e)
