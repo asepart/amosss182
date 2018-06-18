@@ -55,7 +55,7 @@ export default class DeleteUserButton extends Component {
 						</Link>
 					) : (
 						<Link to = {"/projects/" + this.props.project + "/users"} style={{textDecoration: 'none'}}>
-							<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/delete.png')} alt=""/>
+							<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/remove.png')} alt=""/>
 						</Link>
 					)}
 				</div>
