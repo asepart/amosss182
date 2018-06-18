@@ -70,18 +70,19 @@ export default class TicketDetail extends Component {
 		return (
 			<View>
 				<View>
-					<Text>ID:		 { this.state.data.id }</Text>
-					<Text>Project:	 { this.state.name }</Text>
-					<Text>Project key: {this.state.project} </Text>
-					<Text>Required observations: { this.state.data.requiredObservations }</Text>
-					<Text>Category: { this.state.data.category }</Text>
-					<Text>Name: { this.state.data.name }</Text>
-					<Text>Summary: { this.state.data.summary }</Text>
-					<Text>Statistic U: { this.state.statistics[tmp_ticket].U }</Text>
-					<Text>Statistic UP: { this.state.statistics[tmp_ticket].UP }</Text>
-					<Text>Statistic ON: { this.state.statistics[tmp_ticket].ON }</Text>
-					<Text>Statistic OP: { this.state.statistics[tmp_ticket].OP }</Text>
-					<Text>Description: { this.state.data.description }</Text>
+					<Text><br/><b>ID:</b> {this.state.data.id}</Text>
+					<Text><br/><b>Project Name:</b> {this.state.name}</Text>
+					<Text><b>Project Entry Code:</b> {this.state.project}</Text>
+					<Text><br/><b>Name:</b> {this.state.data.name}</Text>
+					<Text><b>Summary:</b> {this.state.data.summary}</Text>
+					<Text><br/><b>Category:</b> {this.state.data.category}</Text>
+					<Text><br/><b>Required observations:</b> {this.state.data.requiredObservations}</Text>
+					<Text><br/><b>U:</b> {this.state.statistics[tmp_ticket].U}</Text>
+					<Text><b>UP:</b> {this.state.statistics[tmp_ticket].UP}</Text>
+					<Text><b>ON:</b> {this.state.statistics[tmp_ticket].ON}</Text>
+					<Text><b>OP:</b> {this.state.statistics[tmp_ticket].OP}</Text>
+					<Text><br/><b>Status:</b> {this.state.data.status}</Text>
+					<Text><br/><b>Description:</b> {'\n' + this.state.data.description}</Text>
 				</View>
 				<View>
 					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>
