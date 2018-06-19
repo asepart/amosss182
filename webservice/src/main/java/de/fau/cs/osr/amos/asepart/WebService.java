@@ -769,13 +769,10 @@ public class WebService
 
     @Path("/files/{ticket}/{file}")
     @DELETE
-    @RolesAllowed({"Admin", "User"})
+    @RolesAllowed({"Admin"})
     public Response removeFile(@Context SecurityContext sc,
                                @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
     {
-        Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
-
         try (DatabaseClient db = new DatabaseClient())
         {
             if (!db.isTicket(ticketId))
@@ -784,10 +781,7 @@ public class WebService
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
-                return Response.status(Response.Status.FORBIDDEN).build();
-
-            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (!project.get("owner").equals(sc.getUserPrincipal().getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 

@@ -332,7 +332,7 @@ The following REST operations are available:
 
   HTTP operation: DELETE
   Path:           /files/{ticket}/{file}
-  Roles:          Admin, User
+  Roles:          Admin
   Status code:    [200 OK]              in case of success.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
