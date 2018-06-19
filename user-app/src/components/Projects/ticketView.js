@@ -10,7 +10,7 @@ import { setTicketID } from '../Chat/sendMessages';
 import { setTicketId } from '../Tickets/ticketProcessed';
 import { StackNavigator } from 'react-navigation'
 import {ticketstatus} from '../Projects/projectInfo';
-import {setUpdateBoolean} from '../Login/state';
+import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
 
 export default class TicketView extends Component {
 
@@ -28,7 +28,7 @@ export default class TicketView extends Component {
 		super(props);
 		this.state = {
 			isLoading: true,
-			isAccepted:false, 
+			isAccepted:"", 
 			ticketDetail: "",
 			idTicket: ""
 		};
@@ -41,14 +41,15 @@ export default class TicketView extends Component {
 	}
 
 	onAcceptPressed() {
-		alert("Ticket successfully accepted")
+		//alert("Ticket successfully accepted")
 		let ticketID = this.props.navigation.state.params.id;
 		var response = fetch(URL + '/tickets/'+ ticketID + '/accept', {
 			method: 'POST',
 			headers: getAuth()
 		})
 		setUpdateBoolean(true);
-		this.forceUpdate(this.getTicketInfo)
+		this.setState({isAccepted: 'accepted'})
+		this.forceUpdate(this.getTicketInfo);
 	}
 
 	onProcessTicketPressed() {
@@ -75,8 +76,10 @@ export default class TicketView extends Component {
 	}
 
 	componentDidMount() {
+		this.setState({isAccepted: ticketstatus})
 		this.getTicketInfo();
 	}
+
 
 
 	componentWillUnmount() {
@@ -103,7 +106,7 @@ export default class TicketView extends Component {
 				</TouchableOpacity>
 
 				<View>
-				{ticketstatus === 'open' ? (
+				{this.state.isAccepted === 'open' ? (
 			<TouchableOpacity
 				onPress={this.onAcceptPressed.bind(this)}
 				style={styles.buttonContainer}>
