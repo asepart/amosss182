@@ -4,13 +4,21 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.*;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -421,8 +429,16 @@ public class WebService
             db.deleteTicket(ticketId);
         }
 
-        FileStorageClient fs = new FileStorageClient();
-        fs.cascade(ticketId);
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.cascade(ticketId);
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            // ignore if file storage is not enabled
+        }
 
         return Response.ok().build();
     }
@@ -697,10 +713,23 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        FileStorageClient fs = new FileStorageClient();
-        fs.upload(ticketId, fileDetail.getFileName(), stream);
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.upload(ticketId, fileDetail.getFileName(), stream);
 
-        return Response.ok().build();
+            return Response.ok().build();
+        }
+
+        catch (FileAlreadyExistsException e)
+        {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
     }
 
     @Path("/files/{ticket}/{file}")
@@ -728,11 +757,19 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        FileStorageClient fs = new FileStorageClient();
-        InputStream stream = fs.download(ticketId, fileName);
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            InputStream stream = fs.download(ticketId, fileName);
 
-        return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-                .header("content-disposition","attachment; filename = " + fileName).build();
+            return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+                    .header("content-disposition", "attachment; filename = " + fileName).build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
     }
 
     @Path("/files/{ticket}/{file}")
@@ -759,10 +796,18 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        FileStorageClient fs = new FileStorageClient();
-        fs.remove(ticketId, fileName);
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.remove(ticketId, fileName);
 
-        return Response.ok().build();
+            return Response.ok().build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
     }
 
     // TODO 501 error code, exception handling

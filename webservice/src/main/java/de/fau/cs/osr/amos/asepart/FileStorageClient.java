@@ -1,6 +1,8 @@
 package de.fau.cs.osr.amos.asepart;
 
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.security.InvalidKeyException;
 import java.util.LinkedList;
 
 import io.minio.MinioClient;
@@ -52,8 +54,21 @@ class FileStorageClient
     public void upload(int ticketId, String fileName, InputStream fileStream) throws Exception
     {
         final String fileId = internalName(ticketId, fileName);
-        client.statObject(bucketName, fileId); // throws exception if file does not exist
-        client.putObject(bucketName, fileId, fileStream, "application/octet-stream");
+        boolean fileExists = true;
+
+        try
+        {
+            client.statObject(bucketName, fileId);
+        }
+
+        catch (Exception e)
+        {
+            fileExists = false;
+        }
+
+        if (!fileExists)
+            client.putObject(bucketName, fileId, fileStream, "application/octet-stream");
+        else throw new FileAlreadyExistsException("File with same name already exists for this ticket.");
     }
 
     public InputStream download(int ticketId, String fileName) throws Exception

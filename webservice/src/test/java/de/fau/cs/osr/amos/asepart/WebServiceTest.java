@@ -1,6 +1,11 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +17,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +31,7 @@ class WebServiceTest
     private WebTarget getClient()
     {
         final URI uri = UriBuilder.fromUri(WebService.address).port(WebService.port).build();
-        WebTarget client = ClientBuilder.newClient().target(uri);
-
-        return client;
+        return ClientBuilder.newBuilder().register(MultiPartFeature.class).build().target(uri);
     }
 
     private WebTarget getUserClient()
@@ -1043,5 +1049,26 @@ class WebServiceTest
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
+    }
+
+    @Test
+    void testFiles() throws IOException
+    {
+        final String filePath = "/tmp/asepart.txt";
+
+        try (PrintWriter writer = new PrintWriter(filePath, "UTF-8"))
+        {
+            writer.println("This is a test file for junit.");
+        }
+
+        final FileDataBodyPart filePart = new FileDataBodyPart("file", new File(filePath));
+
+        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
+             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Files.delete(Paths.get(filePath));
     }
 }
