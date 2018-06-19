@@ -40,9 +40,6 @@ public class WebService
          * below is reached only if the credentials have been validated already.
          */
 
-        if (!sc.isSecure())
-            System.err.println("WARNING: Unencrypted authentication in use - should not happen in production.");
-
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
