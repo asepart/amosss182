@@ -85,7 +85,7 @@ export default styles=StyleSheet.create({
     },
 
     buttonAcceptedContainer: {
-      backgroundColor: '#76ff03',
+      backgroundColor: '#64dd17',
       flex: 1,
       paddingVertical: 15,
       marginBottom: 15,
@@ -94,7 +94,7 @@ export default styles=StyleSheet.create({
     },
 
     buttonProcessedContainer: {
-      backgroundColor: '#ffff00',
+      backgroundColor: '#ef6c00',
       paddingVertical: 15,
       flex: 1,
       marginBottom: 15,
