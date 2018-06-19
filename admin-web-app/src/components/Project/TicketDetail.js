@@ -69,8 +69,8 @@ export default class TicketDetail extends Component {
 		}
 		return (
 			<View>
-				<View>
-					<Text><br/><b>ID:</b> {this.state.data.id}</Text>
+				<View style={{borderWidth: 0.5}}>
+					<Text><b>ID:</b> {this.state.data.id}</Text>
 					<Text><br/><b>Project Name:</b> {this.state.name}</Text>
 					<Text><b>Project Entry Code:</b> {this.state.project}</Text>
 					<Text><br/><b>Name:</b> {this.state.data.name}</Text>

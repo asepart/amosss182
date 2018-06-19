@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View} from 'react-native';
+import {ActivityIndicator,Button, View, Text} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -150,6 +150,28 @@ export default class TicketList extends Component {
 						minRows={this.state.dataSource.length}
 						showPagination={false}
 						columns={columns}
+						SubComponent={row => {
+							return (
+									
+								//TODO: pass data of ticket to subcomponent	
+								
+								<View style={{borderWidth: 0.5}}>
+								<Text><b>ID:</b> {row.id}</Text>
+								<Text><br/><b>Project Name:</b> {this.state.name}</Text>
+								<Text><b>Project Entry Code:</b> {this.state.project}</Text>
+								<Text><br/><b>Name:</b> {row.name}</Text>
+								<Text><b>Summary:</b> {this.state.dataSource.summary}</Text>
+								<Text><br/><b>Category:</b> {this.state.dataSource.category}</Text>
+								<Text><br/><b>Required observations:</b> {this.state.dataSource.requiredObservations}</Text>
+								<Text><br/><b>U:</b> {this.state.dataSource.U}</Text>
+								<Text><b>UP:</b> {this.state.dataSource.UP}</Text>
+								<Text><b>ON:</b> {this.state.dataSource.ON}</Text>
+								<Text><b>OP:</b> {this.state.dataSource.OP}</Text>
+								<Text><br/><b>Status:</b> {this.state.dataSource.status}</Text>
+								<Text><br/><b>Description:</b> {'\n' + this.state.dataSource.description}</Text>
+								</View>
+							)
+						}}
 				/>
 			</View>
 		);
