@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ActivityIndicator,Button, View, Text} from 'react-native';
+import {ActivityIndicator,Button, View} from 'react-native';
 import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -154,7 +154,7 @@ export default class TicketList extends Component {
 						SubComponent={row => {
 							return (
 								//TODO: add link
-								<TicketDetail keyProj={this.props.match.params.project} idTicket={row.original.id}/>
+								<TicketDetail keyProj={this.props.match.params.project} idTicket={row.original.id} isSub={true}/>
 							)
 						}}
 				/>
