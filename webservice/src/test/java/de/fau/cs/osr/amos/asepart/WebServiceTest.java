@@ -1054,11 +1054,11 @@ class WebServiceTest
     @Test
     void testFiles() throws IOException
     {
-        final String filePath = "/tmp/asepart.txt";
+        final String filePath = "/tmp/asepart-test-file.txt";
 
         try (PrintWriter writer = new PrintWriter(filePath, "UTF-8"))
         {
-            writer.println("This is a test file for junit.");
+            writer.println("This is a test file for JUnit.");
         }
 
         final FileDataBodyPart filePart = new FileDataBodyPart("file", new File(filePath));
@@ -1070,5 +1070,10 @@ class WebServiceTest
         }
 
         Files.delete(Paths.get(filePath));
+
+        try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
     }
 }

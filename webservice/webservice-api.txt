@@ -271,7 +271,7 @@ The following REST operations are available:
 - Send a message in a ticket group chat
 
   HTTP operation: POST
-  Path:           /messages/{ticket}
+  Path:           /messages/{ticket}?attachment={attachment}
   Roles:          Admin, User
   Request Body:   The chat message as ASCII text.
   Status code:    [200 OK]           in case of success.

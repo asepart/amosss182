@@ -11,14 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -596,7 +589,9 @@ public class WebService
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin", "User"})
-    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") int ticketId, String message) throws Exception
+    public Response sendMessage(@Context SecurityContext sc,
+                                @PathParam("ticket") int ticketId,
+                                @QueryParam("attachment") String attachment, String message) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -615,7 +610,7 @@ public class WebService
             if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            db.sendMessage(principal.getName(), message, ticketId);
+            db.sendMessage(principal.getName(), message, attachment, ticketId);
         }
 
         return Response.ok().build();
@@ -809,8 +804,6 @@ public class WebService
             return Response.status(Response.Status.NOT_IMPLEMENTED).build();
         }
     }
-
-    // TODO 501 error code, exception handling
 
     static String address = "http://localhost/";
     static int port = 12345;
