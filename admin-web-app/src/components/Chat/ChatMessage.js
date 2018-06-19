@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { Text } from 'react-native';
+import ChatImage from './ChatImage';
 
 export default class ChatMessage extends Component {
 	render() {
 		if(this.props.type === 'img'){
-			//Image
+			<ChatImage>
+				{this.props.children}
+			</ChatImage>
 		} else if(this.props.type === 'vid'){
 			//Video
 		} else if(this.props.type === 'aud'){
