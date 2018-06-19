@@ -13,22 +13,24 @@ export default class TicketDetail extends Component {
 		super(props);
 		this.state = {
 			isDataLoading: true,
-			isStatisticsLoading: true
+			isStatisticsLoading: true,
+			keyProj: this.props.keyProj,
+			idTicket: this.props.idTicket,
 		}
 	}
 
 	componentDidMount() {
-		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.state.keyProj, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
 				name: responseJson.name,
-				project: this.props.match.params.project
+				project: this.state.keyProj
 			}, function() {});
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/tickets/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
+		fetch(URL + '/tickets/' + this.props.idTicket, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -38,7 +40,7 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets', {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.state.keyProj + '/tickets', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -46,7 +48,7 @@ export default class TicketDetail extends Component {
 			}, function() {});
 			if (this.state.statistics !== undefined) {
 				for(var i=0; i < this.state.statistics.length; i++) {
-					if(this.state.statistics[i].id === this.props.match.params.id) {
+					if(this.state.statistics[i].id === this.props.idTicket) {
 						tmp_ticket = i;
 					}
 				}
@@ -85,7 +87,7 @@ export default class TicketDetail extends Component {
 					<Text><br/><b>Description:</b> {'\n' + this.state.data.description}</Text>
 				</View>
 				<View>
-					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>
+					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.idTicket + '/chat'}>
 					<Button
 						onPress = { function doNothing() {} }
 						title = "Chat"
