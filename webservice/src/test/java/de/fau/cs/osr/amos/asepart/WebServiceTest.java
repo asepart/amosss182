@@ -1043,6 +1043,7 @@ class WebServiceTest
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        /*
         Future<Response> futureResponse = getAdminClient().path("/listen").path(String.valueOf(ticketId)).request().async().get();
 
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, other thread!")))
@@ -1054,6 +1055,7 @@ class WebServiceTest
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
+        */
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
