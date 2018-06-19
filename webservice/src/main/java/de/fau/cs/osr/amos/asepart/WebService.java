@@ -421,6 +421,9 @@ public class WebService
             db.deleteTicket(ticketId);
         }
 
+        FileStorageClient fs = new FileStorageClient();
+        fs.cascade(ticketId);
+
         return Response.ok().build();
     }
 
