@@ -11,11 +11,20 @@ var tmp_ticket;
 export default class TicketDetail extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			isDataLoading: true,
-			isStatisticsLoading: true,
-			keyProj: this.props.keyProj,
-			idTicket: this.props.idTicket,
+		if (this.props.isSub) {
+			this.state = {
+				isDataLoading: true,
+				isStatisticsLoading: true,
+				keyProj: this.props.keyProj,
+				idTicket: this.props.idTicket,
+			}
+		} else {
+			this.state = {
+				isDataLoading: true,
+				isStatisticsLoading: true,
+				keyProj: this.props.match.params.project,
+				idTicket: this.props.match.params.id,
+			}
 		}
 	}
 
@@ -30,7 +39,7 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/tickets/' + this.props.idTicket, {method:'GET', headers: getAuth()})
+		fetch(URL + '/tickets/' + this.state.idTicket, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -48,7 +57,7 @@ export default class TicketDetail extends Component {
 			}, function() {});
 			if (this.state.statistics !== undefined) {
 				for(var i=0; i < this.state.statistics.length; i++) {
-					if(this.state.statistics[i].id === this.props.idTicket) {
+					if(this.state.statistics[i].id === this.state.idTicket) {
 						tmp_ticket = i;
 					}
 				}
@@ -59,6 +68,20 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
+	}
+
+	_renderChatButton() {
+		if (this.props.isSub) {
+			return null;
+		} else {
+			return (
+				<Button
+					onPress = { function doNothing() {} }
+					title = "Chat"
+					color = "#0c3868"
+				/>
+			);
+		}
 	}
 
 	render() {
@@ -87,12 +110,8 @@ export default class TicketDetail extends Component {
 					<Text><br/><b>Description:</b> {'\n' + this.state.data.description}</Text>
 				</View>
 				<View>
-					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.idTicket + '/chat'}>
-					<Button
-						onPress = { function doNothing() {} }
-						title = "Chat"
-						color = "#0c3868"
-					/>
+					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.state.idTicket + '/chat'}>
+						{this._renderChatButton()}
 					</Link>
 				</View>
 			</View>
