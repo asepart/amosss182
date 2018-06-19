@@ -303,7 +303,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
 
-- Upload new file related to ticket
+- Upload new file related to a ticket
 
   HTTP operation: POST
   Path:           /files/{ticket}
@@ -319,7 +319,7 @@ The following REST operations are available:
 - Download a file.
 
   HTTP operation: GET
-  Path:           /files/{ticket}
+  Path:           /files/{ticket}/{file}
   Roles:          Admin, User
   Returns:        File as multipart/form-data.
   Status code:    [200 OK]              in case of success.
@@ -328,3 +328,14 @@ The following REST operations are available:
                   [404 Not Found]       if ticket or file does not exist.
                   [501 Not Implemented] file upload feature is not enabled.
 
+- Delete a file.
+
+  HTTP operation: DELETE
+  Path:           /files/{ticket}/{file}
+  Roles:          Admin, User
+  Returns:        File as multipart/form-data.
+  Status code:    [200 OK]              in case of success.
+                  [401 Unauthorized]    if the provided username or password is invalid.
+                  [403 Forbidden]       if the authorized account is not a member of the associated project.
+                  [404 Not Found]       if ticket or file does not exist.
+                  [501 Not Implemented] file upload feature is not enabled.

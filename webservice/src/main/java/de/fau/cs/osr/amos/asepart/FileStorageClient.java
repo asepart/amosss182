@@ -17,17 +17,17 @@ class FileStorageClient
     FileStorageClient() throws Exception
     {
         final String minioUrl = System.getenv("ASEPART_MINIO_URL");
-        final String minioAccesKey = System.getenv("MINIO_ACCESS_KEY");
+        final String minioAccessKey = System.getenv("MINIO_ACCESS_KEY");
         final String minioSecretKey = System.getenv("MINIO_SECRET_KEY");
 
         bucketName = System.getenv("ASEPART_MINIO_BUCKET");
 
-        if (minioUrl == null || minioAccesKey == null || minioSecretKey == null || bucketName == null)
+        if (minioUrl == null || minioAccessKey == null || minioSecretKey == null || bucketName == null)
             throw new UnsupportedOperationException("Environment variables for Minio were not configured!");
 
         try
         {
-            client = new MinioClient(minioUrl, minioAccesKey, minioSecretKey);
+            client = new MinioClient(minioUrl, minioAccessKey, minioSecretKey);
         }
 
         catch (InvalidEndpointException e)
@@ -60,6 +60,12 @@ class FileStorageClient
     {
         final String fileId = internalName(ticketId, fileName);
         return client.getObject(bucketName, fileId);
+    }
+
+    public void remove(int ticketId, String fileName) throws Exception
+    {
+        final String fileId = internalName(ticketId, fileName);
+        client.removeObject(bucketName, fileId);
     }
 
     public void cascade(int ticketId) throws Exception

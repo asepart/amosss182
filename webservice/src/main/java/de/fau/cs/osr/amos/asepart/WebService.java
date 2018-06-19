@@ -700,6 +700,70 @@ public class WebService
         return Response.ok().build();
     }
 
+    @Path("/files/{ticket}/{file}")
+    @GET
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    @RolesAllowed({"Admin", "User"})
+    public Response downloadFile(@Context SecurityContext sc,
+                                 @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        FileStorageClient fs = new FileStorageClient();
+        InputStream stream = fs.download(ticketId, fileName);
+
+        return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition","attachment; filename = " + fileName).build();
+    }
+
+    @Path("/files/{ticket}/{file}")
+    @DELETE
+    @RolesAllowed({"Admin", "User"})
+    public Response removeFile(@Context SecurityContext sc,
+                               @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        FileStorageClient fs = new FileStorageClient();
+        fs.remove(ticketId, fileName);
+
+        return Response.ok().build();
+    }
+
+    // TODO 501 error code, exception handling
+
     static String address = "http://localhost/";
     static int port = 12345;
     
