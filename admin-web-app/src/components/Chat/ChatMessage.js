@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text } from 'react-native';
 import ChatImage from './ChatImage';
+import ChatVideo from './ChatVideo';
 
 export default class ChatMessage extends Component {
 	render() {
@@ -9,7 +10,9 @@ export default class ChatMessage extends Component {
 				{this.props.children}
 			</ChatImage>
 		} else if(this.props.type === 'vid'){
-			//Video
+			<ChatVideo>
+				{this.props.children}
+			</ChatVideo>
 		} else if(this.props.type === 'aud'){
 			//Audio
 		} else {
