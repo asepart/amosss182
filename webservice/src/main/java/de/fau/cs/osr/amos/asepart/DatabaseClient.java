@@ -767,13 +767,14 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void sendMessage(String sender, String content, int ticketId) throws SQLException
+    void sendMessage(String sender, String content, String attachment, int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, ticket_id) values (?, ?, ?);"))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, attachment, ticket_id) values (?, ?, ?, ?);"))
         {
             stmt.setString(1, sender);
             stmt.setString(2, content);
-            stmt.setInt(3, ticketId);
+            stmt.setString(3, attachment);
+            stmt.setInt(4, ticketId);
 
             stmt.executeUpdate();
         }
@@ -787,7 +788,7 @@ class DatabaseClient implements AutoCloseable
     List<Map<String, String>> listMessages(int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                     "select id, sender, timestamp, content, ticket_id from message where ticket_id = ?;"))
+                     "select id, sender, timestamp, content, attachment, ticket_id from message where ticket_id = ?;"))
         {
             stmt.setInt(1, ticketId);
 
@@ -802,6 +803,7 @@ class DatabaseClient implements AutoCloseable
                     row.put("sender", rs.getString(2));
                     row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
                     row.put("content", rs.getString(4));
+                    row.put("attachment", rs.getString(5));
                     result.add(row);
                 }
 

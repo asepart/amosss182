@@ -1,9 +1,17 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.net.URI;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Future;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -12,6 +20,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,9 +34,7 @@ class WebServiceTest
     private WebTarget getClient()
     {
         final URI uri = UriBuilder.fromUri(WebService.address).port(WebService.port).build();
-        WebTarget client = ClientBuilder.newClient().target(uri);
-
-        return client;
+        return ClientBuilder.newBuilder().register(MultiPartFeature.class).build().target(uri);
     }
 
     private WebTarget getUserClient()
@@ -65,7 +74,7 @@ class WebServiceTest
     }
 
     @BeforeAll
-    static void start() throws Exception
+    static void start()
     {
         WebService.main(null);
     }
@@ -956,7 +965,7 @@ class WebServiceTest
     }
 
     @Test
-    void testMessages()
+    void testMessages() throws Exception
     {
         Map<String, String> project = new HashMap<>(3);
         project.put("entryKey", "junit_test");
@@ -1034,6 +1043,20 @@ class WebServiceTest
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        /*
+        Future<Response> futureResponse = getAdminClient().path("/listen").path(String.valueOf(ticketId)).request().async().get();
+
+        try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, other thread!")))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (Response response = futureResponse.get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+        */
+
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
@@ -1042,6 +1065,53 @@ class WebServiceTest
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testFiles() throws IOException
+    {
+        final String fileName = "/tmp/asepart-test-file.txt";
+        final Path filePath = Paths.get(fileName);
+        final String fileContent = "This is a test file for JUnit.";
+
+        try (PrintWriter writer = new PrintWriter(fileName, "UTF-8"))
+        {
+            writer.println(fileContent);
+        }
+
+        final FileDataBodyPart filePart = new FileDataBodyPart("file", new File(fileName));
+
+        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
+             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
+             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+        {
+            assertEquals(Response.Status.CONFLICT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Files.delete(filePath);
+
+        try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            InputStream stream = response.readEntity(InputStream.class);
+            Files.copy(stream, filePath);
+            List<String> contents = Files.readAllLines(filePath);
+
+            assertEquals(fileContent, contents.get(0));
+        }
+
+        Files.delete(filePath);
+
+        try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().delete())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 }

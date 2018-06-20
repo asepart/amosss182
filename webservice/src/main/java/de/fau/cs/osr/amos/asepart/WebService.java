@@ -1,22 +1,17 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -25,8 +20,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ManagedAsync;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -42,6 +39,9 @@ public class WebService
          * This is done by the AuthenticationFilter, so if the return statement
          * below is reached only if the credentials have been validated already.
          */
+
+        if (!sc.isSecure())
+            System.err.println("WARNING: Unencrypted authentication in use - should not be done in production!");
 
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
@@ -425,6 +425,17 @@ public class WebService
             db.deleteTicket(ticketId);
         }
 
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.cascade(ticketId);
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            // ignore if file storage is not enabled
+        }
+
         return Response.ok().build();
     }
 
@@ -581,7 +592,9 @@ public class WebService
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin", "User"})
-    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") int ticketId, String message) throws Exception
+    public Response sendMessage(@Context SecurityContext sc,
+                                @PathParam("ticket") int ticketId,
+                                @QueryParam("attachment") String attachment, String message) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
         final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
@@ -600,7 +613,7 @@ public class WebService
             if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            db.sendMessage(principal.getName(), message, ticketId);
+            db.sendMessage(principal.getName(), message, attachment, ticketId);
         }
 
         return Response.ok().build();
@@ -672,10 +685,127 @@ public class WebService
         }
     }
 
+    @Path("/files/{ticket}")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @RolesAllowed({"Admin", "User"})
+    public Response uploadFile(@Context SecurityContext sc, @PathParam("ticket") int ticketId,
+                               @FormDataParam("file") InputStream stream,
+                               @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.upload(ticketId, fileDetail.getFileName(), stream);
+
+            return Response.ok().build();
+        }
+
+        catch (FileAlreadyExistsException e)
+        {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+    }
+
+    @Path("/files/{ticket}/{file}")
+    @GET
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    @RolesAllowed({"Admin", "User"})
+    public Response downloadFile(@Context SecurityContext sc,
+                                 @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+    {
+        Principal principal = sc.getUserPrincipal();
+        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            InputStream stream = fs.download(ticketId, fileName);
+
+            return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+                    .header("content-disposition", "attachment; filename = " + fileName).build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+    }
+
+    @Path("/files/{ticket}/{file}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response removeFile(@Context SecurityContext sc,
+                               @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+    {
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (!project.get("owner").equals(sc.getUserPrincipal().getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.remove(ticketId, fileName);
+
+            return Response.ok().build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+    }
+
     static String address = "http://localhost/";
     static int port = 12345;
     
-    public static void main(String[] args) throws Exception
+    public static void main(String[] args)
     {
         try
         {
@@ -691,15 +821,17 @@ public class WebService
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
             address = "http://" + ip + "/";
-
             final URI uri = UriBuilder.fromUri(address).port(port).build();
 
             ResourceConfig config = new ResourceConfig(WebService.class);
-            config.register(CORSFilter.class);
-            config.register(AuthenticationFilter.class);
-            config.register(DebugExceptionMapper.class);
 
-            HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, config);
+            config.register(CORSFilter.class); // allow cross-origin requests
+            config.register(AuthenticationFilter.class); // enable authentication
+
+            config.register(DebugExceptionMapper.class); // display exceptions in server log
+            config.register(MultiPartFeature.class); // enable file upload
+
+            GrizzlyHttpServerFactory.createHttpServer(uri, config);
         }
 
         catch (UnknownHostException e)
