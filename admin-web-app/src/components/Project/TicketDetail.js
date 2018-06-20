@@ -11,24 +11,35 @@ var tmp_ticket;
 export default class TicketDetail extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			isDataLoading: true,
-			isStatisticsLoading: true
+		if (this.props.isSub) {
+			this.state = {
+				isDataLoading: true,
+				isStatisticsLoading: true,
+				keyProj: this.props.keyProj,
+				idTicket: this.props.idTicket,
+			}
+		} else {
+			this.state = {
+				isDataLoading: true,
+				isStatisticsLoading: true,
+				keyProj: this.props.match.params.project,
+				idTicket: this.props.match.params.id,
+			}
 		}
 	}
 
 	componentDidMount() {
-		fetch(URL + '/projects/' + this.props.match.params.project, {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.state.keyProj, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
 				name: responseJson.name,
-				project: this.props.match.params.project
+				project: this.state.keyProj
 			}, function() {});
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/tickets/' + this.props.match.params.id, {method:'GET', headers: getAuth()})
+		fetch(URL + '/tickets/' + this.state.idTicket, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -38,7 +49,7 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
-		fetch(URL + '/projects/' + this.props.match.params.project + '/tickets', {method:'GET', headers: getAuth()})
+		fetch(URL + '/projects/' + this.state.keyProj + '/tickets', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -46,7 +57,7 @@ export default class TicketDetail extends Component {
 			}, function() {});
 			if (this.state.statistics !== undefined) {
 				for(var i=0; i < this.state.statistics.length; i++) {
-					if(this.state.statistics[i].id === this.props.match.params.id) {
+					if(this.state.statistics[i].id === this.state.idTicket) {
 						tmp_ticket = i;
 					}
 				}
@@ -59,6 +70,20 @@ export default class TicketDetail extends Component {
 		});
 	}
 
+	_renderChatButton() {
+		if (this.props.isSub) {
+			return null;
+		} else {
+			return (
+				<Button
+					onPress = { function doNothing() {} }
+					title = "Chat"
+					color = "#0c3868"
+				/>
+			);
+		}
+	}
+
 	render() {
 		if (this.state.isDataLoading || this.state.isStatisticsLoading) {
 			return (
@@ -69,8 +94,8 @@ export default class TicketDetail extends Component {
 		}
 		return (
 			<View>
-				<View>
-					<Text><br/><b>ID:</b> {this.state.data.id}</Text>
+				<View style={{borderWidth: 0.5}}>
+					<Text><b>ID:</b> {this.state.data.id}</Text>
 					<Text><br/><b>Project Name:</b> {this.state.name}</Text>
 					<Text><b>Project Entry Code:</b> {this.state.project}</Text>
 					<Text><br/><b>Name:</b> {this.state.data.name}</Text>
@@ -85,12 +110,8 @@ export default class TicketDetail extends Component {
 					<Text><br/><b>Description:</b> {'\n' + this.state.data.description}</Text>
 				</View>
 				<View>
-					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.props.match.params.id + '/chat'}>
-					<Button
-						onPress = { function doNothing() {} }
-						title = "Chat"
-						color = "#0c3868"
-					/>
+					<Link to={ '/projects/' + this.state.project + '/tickets/' + this.state.idTicket + '/chat'}>
+						{this._renderChatButton()}
 					</Link>
 				</View>
 			</View>
