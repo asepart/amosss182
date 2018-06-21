@@ -377,7 +377,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.CONFLICT, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -392,7 +392,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
         {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.CONFLICT, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -759,11 +759,6 @@ class WebServiceTest
             assertEquals("Pizza Project", projectName);
         }
 
-        try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
-        {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
         try (Response response = getUserClient().path("/join").request().post(Entity.text("doesnotexist")))
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
@@ -779,11 +774,6 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
-        {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
         try (Response response = getAdminClient().path("/projects/pizza/users/invaliduser").request().delete())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
@@ -792,11 +782,6 @@ class WebServiceTest
         try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
-        {
-            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
