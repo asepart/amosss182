@@ -71,10 +71,10 @@ class FileStorageClient
         else throw new FileAlreadyExistsException("File with same name already exists for this ticket.");
     }
 
-    public InputStream download(int ticketId, String fileName) throws Exception
+    public String download(int ticketId, String fileName) throws Exception
     {
         final String fileId = internalName(ticketId, fileName);
-        return client.getObject(bucketName, fileId);
+        return client.presignedGetObject(bucketName, fileId, 86400);
     }
 
     public void remove(int ticketId, String fileName) throws Exception

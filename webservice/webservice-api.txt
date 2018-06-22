@@ -30,7 +30,7 @@ The following REST operations are available:
   Path:           /users
   Roles:          Admin
   Request-Body:   User information as JSON object (loginName, password, firstName, lastName, phoneNumber).
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [400 Bad Request]  if password for new user is missing.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -61,7 +61,7 @@ The following REST operations are available:
   HTTP operation: DELETE
   Path:           /users/{name}
   Roles:          Admin
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not Found]    if user does not exist.
@@ -72,7 +72,7 @@ The following REST operations are available:
   Path:           /admins
   Roles:          Admin
   Request-Body:   Admin information as JSON object (loginName, password, firstName, lastName).
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [400 Bad Request]  if password for new admin is missing.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -104,7 +104,7 @@ The following REST operations are available:
   HTTP operation: DELETE
   Path:           /admins/{name}
   Roles:          Admin
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not Found]    if admin does not exist.
@@ -125,7 +125,7 @@ The following REST operations are available:
   Path:           /projects
   Roles:          Admin
   Request-Body:   Project information as JSON object (entryKey, name, owner).
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient (e.g. you are not an admin/do not own the project).
 
@@ -139,13 +139,12 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project does not exist.
 
-
 - Delete project
 
   HTTP operation: DELETE
   Path:           /projects/{key}
   Roles:          Admin
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project did not exist before request.
@@ -167,7 +166,7 @@ The following REST operations are available:
   Path:           /tickets
   Roles:          Admin
   Request-Body:   Ticket information as JSON object (id, name, summary, description, category, requiredObservations, projectKey).
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [400 Bad Request]  if ticket object is malformed.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
@@ -188,7 +187,7 @@ The following REST operations are available:
   HTTP operation: DELETE
   Path:           /tickets/{id}
   Roles:          Admin
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project or ticket did not exist before request.
@@ -198,7 +197,7 @@ The following REST operations are available:
   HTTP operation: POST
   Path:           /tickets/{id}/accept
   Roles:          User
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket does not exist.
@@ -209,7 +208,7 @@ The following REST operations are available:
   Path:           /tickets/{id}/observations
   Roles:          User
   Request-Body:   Observation information as JSON object (outcome and quantity).
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket does not exist.
@@ -241,7 +240,7 @@ The following REST operations are available:
   HTTP operation: DELETE
   Path:           /projects/{key}/users/{name}
   Roles:          Admin
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project does not exist or user was not member of project.
@@ -252,7 +251,7 @@ The following REST operations are available:
   Path:           /join
   Roles:          User
   Request-Body:   Entry key as ASCII string.
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an user account.
                   [404 Not Found]    if entry key is invalid.
@@ -275,7 +274,7 @@ The following REST operations are available:
   Notice:         "attachment" must be a file name previously uploaded using the /files/... api.
   Roles:          Admin, User
   Request Body:   The chat message as ASCII text.
-  Status code:    [200 OK]           in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
@@ -310,7 +309,7 @@ The following REST operations are available:
   Path:           /files/{ticket}
   Roles:          Admin, User
   Request Body:   File as multipart/form-data.
-  Status code:    [200 OK]              in case of success.
+  Status code:    [204 No Content]   in case of success.
                   [400 Bad Request]     if request is malformed.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
@@ -323,8 +322,8 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /files/{ticket}/{file}
   Roles:          Admin, User
-  Returns:        File as multipart/form-data.
-  Status code:    [200 OK]              in case of success.
+  Returns:        URL to file location.
+  Status code:    [302 Found]           in case of success.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
                   [404 Not Found]       if ticket or file does not exist.
@@ -335,7 +334,7 @@ The following REST operations are available:
   HTTP operation: DELETE
   Path:           /files/{ticket}/{file}
   Roles:          Admin
-  Status code:    [200 OK]              in case of success.
+  Status code:    [204 No Content]              in case of success.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
                   [404 Not Found]       if ticket or file does not exist.

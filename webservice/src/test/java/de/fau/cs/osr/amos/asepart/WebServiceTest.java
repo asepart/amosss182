@@ -191,14 +191,14 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         newUser.put("password", "secure");
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         newUser.remove("password");
@@ -206,7 +206,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/users/junit_user").request().get())
@@ -236,7 +236,7 @@ class WebServiceTest
 
         try (Response response = getUserClient("junit_user", "secure").path("/join").request().post(Entity.text("pizza")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
@@ -248,7 +248,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/users").request().get())
@@ -262,7 +262,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users/junit_user").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/users/junit_user").request().delete())
@@ -288,7 +288,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/admins").request().post(Entity.json(newAdmin)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/admins/junit_admin").request().get())
@@ -310,7 +310,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         newAdmin.put("password","hostile_attack");
@@ -356,7 +356,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/admins/junit_admin").request().delete())
@@ -419,7 +419,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/projects/junit_test").request().get())
@@ -431,12 +431,12 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/join").request().post(Entity.text("junit_test")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/projects/junit_test/users").request().get())
@@ -461,7 +461,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -501,7 +501,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").request().post(Entity.json(ticket)))
@@ -565,7 +565,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(lastTicket)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
@@ -589,7 +589,7 @@ class WebServiceTest
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("accept").request().post(Entity.text("")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().get())
@@ -616,7 +616,7 @@ class WebServiceTest
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
@@ -659,7 +659,7 @@ class WebServiceTest
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/projects").path("pizza").path("tickets").request().get())
@@ -669,7 +669,7 @@ class WebServiceTest
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient().path("/tickets").path(String.valueOf(lastTicketId)).request().get())
@@ -694,7 +694,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
@@ -771,7 +771,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects/pizza/users/user").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/projects/pizza/users/invaliduser").request().delete())
@@ -781,7 +781,7 @@ class WebServiceTest
 
         try (Response response = getUserClient().path("/join").request().post(Entity.text("pizza")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -797,7 +797,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         newUser.put("loginName", "stat_user2");
@@ -806,7 +806,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         Map<String, String> project = new HashMap<>(3);
@@ -816,7 +816,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         Map<String, String> ticket = new HashMap<>(6);
@@ -829,17 +829,17 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("stat_user1", "test").path("/join").request().post(Entity.text("stat_project")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("stat_user2", "test").path("/join").request().post(Entity.text("stat_project")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         int ticketId;
@@ -855,7 +855,7 @@ class WebServiceTest
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("accept").request().post(Entity.text("")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         Map<String, String> observation = new HashMap<>(2);
@@ -864,7 +864,7 @@ class WebServiceTest
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
@@ -883,7 +883,7 @@ class WebServiceTest
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
@@ -900,7 +900,7 @@ class WebServiceTest
 
         try (Response response = getUserClient("stat_user2", "test").path("/tickets").path(String.valueOf(ticketId)).path("accept").request().post(Entity.text("")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
@@ -917,7 +917,7 @@ class WebServiceTest
 
         try (Response response = getUserClient("stat_user2", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
@@ -934,17 +934,17 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").path("stat_project").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/users/stat_user1").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/users/stat_user2").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
     }
@@ -959,7 +959,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         Map<String, String> ticket = new HashMap<>(6);
@@ -972,7 +972,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         int ticketId;
@@ -988,7 +988,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
@@ -1033,7 +1033,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, other thread!")))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = futureResponse.get())
@@ -1044,7 +1044,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
@@ -1070,7 +1070,7 @@ class WebServiceTest
         try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
              Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
         try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
@@ -1085,8 +1085,8 @@ class WebServiceTest
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
 
-            InputStream stream = response.readEntity(InputStream.class);
-            Files.copy(stream, filePath);
+            InputStream fileStream = response.readEntity(InputStream.class);
+            Files.copy(fileStream, filePath);
             List<String> contents = Files.readAllLines(filePath);
 
             assertEquals(fileContent, contents.get(0));
@@ -1096,7 +1096,7 @@ class WebServiceTest
 
         try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().delete())
         {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 }

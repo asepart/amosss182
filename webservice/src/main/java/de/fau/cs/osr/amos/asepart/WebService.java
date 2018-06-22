@@ -88,7 +88,7 @@ public class WebService
             }
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/users")
@@ -130,7 +130,7 @@ public class WebService
             db.deleteAccount(user);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/admins")
@@ -168,7 +168,7 @@ public class WebService
             }
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/admins")
@@ -233,7 +233,7 @@ public class WebService
             db.deleteAccount(admin);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects")
@@ -269,7 +269,7 @@ public class WebService
             else db.insertProject(entryKey, project.get("name"), project.get("owner")); 
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}")
@@ -320,7 +320,7 @@ public class WebService
             db.deleteProject(entryKey);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/tickets")
@@ -403,7 +403,7 @@ public class WebService
                                           ticket.get("description"), ticket.get("category"),
                                           Integer.parseInt(ticket.get("requiredObservations")));
 
-                return Response.ok().build();
+                return Response.noContent().build();
             }
 
             else
@@ -412,7 +412,7 @@ public class WebService
                          ticket.get("description"), ticket.get("category"),
                          Integer.parseInt(ticket.get("requiredObservations")), projectKey);
 
-                return Response.ok().build();
+                return Response.noContent().build();
             }
         }
     }
@@ -486,7 +486,7 @@ public class WebService
             // ignore if file storage is not enabled
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/accept")
@@ -510,7 +510,7 @@ public class WebService
                 db.acceptTicket(principal.getName(), ticketId);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/observations")
@@ -535,7 +535,7 @@ public class WebService
                     observation.get("outcome"), Integer.parseInt(observation.get("quantity")));
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/observations")
@@ -599,7 +599,7 @@ public class WebService
                 db.leaveProject(user, entryKey);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/join")
@@ -618,7 +618,7 @@ public class WebService
                 db.joinProject(user, entryKey);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/join")
@@ -661,7 +661,7 @@ public class WebService
             db.sendMessage(principal.getName(), message, attachment, ticketId);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/messages/{ticket}")
@@ -761,7 +761,7 @@ public class WebService
             FileStorageClient fs = new FileStorageClient();
             fs.upload(ticketId, fileDetail.getFileName(), stream);
 
-            return Response.ok().build();
+            return Response.noContent().build();
         }
 
         catch (FileAlreadyExistsException e)
@@ -777,7 +777,6 @@ public class WebService
 
     @Path("/files/{ticket}/{file}")
     @GET
-    @Produces(MediaType.MULTIPART_FORM_DATA)
     @RolesAllowed({"Admin", "User"})
     public Response downloadFile(@Context SecurityContext sc,
                                  @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
@@ -802,10 +801,8 @@ public class WebService
         try
         {
             FileStorageClient fs = new FileStorageClient();
-            InputStream stream = fs.download(ticketId, fileName);
-
-            return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-                    .header("content-disposition", "attachment; filename = " + fileName).build();
+            final String location = fs.download(ticketId, fileName);
+            return Response.temporaryRedirect(new URI(location)).build();
         }
 
         catch (UnsupportedOperationException e)
@@ -815,9 +812,8 @@ public class WebService
 
         catch (ErrorResponseException e)
         {
-            if (e.errorResponse().errorCode() == ErrorCode.NO_SUCH_KEY)
+            if (e.errorResponse().errorCode().code().equals(ErrorCode.NO_SUCH_KEY.code()))
                 return Response.status(Response.Status.NOT_FOUND).build();
-
             else return Response.serverError().build();
         }
     }
@@ -845,7 +841,7 @@ public class WebService
             FileStorageClient fs = new FileStorageClient();
             fs.remove(ticketId, fileName);
 
-            return Response.ok().build();
+            return Response.noContent().build();
         }
 
         catch (UnsupportedOperationException e)
