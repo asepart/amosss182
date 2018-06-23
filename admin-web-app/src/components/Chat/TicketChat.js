@@ -4,6 +4,7 @@ import {URL, FileSelector} from '../shared/const';
 import {getAuth} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
+import ChatMessage from './ChatMessage';
 
 export default class TicketChat extends Component {
 
@@ -22,7 +23,13 @@ export default class TicketChat extends Component {
 			this.fetchTicketName();
 			this.fetchProjectName();
 		}
+		
 		this.fetchMessages();
+		this.interval = setInterval(() => this.listenForNewMessages(), 500);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.interval);
 	}
 
 	componentDidUpdate() {
@@ -30,6 +37,7 @@ export default class TicketChat extends Component {
 			this.fetchMessages();
 			setUpdateBoolean(false);
 		}
+		this.textInput.focus();
 	}
 
 	fetchProjectName() {
@@ -60,8 +68,22 @@ export default class TicketChat extends Component {
 		});
 	}
 
-	async fetchMessages() {
-		await fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+	fetchMessages() {
+		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				isLoading: false,
+				chatHistory: responseJson,
+			}, function(){});
+		})
+		.catch((error) =>{
+			console.error(error);
+		});
+	}
+
+	listenForNewMessages() {
+		fetch(URL + '/listen/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -138,14 +160,14 @@ export default class TicketChat extends Component {
 					<div>
 						{news.content.search("http") === -1 ? (
 							<Text style={{fontWeight: 'bold'}}>
-								[{news.content.slice(18,27)} {news.sender}: {news.content.slice(29)}
+								[{news.content.slice(18,27)} {news.sender}: <ChatMessage>{news.content.slice(29)}</ChatMessage>
 							</Text>
 						) : (
 							<div>
 								<Text style={{fontWeight: 'bold'}}>
 									[{news.content.slice(18,27)} {news.sender}:
 								</Text>
-								<a href={news.content.slice(29)}> {news.content.slice(29)}</a>
+								<ChatMessage><a href={news.content.slice(29)}> {news.content.slice(29)}</a></ChatMessage>
 							</div>
 						)}
 					</div>
@@ -208,6 +230,7 @@ export default class TicketChat extends Component {
 				/>
 
 				<TextInput
+					autoFocus = {true}
 					placeholder = "Message"
 					style = {{height: 40, borderColor: 'gray',borderWidth: 1}}
 					onChangeText = {(text) => this.setState({message: text})}

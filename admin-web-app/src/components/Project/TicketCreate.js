@@ -18,7 +18,7 @@ export default class TicketCreate extends Component {
 			name: '',
 			summary: '',
 			description: '',
-			category: '',
+			category: pickerPlaceholder,
 			requiredObservations: '',
 			projectKey: this.props.project,
 		};
@@ -32,7 +32,7 @@ export default class TicketCreate extends Component {
 			name: '',
 			summary: '',
 			description: '',
-			category: '',
+			category: pickerPlaceholder,
 			requiredObservations: '',
 		})
 	};
@@ -88,19 +88,19 @@ export default class TicketCreate extends Component {
 					<TextInput
 						placeholder = "Description"
 						multiline={true}
-						style = {{height: 450, borderColor: 'gray',borderWidth: 1}}
+						style = {{height: window.innerHeight*0.4, borderColor: 'gray',borderWidth: 1}}
 						onChangeText = {(text) => this.setState({description: text})}
 						value = {this.state.description}
 					/>
 					<Picker
-						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1}}
+						style = {{height: 40, backgroundColor: 'transparent', borderColor: 'gray', borderWidth: 1, textAlign: 'center'}}
 						onValueChange = {(text) => this.setState({category: text})}
 						selectedValue = {this.state.category}
 					>
 						<Picker.Item label = {pickerPlaceholder} value = {pickerPlaceholder} />
-						<Picker.Item label = "ONE_TIME_ERROR" value = "one-time-error" />
-						<Picker.Item label = "TRACE" value = "trace" />
-						<Picker.Item label = "BEHAVIOR" value = "behavior" />
+						<Picker.Item label = "one-time-error" value = "one-time-error" />
+						<Picker.Item label = "trace" value = "trace" />
+						<Picker.Item label = "behavior" value = "behavior" />
 					</Picker>
 					<TextInput
 						placeholder = "Required Observations"

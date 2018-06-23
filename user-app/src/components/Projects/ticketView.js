@@ -10,6 +10,7 @@ import { setTicketID } from '../Chat/sendMessages';
 import { setTicketId } from '../Tickets/ticketProcessed';
 import { StackNavigator } from 'react-navigation'
 import {ticketstatus} from '../Projects/projectInfo';
+import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
 
 export default class TicketView extends Component {
 
@@ -27,6 +28,7 @@ export default class TicketView extends Component {
 		super(props);
 		this.state = {
 			isLoading: true,
+			isAccepted:"", 
 			ticketDetail: "",
 			idTicket: ""
 		};
@@ -39,12 +41,15 @@ export default class TicketView extends Component {
 	}
 
 	onAcceptPressed() {
-		alert("Ticket successfully accepted")
+		//alert("Ticket successfully accepted")
 		let ticketID = this.props.navigation.state.params.id;
 		var response = fetch(URL + '/tickets/'+ ticketID + '/accept', {
 			method: 'POST',
 			headers: getAuth()
 		})
+		setUpdateBoolean(true);
+		this.setState({isAccepted: 'accepted'})
+		this.forceUpdate(this.getTicketInfo);
 	}
 
 	onProcessTicketPressed() {
@@ -71,7 +76,15 @@ export default class TicketView extends Component {
 	}
 
 	componentDidMount() {
+		this.setState({isAccepted: ticketstatus})
 		this.getTicketInfo();
+	}
+
+
+
+	componentWillUnmount() {
+		const { navigate } = this.props.navigation;
+        navigate("Fourth", { name: "ProjectInfo" })
 	}
 
 	render() {
@@ -93,19 +106,19 @@ export default class TicketView extends Component {
 				</TouchableOpacity>
 
 				<View>
-					{ticketstatus === 'open' ? (
-						<TouchableOpacity
-							onPress={this.onAcceptPressed.bind(this)}
-							style={styles.buttonContainer}>
-							<Text style={styles.buttonText}>Accept</Text>
-						</TouchableOpacity>
-					) : (
-						<TouchableOpacity
-							onPress={this.onProcessTicketPressed.bind(this)}
-							style={styles.buttonContainer}>
-							<Text style={styles.buttonText}>Process Ticket</Text>
-						</TouchableOpacity>
-					)}
+				{this.state.isAccepted === 'open' ? (
+			<TouchableOpacity
+				onPress={this.onAcceptPressed.bind(this)}
+				style={styles.buttonContainer}>
+				<Text style={styles.buttonText}>Accept</Text>
+			</TouchableOpacity>
+		) : (
+			<TouchableOpacity
+				onPress={this.onProcessTicketPressed.bind(this)}
+				style={styles.buttonContainer}>
+				<Text style={styles.buttonText}>Process Ticket</Text>
+			</TouchableOpacity>
+		)}
 				</View>
 
 				<Text style={styles.text}>

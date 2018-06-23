@@ -53,7 +53,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
-                  [404 Not found]    if user does not exist.
+                  [404 Not Found]    if user does not exist.
 
 - Delete user
 
@@ -63,7 +63,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
-                  [404 Not found]    if user does not exist.
+                  [404 Not Found]    if user does not exist.
 
 - Create or edit admin
 
@@ -95,7 +95,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
-                  [404 Not found]    if admin does not exist.
+                  [404 Not Found]    if admin does not exist.
 
 - Delete admin
 
@@ -105,7 +105,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
-                  [404 Not found]    if admin does not exist.
+                  [404 Not Found]    if admin does not exist.
 
 - List existing projects the admin is able to view
 
@@ -135,7 +135,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project does not exist.
+                  [404 Not Found]    if project does not exist.
 
 
 - Delete project
@@ -146,7 +146,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project did not exist before request.
+                  [404 Not Found]    if project did not exist before request.
 
 - List tickets of project
 
@@ -157,7 +157,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project does not exist.
+                  [404 Not Found]    if project does not exist.
 
 - Create new ticket (omit id attribute) or change existing ticket.
 
@@ -169,7 +169,7 @@ The following REST operations are available:
                   [400 Bad Request]  if ticket object is malformed.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if ticket id ist set, but not valid.
+                  [404 Not Found]    if ticket id ist set, but not valid.
 
 - Get specific ticket
 
@@ -179,7 +179,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if ticket do not exist.
+                  [404 Not Found]    if ticket do not exist.
 
 - Delete ticket from project
 
@@ -189,7 +189,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project or ticket did not exist before request.
+                  [404 Not Found]    if project or ticket did not exist before request.
 
 - Accept ticket
 
@@ -199,7 +199,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if ticket does not exist.
+                  [404 Not Found]    if ticket does not exist.
 
 - Submit observation
 
@@ -210,7 +210,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if ticket does not exist.
+                  [404 Not Found]    if ticket does not exist.
 
 - Get observations of ticket
 
@@ -221,7 +221,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if ticket does not exist.
+                  [404 Not Found]    if ticket does not exist.
 
 - List users of project
 
@@ -232,7 +232,7 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project does not exist.
+                  [404 Not Found]    if project does not exist.
 
 - Delete user from project
 
@@ -243,7 +243,7 @@ The following REST operations are available:
                   [400 Bad Request]  if user has not joined.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not found]    if project does not exist or user was not member of project.
+                  [404 Not Found]    if project does not exist or user was not member of project.
 
 - Join project as user
 
@@ -255,7 +255,7 @@ The following REST operations are available:
                   [400 Bad Request]  if user has already joined.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an user account.
-                  [404 Not found]    if entry key is invalid.
+                  [404 Not Found]    if entry key is invalid.
 
 - Get the name of the project the user got an entry key for
 
@@ -266,26 +266,76 @@ The following REST operations are available:
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an user account.
-                  [404 Not found]    if entry key is invalid.
+                  [404 Not Found]    if entry key is invalid.
 
 - Send a message in a ticket group chat
 
   HTTP operation: POST
-  Path:           /messages/{ticket}
+  Path:           /messages/{ticket}?attachment={attachment}
+  Notice:         "attachment" must be a file name previously uploaded using the /files/... api.
   Roles:          Admin, User
   Request Body:   The chat message as ASCII text.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
-                  [404 Not found]    if ticket does not exist.
+                  [404 Not Found]    if ticket does not exist.
 
-- Lists messages of a ticket group chat
+- Lists current messages of a ticket group chat
 
   HTTP operation: GET
   Path:           /messages/{ticket}
   Roles:          Admin, User
-  Returns:        JSON array of chat messages (id, sender, content, ticketId).
+  Returns:        JSON array of chat messages (id, sender, timestamp, content).
+  Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
-                  [404 Not found]    if ticket does not exist.
+                  [404 Not Found]    if ticket does not exist.
+
+- Listens until new messages arrive in group chat, then returns current messages
+
+  HTTP operation: GET
+  Path:           /listen/{ticket}
+  Roles:          Admin, User
+  Returns:        JSON array of chat messages (id, sender, timestamp, content).
+  Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
+  Status code:    [200 OK]           in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not a member of the associated project.
+                  [404 Not Found]    if ticket does not exist.
+
+- Upload new file related to a ticket
+
+  HTTP operation: POST
+  Path:           /files/{ticket}
+  Roles:          Admin, User
+  Request Body:   File as multipart/form-data.
+  Status code:    [200 OK]              in case of success.
+                  [401 Unauthorized]    if the provided username or password is invalid.
+                  [403 Forbidden]       if the authorized account is not a member of the associated project.
+                  [404 Not Found]       if ticket does not exist.
+                  [409 Conflict]        a file with the same name already exists for this ticket.
+                  [501 Not Implemented] file upload feature is not enabled.
+
+- Download a file.
+
+  HTTP operation: GET
+  Path:           /files/{ticket}/{file}
+  Roles:          Admin, User
+  Returns:        File as multipart/form-data.
+  Status code:    [200 OK]              in case of success.
+                  [401 Unauthorized]    if the provided username or password is invalid.
+                  [403 Forbidden]       if the authorized account is not a member of the associated project.
+                  [404 Not Found]       if ticket or file does not exist.
+                  [501 Not Implemented] file upload feature is not enabled.
+
+- Delete a file.
+
+  HTTP operation: DELETE
+  Path:           /files/{ticket}/{file}
+  Roles:          Admin
+  Status code:    [200 OK]              in case of success.
+                  [401 Unauthorized]    if the provided username or password is invalid.
+                  [403 Forbidden]       if the authorized account is not a member of the associated project.
+                  [404 Not Found]       if ticket or file does not exist.
+                  [501 Not Implemented] file upload feature is not enabled.

@@ -84,23 +84,33 @@ export default styles=StyleSheet.create({
       fontWeight: '700'
     },
 
-    buttonTextAccepted: {
-      textAlign: 'center',
-      color: '#76ff03',
-      fontWeight: '700'
+    buttonAcceptedContainer: {
+      backgroundColor: '#64dd17',
+      flex: 1,
+      paddingVertical: 15,
+      marginBottom: 15,
+      justifyContent: 'space-between',
+      width: 350
     },
 
-    buttonTextInProgress: {
-      textAlign: 'center',
-      color: '#ffff00',
-      fontWeight: '700'
+    buttonProcessedContainer: {
+      backgroundColor: '#ef6c00',
+      paddingVertical: 15,
+      flex: 1,
+      marginBottom: 15,
+      justifyContent: 'space-between',
+      width: 350
     },
 
-    buttonTextCompleted: {
-      textAlign: 'center',
-      color: '#dd2c00',
-      fontWeight: '700'
+    buttonFinishedContainer: {
+      backgroundColor: '#dd2c00',
+      paddingVertical: 15,
+      flex: 1,
+      marginBottom: 15,
+      justifyContent: 'space-between',
+      width: 350
     },
+
 
     //add button
     addButton: {

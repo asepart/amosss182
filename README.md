@@ -7,7 +7,7 @@ The team develops an app to manage testdrivers.
 The app has the following main features:
 * Android App
 * Java-based server backend
-* Secure chat betweeen clients
+* Secure chat between clients
 * Problem reports via app
 
 ## Database
@@ -18,7 +18,9 @@ We use PostgreSQL as our database. To run the web service on your machine, a Pos
 
 For running the web service locally, it is recommended to build and run the web service docker container. Execute the script `run-docker.sh` inside the `webservice` directory with root privileges (call `stop-docker.sh` to revert). You can also run the web service as a user process with `mvn exec:java`. JUnit tests can be executed by running `mvn test` inside the `webservice` directory.
 
-The environment variable `ASEPART_POSTGRES_HOST` can be set to change the hostname of the database the web service tries to connect to. Default is localhost. If `JDBC_DATABASE_URL` is set, the web service will use that and ignore all other configuration options.
+The environment variable `ASEPART_POSTGRES_HOST` can be set to change the default hostname of the database the web service tries to connect to. Default is localhost. If `JDBC_DATABASE_URL` is set, the web service will use that and ignore all other configuration options.
+
+For the file upload feature, we use a Minio server, which is an Open Source S3-compatible file storage server. The environment variables `ASEPART_MINIO_URL`, `ASEPART_MINIO_BUCKET`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` must be set to enable this feature.
 
 ## Admin Web App
 

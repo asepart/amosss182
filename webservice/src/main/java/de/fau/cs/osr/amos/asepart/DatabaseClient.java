@@ -11,9 +11,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.postgresql.PGConnection;
+import org.postgresql.PGNotification;
 import org.postgresql.ds.PGSimpleDataSource;
 
-class DBClient implements AutoCloseable
+class DatabaseClient implements AutoCloseable
 {
     private static DataSource createDataSource()
     {
@@ -45,7 +47,7 @@ class DBClient implements AutoCloseable
     private static final DataSource ds = createDataSource();
     private final Connection cn;
 
-    DBClient() throws SQLException
+    DatabaseClient() throws SQLException
     {
         cn = ds.getConnection();
     }
@@ -667,7 +669,7 @@ class DBClient implements AutoCloseable
     private int positiveObservationCount(int ticketId) throws SQLException
     {
         try (Connection connection = ds.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("select count(*) from observation where ticket_id = ? and outcome = 'positive';"))
+             PreparedStatement stmt = connection.prepareStatement("select sum(quantity) from observation where ticket_id = ? and outcome = 'positive';"))
         {
             stmt.setInt(1, ticketId);
 
@@ -681,7 +683,7 @@ class DBClient implements AutoCloseable
 
     private int negativeObservationCount(int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("select count(*) from observation where ticket_id = ? and outcome = 'negative';"))
+        try (PreparedStatement stmt = cn.prepareStatement("select sum(quantity) from observation where ticket_id = ? and outcome = 'negative';"))
         {
             stmt.setInt(1, ticketId);
 
@@ -765,22 +767,28 @@ class DBClient implements AutoCloseable
         }
     }
 
-    int sendMessage(String sender, String content, int ticketId) throws SQLException
+    void sendMessage(String sender, String content, String attachment, int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, ticket_id) values (?, ?, ?);"))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, attachment, ticket_id) values (?, ?, ?, ?);"))
         {
             stmt.setString(1, sender);
             stmt.setString(2, content);
-            stmt.setInt(3, ticketId);
+            stmt.setString(3, attachment);
+            stmt.setInt(4, ticketId);
 
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
+        }
+
+        try (Statement stmt = cn.createStatement())
+        {
+            stmt.execute(String.format("notify ticket_%d;", ticketId));
         }
     }
 
     List<Map<String, String>> listMessages(int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                     "select id, sender, content, ticket_id from message where ticket_id = ?;"))
+                     "select id, sender, timestamp, content, attachment, ticket_id from message where ticket_id = ?;"))
         {
             stmt.setInt(1, ticketId);
 
@@ -793,13 +801,44 @@ class DBClient implements AutoCloseable
                     Map<String, String> row = new HashMap<>(4);
                     row.put("id", String.valueOf(rs.getInt(1)));
                     row.put("sender", rs.getString(2));
-                    row.put("content", rs.getString(3));
-                    row.put("ticketId", String.valueOf(rs.getInt(4)));
+                    row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
+                    row.put("content", rs.getString(4));
+                    row.put("attachment", rs.getString(5));
                     result.add(row);
                 }
 
                 return result;
             }
         }
+    }
+
+    List<Map<String, String>> listenChannel(int ticketId) throws Exception
+    {
+        try (Statement stmt = cn.createStatement())
+        {
+            stmt.execute(String.format("listen ticket_%d", ticketId));
+        }
+
+        final PGConnection pgcn = cn.unwrap(PGConnection.class);
+        PGNotification[] notifications;
+
+        do
+        {
+            notifications = pgcn.getNotifications();
+            Thread.sleep(500);
+        }
+        while (notifications == null);
+
+        for (PGNotification notification : notifications)
+        {
+            System.err.println("Received chat notification for ticket channel: " + notification.getName());
+        }
+
+        try (Statement stmt = cn.createStatement())
+        {
+            stmt.execute(String.format("unlisten ticket_%d", ticketId));
+        }
+
+        return listMessages(ticketId);
     }
 }

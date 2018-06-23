@@ -5,6 +5,7 @@ import { StackNavigator, } from 'react-navigation';
 import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
 import {key} from './keyValid';
+import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
 
 window.btoa = require('Base64').btoa;
 export var ticketstatus = '';
@@ -20,7 +21,19 @@ export default class ProjectInfo extends Component {
 	}
 
 	componentDidMount() {
-			fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
+			this.fetchTicketDetails();
+	}
+
+	componentDidUpdate() {
+		if(getUpdateBoolean() === true) {
+		  this.fetchTicketDetails();
+		  setUpdateBoolean(false);
+		}
+	  }
+	 
+
+	fetchTicketDetails() {
+		fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
 				.then((response) => response.json())
 					.then((responseJson) => {
 						this.setState({
@@ -43,66 +56,138 @@ export default class ProjectInfo extends Component {
 	}
 
 	_renderItem({item}) {
-		return (
-			<TouchableOpacity
-				onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) }
-				style={styles.buttonLargeContainer}
-			>
-				<Text style={styles.buttonText}>
-					 id:	{item.id}
-				</Text>
-				<Text style={styles.buttonText}>
-					summary: {item.summary}
-				</Text>
-				<Text style={styles.buttonText}>
-					category: {item.category}
-				</Text>
-				{this._getTicketStatus({item})}
-				<Text style={styles.buttonText}>
-					accepted: {item.U}
-				</Text>
-				<Text style={styles.buttonText}>
-					positive: {item.UP}
-				</Text>
-			</TouchableOpacity>
-		);
+		return (this._getTicketStatus({item}));
+		
 	}
 
 	_getTicketStatus({item}) {
 		ticketstatus = item.status;
 		switch (ticketstatus){
 			case 'open':
-				return (
+				return (<TouchableOpacity
+					onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) }
+					style={styles.buttonLargeContainer}
+			>
 					<Text style={styles.buttonText}>
-						status: {item.status}
-				 	</Text> );
+						id:  {item.id}
+					</Text>
+					<Text style={styles.buttonText}>
+						 summary: {item.summary}
+					</Text>
+				 <Text style={styles.buttonText}>
+						category: {item.category}
+				 </Text>
+				  <Text style={styles.buttonText}>
+						 status: {item.status}
+				 </Text>
+				<Text style={styles.buttonText}>
+						 accepted: {item.U}
+				 </Text>
+				 <Text style={styles.buttonText}>
+						 positive: {item.UP}
+				 </Text>
+				</TouchableOpacity> );
 			case 'accepted':
-				return (
-					<Text style={styles.buttonTextAccepted}>
-						status: {item.status}
-				 	</Text> );
-			case 'in progress':
-				return (
-					<Text style={styles.buttonInProgress}>
-						status: {item.status}
-					</Text> );
+				return (	<TouchableOpacity
+					onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) }
+					style={styles.buttonAcceptedContainer}
+			>
+					<Text style={styles.buttonText}>
+						id:  {item.id}
+					</Text>
+					<Text style={styles.buttonText}>
+						 summary: {item.summary}
+					</Text>
+				 <Text style={styles.buttonText}>
+						category: {item.category}
+				 </Text>
+				  <Text style={styles.buttonText}>
+						 status: {item.status}
+				 </Text>
+				<Text style={styles.buttonText}>
+						 accepted: {item.U}
+				 </Text>
+				 <Text style={styles.buttonText}>
+						 positive: {item.UP}
+				 </Text>
+				</TouchableOpacity> );
 			case 'processed':
-				return (
-					<Text style={styles.buttonCompleted}>
-						status: {item.status}
-					</Text> );
+				return (	<TouchableOpacity
+					onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) }
+					style={styles.buttonProcessedContainer}
+			>
+					<Text style={styles.buttonText}>
+						id:  {item.id}
+					</Text>
+					<Text style={styles.buttonText}>
+						 summary: {item.summary}
+					</Text>
+				 <Text style={styles.buttonText}>
+						category: {item.category}
+				 </Text>
+				  <Text style={styles.buttonText}>
+						 status: {item.status}
+				 </Text>
+				<Text style={styles.buttonText}>
+						 accepted: {item.U}
+				 </Text>
+				 <Text style={styles.buttonText}>
+						 positive: {item.UP}
+				 </Text>
+				</TouchableOpacity> );
 			case 'finished':
-				return (
-					<Text style={styles.buttonCompleted}>
-						status: {item.status}
-					</Text> );
+				return (<TouchableOpacity
+					onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) }
+					style={styles.buttonFinishedContainer}
+			>
+					<Text style={styles.buttonText}>
+						id:  {item.id}
+					</Text>
+					<Text style={styles.buttonText}>
+						 summary: {item.summary}
+					</Text>
+				 <Text style={styles.buttonText}>
+						category: {item.category}
+				 </Text>
+				  <Text style={styles.buttonText}>
+						 status: {item.status}
+				 </Text>
+				<Text style={styles.buttonText}>
+						 accepted: {item.U}
+				 </Text>
+				 <Text style={styles.buttonText}>
+						 positive: {item.UP}
+				 </Text>
+				</TouchableOpacity> );
 			default:
 				return(
+					<TouchableOpacity
+					onPress={()=> this.props.navigation.navigate("Sixth", {id:item.id}) }
+					style={styles.buttonLargeContainer}
+			>
 					<Text style={styles.buttonText}>
-						status: {item.status}
-					</Text> );
+						id:  {item.id}
+					</Text>
+					<Text style={styles.buttonText}>
+						 summary: {item.summary}
+					</Text>
+				 <Text style={styles.buttonText}>
+						category: {item.category}
+				 </Text>
+				  <Text style={styles.buttonText}>
+						 status: {item.status}
+				 </Text>
+				<Text style={styles.buttonText}>
+						 accepted: {item.U}
+				 </Text>
+				 <Text style={styles.buttonText}>
+						 positive: {item.UP}
+				 </Text>
+				</TouchableOpacity> 
+				);
 		}
 	}
+
 
 	render() {
 		if (this.state.isLoading) {
