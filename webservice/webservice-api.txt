@@ -309,7 +309,7 @@ The following REST operations are available:
   Path:           /files/{ticket}
   Roles:          Admin, User
   Request Body:   File as multipart/form-data.
-  Status code:    [204 No Content]   in case of success.
+  Status code:    [204 No Content]      in case of success.
                   [400 Bad Request]     if request is malformed.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
@@ -317,13 +317,14 @@ The following REST operations are available:
                   [409 Conflict]        a file with the same name already exists for this ticket.
                   [501 Not Implemented] file upload feature is not enabled.
 
-- Download a file.
+- Download a file (set thumbnail=true to get a thumbnail of the file instead).
 
   HTTP operation: GET
-  Path:           /files/{ticket}/{file}
+  Path:           /files/{ticket}/{file}?thumbnail={true|false}
   Roles:          Admin, User
   Returns:        URL to file location.
   Status code:    [302 Found]           in case of success.
+                  [400 Bad Request]     if thumbnail of file was requested that does not support thumbnails.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
                   [404 Not Found]       if ticket or file does not exist.

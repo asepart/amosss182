@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URI;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.net.URI;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -1095,6 +1097,40 @@ class WebServiceTest
         Files.delete(filePath);
 
         try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().delete())
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+    }
+
+    @Test
+    void testThumbnails() throws IOException
+    {
+        final URL sourceURL = new URL("https://upload.wikimedia.org/wikipedia/commons/d/de/Wikipedia_Logo_1.0.png");
+        final String fileName = "/tmp/wikipedia.png";
+        final Path filePath = Paths.get(fileName);
+
+        try (InputStream logoStream = sourceURL.openStream())
+        {
+            Files.copy(logoStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        final FileDataBodyPart filePart = new FileDataBodyPart("file", new File(fileName));
+
+        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
+             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
+             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+        {
+            assertEquals(Response.Status.CONFLICT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Files.delete(filePath);
+
+        try (Response response = getAdminClient().path("/files/1").path("wikipedia.png").request().delete())
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }

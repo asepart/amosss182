@@ -20,6 +20,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -779,7 +780,8 @@ public class WebService
     @GET
     @RolesAllowed({"Admin", "User"})
     public Response downloadFile(@Context SecurityContext sc,
-                                 @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+                                 @PathParam("ticket") int ticketId, @PathParam("file") String fileName,
+                                 @DefaultValue("false") @QueryParam("thumbnail") boolean thumbnail) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
 
@@ -801,7 +803,17 @@ public class WebService
         try
         {
             FileStorageClient fs = new FileStorageClient();
-            final String location = fs.download(ticketId, fileName);
+            String location;
+
+            if (thumbnail)
+            {
+                if (!fs.hasThumbnail(ticketId, fileName))
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+
+                location = fs.getThumbnail(ticketId, fileName);
+            }
+
+            else location = fs.download(ticketId, fileName);
             return Response.temporaryRedirect(new URI(location)).build();
         }
 
