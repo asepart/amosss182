@@ -36,7 +36,8 @@ export default class Messages extends Component {
 
 	componentDidMount(){
 		this.makeApiCall();
-		this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		//TODO: following line causes bug, please fix
+		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
 	}
 	
 	componentWillUnmount() {
