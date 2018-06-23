@@ -84,13 +84,16 @@ export default class Messages extends Component {
 	//TODO: add actions like upload photo, video, document
 	renderActions(props) {
 		const options = {
-			'Upload 1': (props) => {
+			'Camera': (props) => {
 				alert('option 1');
 			},
-			'Upload 2': (props) => {
+			'Photo & Video Library': (props) => {
 				alert('option 2');
 			},
-			'Cancel': () => {},
+			'Document': (props) => {
+				alert('option 3');
+			},
+			'Cancel': () => {}
 		};
 		return (
 			<Actions
