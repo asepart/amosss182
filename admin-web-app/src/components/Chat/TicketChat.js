@@ -23,9 +23,9 @@ export default class TicketChat extends Component {
 			this.fetchTicketName();
 			this.fetchProjectName();
 		}
-		
+
 		this.fetchMessages();
-		this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
@@ -69,7 +69,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -82,18 +82,25 @@ export default class TicketChat extends Component {
 		});
 	}
 
-	listenForNewMessages() {
-		fetch(URL + '/listen/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				chatHistory: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+	async listenForNewMessages() {
+		while (true){
+			console.log("fetch " + (new Date()).toISOString());
+			var response = await fetch(URL + '/listen/' + this.state.idTicket, {
+				method: 'GET',
+				headers: getAuth()
+			})
+			switch (response.status) {
+				case 200:
+					this.setState({
+						isLoading: false,
+						chatHistory: response,
+					});
+					break;
+				default:
+					console.error("Error:" + response.status);
+					console.error(response.text);
+			}
+		}
 	}
 
 	async onSendPressed() {
