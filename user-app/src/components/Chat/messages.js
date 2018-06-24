@@ -85,8 +85,9 @@ export default class Messages extends Component {
 	renderActions(props) {
 		const options = {
 			'Camera': (props) => {
-				const { navigate } = this.props.navigation;
-				navigate("Ninth", { name: "Camera" })
+				alert('Camera');
+				//const { navigate } = this.props.navigation;
+				//navigate("Ninth", { name: "Camera" })
 			},
 			'Upload 2': (props) => {
 				alert('option 2');

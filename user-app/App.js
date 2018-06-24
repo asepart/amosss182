@@ -28,7 +28,7 @@ const AppNavigation = StackNavigator({
   })},
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
-  Ninth: {screen: Camera }
+ // Ninth: {screen: Camera }
 
  
 
