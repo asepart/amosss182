@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Future;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -1029,20 +1028,6 @@ class WebServiceTest
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
-
-        /*
-        Future<Response> futureResponse = getAdminClient().path("/listen").path(String.valueOf(ticketId)).request().async().get();
-
-        try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, other thread!")))
-        {
-            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (Response response = futureResponse.get())
-        {
-            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
-        }
-        */
 
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {

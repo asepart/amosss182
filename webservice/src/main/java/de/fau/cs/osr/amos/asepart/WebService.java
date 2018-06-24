@@ -264,7 +264,7 @@ public class WebService
                 if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                     return Response.status(Response.Status.FORBIDDEN).build();
 
-                db.updateProject(entryKey, project.get("name"), project.get("owner"));
+                db.updateProject(entryKey, project.get("name"), project.get("owner"), Boolean.parseBoolean(project.get("finished")));
             }
 
             else db.insertProject(entryKey, project.get("name"), project.get("owner")); 
@@ -338,13 +338,14 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> project = db.getProject(projectKey);
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
             if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            else if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), projectKey))
+            else if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), projectKey)))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
@@ -438,7 +439,9 @@ public class WebService
 
             else if (sc.isUserInRole("User"))
             {
-                if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                final boolean finished = Boolean.parseBoolean(project.get("finished"));
+
+                if (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 {
                     return Response.status(Response.Status.FORBIDDEN).build();
                 }
@@ -503,8 +506,10 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             if (!db.hasUserAcceptedTicket(principal.getName(), ticketId))
@@ -528,8 +533,10 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !db.hasUserAcceptedTicket(principal.getName(), ticketId))
+            if (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !db.hasUserAcceptedTicket(principal.getName(), ticketId))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             db.submitObservation(principal.getName(), ticketId,
@@ -554,11 +561,12 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
             if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(db.listObservations(ticketId)).build();
@@ -615,6 +623,13 @@ public class WebService
         {
             if (!db.isProject(entryKey) || !db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> project = db.getProject(entryKey);
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
+
+            if (finished)
+                return Response.status(Response.Status.FORBIDDEN).build();
+
             if (!db.isUserMemberOfProject(user, entryKey))
                 db.joinProject(user, entryKey);
         }
@@ -652,11 +667,12 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
             if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             db.sendMessage(principal.getName(), message, attachment, ticketId);
@@ -749,11 +765,12 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
             if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -792,7 +809,6 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
-
             if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
