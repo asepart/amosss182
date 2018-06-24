@@ -6,13 +6,17 @@ import ChatVideo from './ChatVideo';
 export default class ChatMessage extends Component {
 	render() {
 		if(this.props.type === 'img'){
-			<ChatImage>
-				{this.props.children}
-			</ChatImage>
+			return(
+				<ChatImage>
+					{this.props.children}
+				</ChatImage>
+			)
 		} else if(this.props.type === 'vid'){
-			<ChatVideo>
-				{this.props.children}
-			</ChatVideo>
+			return(
+				<ChatVideo>
+					{this.props.children}
+				</ChatVideo>
+			)
 		} else if(this.props.type === 'aud'){
 			//Audio
 		} else {

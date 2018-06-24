@@ -1,17 +1,12 @@
 import React, { Component } from 'react';
-import { Image } from 'react-native';
+import CPopup from '../shared/Popup';
 
 export default class ChatImage extends Component {
-	viewImage (url){
-		console.log('preview: ' + url);
-	}
 	render() {
 		return (
-			<Image
-				source={require(this.props.children.preview)}
-				style={{width: 100, height: 100}}
-				onPress={this.viewImage(this.props.children.image)}
-			/>
+			<CPopup toggle="<img source={this.props.children.image}?thumbnail=true' style={{width: 100, height: 100}}/>">
+				<img source={this.props.children.image} alt=""/>
+			</CPopup>
 		);
 	}
 }
