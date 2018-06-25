@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
-import { View } from 'react-native'
+import { Link } from 'react-router-dom';
+import { View } from 'react-native';
+import { logout } from '../Login/logout.js';
 
 export default class Header extends Component {
 
@@ -15,7 +16,7 @@ export default class Header extends Component {
     					</Link>
     				</div>
             <div style={{flex: 1, direction: 'rtl'}}>
-              <img style={{height: 30, width: undefined}} src={require('../images/logout.png')} alt=""/>
+              <img style={{height: 30, width: undefined}} src={require('../images/logout.png')} alt="" onClick={logout}/>
             </div>
           </View>
         )
