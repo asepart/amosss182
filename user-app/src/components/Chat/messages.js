@@ -81,17 +81,20 @@ export default class Messages extends Component {
 		this.makeApiCall();
 	}
 
-	//TODO: add actions like upload photo, video, document
+	//TODO: fix bug (all options are accessed at once)
 	renderActions(props) {
 		const options = {
 			'Camera': (props) => {
-				alert('option 1');
+				//TODO: implement camera feature
+				alert("implement camera feature");
 			},
 			'Photo & Video Library': (props) => {
-				alert('option 2');
+				const { navigate } = this.props.navigation;
+				navigate("Tenth", { name: "CameraRollPicker" });
 			},
 			'Document': (props) => {
-				alert('option 3');
+				//TODO: implement document feature
+				alert("implement document feature");
 			},
 			'Cancel': () => {}
 		};
@@ -133,7 +136,7 @@ export default class Messages extends Component {
 				onInputTextChanged={(text) => this.setState({message: text})}
 				onSend={this.onSendPressed.bind(this)}
 				showAvatarForEveryMessage={true}
-				renderActions={this.renderActions}
+				renderActions={this.renderActions.bind(this)}
 				user={{
 					_id: username,
 					name: username,
