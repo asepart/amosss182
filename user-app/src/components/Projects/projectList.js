@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList} from 'react-native';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {StackNavigator,} from 'react-navigation';
+import {getAuth} from '../Login/auth';
 
 export default class ProjectList extends Component {
     static navigationOptions= {
@@ -15,13 +16,36 @@ export default class ProjectList extends Component {
 		}
     } 
 
+    constructor(props) {
+		super(props);
+		this.state = {
+			isLoading: true,
+			userProjects: [],
+		};
+	}
+
+    componentDidMount() {
+        this.fetchUserProjects();
+}
     async onAddProject() {
 
          const { navigate } = this.props.navigation;
           navigate("Third", { name: "JoinProject" })
     
        } 
-      
+     
+       fetchUserProjects() {
+        fetch(URL + '/projects', {method:'GET', headers: getAuth()})
+				.then((response) => response.json())
+					.then((responseJson) => {
+						this.setState({
+							isLoading: false,
+							userProjects: responseJson
+						}, function() {});
+					}).catch((error) => {
+						console.error(error);
+					});
+       }       
         
 render() {
     var {params} = this.props.navigation.state;
