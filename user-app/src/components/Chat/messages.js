@@ -7,7 +7,9 @@ import {setState} from '../Login/state';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ticket} from './sendMessages';
 import {StackNavigator} from 'react-navigation';
-import { GiftedChat, Actions } from 'react-native-gifted-chat'
+import { GiftedChat } from 'react-native-gifted-chat';
+import CustomActions from './customActions';
+
 
 export default class Messages extends Component {
 
@@ -81,27 +83,12 @@ export default class Messages extends Component {
 		this.makeApiCall();
 	}
 
-	//TODO: fix bug (all options are accessed at once)
-	renderActions(props) {
-		const options = {
-			'Camera': (props) => {
-				//TODO: implement camera feature
-			},
-			'Photo & Video Library': (props) => {
-				const { navigate } = this.props.navigation;
-				navigate("Tenth", { name: "CameraRollPicker" });
-			},
-			'Document': (props) => {
-				//TODO: implement document feature
-			},
-			'Cancel': () => {}
-		};
+	renderCustomActions(props) {
 		return (
-			<Actions
-				{...props}
-				options={options}
-			/>
-		);
+	      <CustomActions
+	        {...props}
+	      />
+	    );
 	}
 
 	onLongPress(ctx, currentMessage) {
@@ -141,7 +128,7 @@ export default class Messages extends Component {
 				onInputTextChanged={(text) => this.setState({message: text})}
 				onSend={this.onSendPressed.bind(this)}
 				showAvatarForEveryMessage={true}
-				renderActions={this.renderActions.bind(this)}
+				renderActions={ () => this.renderCustomActions(this.props)}
 				user={{
 					_id: username,
 					name: username,
