@@ -2,8 +2,12 @@ import React, {Component} from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList} from 'react-native';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
+import {URL} from '../Login/const';
 import {StackNavigator,} from 'react-navigation';
 import {getAuth} from '../Login/auth';
+
+export var projectname = '';
+export var projectstatus = '';
 
 export default class ProjectList extends Component {
     static navigationOptions= {
@@ -19,7 +23,6 @@ export default class ProjectList extends Component {
     constructor(props) {
 		super(props);
 		this.state = {
-			isLoading: true,
 			userProjects: [],
 		};
 	}
@@ -39,16 +42,33 @@ export default class ProjectList extends Component {
 				.then((response) => response.json())
 					.then((responseJson) => {
 						this.setState({
-							isLoading: false,
 							userProjects: responseJson
 						}, function() {});
 					}).catch((error) => {
 						console.error(error);
 					});
        }       
-        
+
+ _renderProjects({item}) {
+    if (item.finished === 'false') {
+        projectstatus = 'Project is finished';
+    } else {
+        projectstatus = 'Project is open';
+    }
+     return (
+        <TouchableOpacity
+                     style={styles.buttonLargeContainer}>
+                     <Text style={styles.buttonText}>
+                    Project Name: {item.name} 
+                    </Text>
+                    <Text style={styles.buttonText}>
+                    Project Status: {projectstatus}
+                    </Text>
+                      </TouchableOpacity>
+     );
+ }      
+      
 render() {
-    var {params} = this.props.navigation.state;
     return (
       <View style={styles.container}>
           <TouchableOpacity 
@@ -58,14 +78,12 @@ render() {
               <Text style={styles.buttonText}>Add Project</Text>
         
           </TouchableOpacity>
-          <View>
           <FlatList
 					style={styles.textLarge}
 					data={this.state.userProjects}
-					renderItem={this._renderProjects.bind(this)}
+                    renderItem={this._renderProjects.bind(this)}
 					 keyExtractor={(item, index) => index}
 				/>   
-          </View>    
 
       </View>
     );
