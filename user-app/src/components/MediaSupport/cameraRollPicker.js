@@ -6,11 +6,10 @@ import {
   View,
   Button
 } from 'react-native';
-import {setMsg, sendMessage, setTicketID, msg, ticket} from '../Chat/sendMessages'
-import {URL} from '../Login/const';
-import {getAuthForMediaPost} from '../Login/auth';
-
+import {setMsg, sendMessage, setTicketID, msg, ticket} from '../Chat/sendMessages';
+import {uploadFile} from '../Chat/uploadFile';
 import CameraRollPicker from 'react-native-camera-roll-picker';
+//import fileType from 'react-native-file-type';
 
 var buttonEnabled = false;
 
@@ -46,41 +45,38 @@ export default class CameraRollPicer extends Component {
 	  }
 	
 	sendFile = () => {
-		alert("Sending " + this.state.num + " file(s).");
 		
-		//send filename to chat
+		//create new filename
+/*		var ext = '';
+		fileType(this.state.selected[0].uri).then((type) => {
+		    //Ext: type.ext
+		    //MimeType: type.mime
+			ext = type.ext;
+		})
+		const filename = (Date() + '.' + ext); console.log(filename);
+*/		const filename = ('TESTJPG-' + Date() + '.jpg')
+		
+		//send  flename to chat
 		var tmp = new Date();
 		var date = tmp.toDateString();
 		var time = tmp.toTimeString().slice(0,8);
 		var timestamp = "[" + date + ", " + time + "]";
-		setMsg(timestamp + ": " + this.state.selected[0].filename);
+		setMsg(timestamp + ": " + filename);
 		sendMessage();
 		
-		//send file to backend
+		//convert file into FormData
 		const image = {
 			      uri: this.state.selected[0].uri,
 			      type: 'multipart/form-data',
-			      name: this.state.selected[0].filename
+			      name: filename
 		}
 		const imgBody = new FormData();
 		imgBody.append('file', image);
 		
-		fetch(URL + '/files/' + ticket, {
-            method: 'POST',
-            headers: getAuthForMediaPost(),
-            body: imgBody
-		}).then(
-			    response => {
-			    	response.json();
-			    	console.log('response: ' + response.status);
-			    }
-		  ).catch(
-		    error => console.log('uploadImage error:', error)
-		  );
+		//send file to backend
+		uploadFile(imgBody, ticket);
 		
-		console.log(ticket);
-		console.log(imgBody);
-		
+		//navigate back to chat
 		const { navigate } = this.props.navigation;
 		navigate("Seventh", { name: "GetMessages" });
 	}
