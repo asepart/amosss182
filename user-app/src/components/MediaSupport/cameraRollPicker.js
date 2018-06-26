@@ -7,7 +7,7 @@ import {
   Button
 } from 'react-native';
 import {setTicketID, msg, ticket} from '../Chat/sendMessages';
-import {uploadFile} from '../Chat/uploadFile';
+import {uploadFile} from '../Chat/files';
 import CameraRollPicker from 'react-native-camera-roll-picker';
 
 var buttonEnabled = false;
