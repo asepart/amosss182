@@ -86,7 +86,6 @@ export default class Messages extends Component {
 		const options = {
 			'Camera': (props) => {
 				//TODO: implement camera feature
-				alert("implement camera feature");
 			},
 			'Photo & Video Library': (props) => {
 				const { navigate } = this.props.navigation;
@@ -94,7 +93,6 @@ export default class Messages extends Component {
 			},
 			'Document': (props) => {
 				//TODO: implement document feature
-				alert("implement document feature");
 			},
 			'Cancel': () => {}
 		};
@@ -106,6 +104,13 @@ export default class Messages extends Component {
 		);
 	}
 
+	onLongPress(ctx, currentMessage) {
+	    console.log(currentMessage);
+	    
+	    //TODO: implement file download
+    	alert("Saved " + currentMessage.text);
+	}
+	
 	render() {
 		if(this.state.isLoading) {
 			return(
@@ -141,6 +146,7 @@ export default class Messages extends Component {
 					_id: username,
 					name: username,
 				}}
+			onLongPress={(ctx, currentMessage) => this.onLongPress(ctx, currentMessage)}
 			/>
 		);
 	}
