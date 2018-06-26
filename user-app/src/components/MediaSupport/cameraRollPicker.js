@@ -6,6 +6,9 @@ import {
   View,
   Button
 } from 'react-native';
+import {setMsg, sendMessage, setTicketID, msg, ticket} from '../Chat/sendMessages'
+import {URL} from '../Login/const';
+import {getAuthForMediaPost} from '../Login/auth';
 
 import CameraRollPicker from 'react-native-camera-roll-picker';
 
@@ -45,7 +48,38 @@ export default class CameraRollPicer extends Component {
 	sendFile = () => {
 		alert("Sending " + this.state.num + " file(s).");
 		
-		//TODO: implement upload
+		//send filename to chat
+		var tmp = new Date();
+		var date = tmp.toDateString();
+		var time = tmp.toTimeString().slice(0,8);
+		var timestamp = "[" + date + ", " + time + "]";
+		setMsg(timestamp + ": " + this.state.selected[0].filename);
+		sendMessage();
+		
+		//send file to backend
+		const image = {
+			      uri: this.state.selected[0].uri,
+			      type: 'multipart/form-data',
+			      name: this.state.selected[0].filename
+		}
+		const imgBody = new FormData();
+		imgBody.append('file', image);
+		
+		fetch(URL + '/files/' + ticket, {
+            method: 'POST',
+            headers: getAuthForMediaPost(),
+            body: imgBody
+		}).then(
+			    response => {
+			    	response.json();
+			    	console.log('response: ' + response.status);
+			    }
+		  ).catch(
+		    error => console.log('uploadImage error:', error)
+		  );
+		
+		console.log(ticket);
+		console.log(imgBody);
 		
 		const { navigate } = this.props.navigation;
 		navigate("Seventh", { name: "GetMessages" });
@@ -85,7 +119,7 @@ export default class CameraRollPicer extends Component {
 					batchSize={5}
 					maximum={3}
 					selected={this.state.selected}
-					selectSingleItem={false}
+					selectSingleItem={true}
 					assetType='All'
 					imagesPerRow={3}
 					imageMargin={5}
