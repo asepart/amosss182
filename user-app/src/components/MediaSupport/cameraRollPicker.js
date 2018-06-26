@@ -6,10 +6,9 @@ import {
   View,
   Button
 } from 'react-native';
-import {setMsg, sendMessage, setTicketID, msg, ticket} from '../Chat/sendMessages';
+import {setTicketID, msg, ticket} from '../Chat/sendMessages';
 import {uploadFile} from '../Chat/uploadFile';
 import CameraRollPicker from 'react-native-camera-roll-picker';
-//import fileType from 'react-native-file-type';
 
 var buttonEnabled = false;
 
@@ -46,35 +45,8 @@ export default class CameraRollPicer extends Component {
 	
 	sendFile = () => {
 		
-		//create new filename
-/*		var ext = '';
-		fileType(this.state.selected[0].uri).then((type) => {
-		    //Ext: type.ext
-		    //MimeType: type.mime
-			ext = type.ext;
-		})
-		const filename = (Date() + '.' + ext); console.log(filename);
-*/		const filename = ('TESTJPG-' + Date() + '.jpg')
-		
-		//send  flename to chat
-		var tmp = new Date();
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-		setMsg(timestamp + ": " + filename);
-		sendMessage();
-		
-		//convert file into FormData
-		const image = {
-			      uri: this.state.selected[0].uri,
-			      type: 'multipart/form-data',
-			      name: filename
-		}
-		const imgBody = new FormData();
-		imgBody.append('file', image);
-		
 		//send file to backend
-		uploadFile(imgBody, ticket);
+		uploadFile(this.state.selected[0].uri, ticket);
 		
 		//navigate back to chat
 		const { navigate } = this.props.navigation;
