@@ -240,13 +240,28 @@ public class WebService
     @Path("/projects")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response listProjects(@Context SecurityContext sc) throws Exception
     {
-        try (DatabaseClient db = new DatabaseClient())
+        final String account = sc.getUserPrincipal().getName();
+
+        if (sc.isUserInRole("Admin"))
         {
-            return Response.ok(db.listProjects(sc.getUserPrincipal().getName())).build();
+            try (DatabaseClient db = new DatabaseClient())
+            {
+                return Response.ok(db.listProjects(account)).build();
+            }
         }
+
+        else if (sc.isUserInRole("User"))
+        {
+            try (DatabaseClient db = new DatabaseClient())
+            {
+                return Response.ok(db.listJoinedProjects(account)).build();
+            }
+        }
+
+        else return Response.status(Response.Status.FORBIDDEN).build();
     }
 
     @Path("/projects")

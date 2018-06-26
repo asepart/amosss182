@@ -374,6 +374,32 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
+    List<Map<String, String>> listJoinedProjects(String user) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select p.entry_key, p.name, p.owner, p.finished from project p join membership m on p.entry_key = m.project_key where m.login_name = ?;"))
+        {
+            stmt.setString(1, user);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                List<Map<String, String>> result = new LinkedList<>();
+
+                while (rs.next())
+                {
+                    Map<String, String> row = new HashMap<>(4);
+                    row.put("entryKey", rs.getString(1));
+                    row.put("name", rs.getString(2));
+                    row.put("owner", rs.getString(3));
+                    row.put("finished", String.valueOf(rs.getBoolean(4)));
+
+                    result.add(row);
+                }
+
+                return result;
+            }
+        }
+    }
+
     int deleteProject(String entryKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("delete from project where entry_key = ?;"))
