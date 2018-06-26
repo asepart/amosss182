@@ -46,7 +46,14 @@ export default class CameraRollPicer extends Component {
 	sendFile = () => {
 		
 		//send file to backend
-		uploadFile(this.state.selected[0].uri, ticket);
+		for(let i = 0; i < this.state.num; i++){
+			
+			setTimeout(() => {
+				 
+				uploadFile(this.state.selected[i].uri, ticket);
+			 
+			    }, i*1000);
+		}
 		
 		//navigate back to chat
 		const { navigate } = this.props.navigation;
@@ -87,7 +94,7 @@ export default class CameraRollPicer extends Component {
 					batchSize={5}
 					maximum={3}
 					selected={this.state.selected}
-					selectSingleItem={true}
+					selectSingleItem={false}
 					assetType='All'
 					imagesPerRow={3}
 					imageMargin={5}

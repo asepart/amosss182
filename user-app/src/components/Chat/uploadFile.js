@@ -14,8 +14,8 @@ export function uploadFile (uri, ticket) {
 	    //MimeType: type.mime
 		ext = type.ext;
 	})
-	const filename = (Date() + '.' + ext);
-*/	const filename = Date();
+	var filename = (Date() + '.' + ext);
+*/	var filename = Date();
 	
 	//send  filename to chat
 	var tmp = new Date();
