@@ -10,6 +10,7 @@ import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import {
   StackNavigator,
 } from 'react-navigation';
+import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = StackNavigator({
   First: { screen: Login },
@@ -26,8 +27,8 @@ const AppNavigation = StackNavigator({
 	}
   })},
   Seventh: {screen: GetMessages},
-  Eigth: {screen: TicketProcessing }
-
+  Eigth: {screen: TicketProcessing },
+  Tenth: {screen:ProjectList}
  
 
 }); 

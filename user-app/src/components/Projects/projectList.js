@@ -14,4 +14,21 @@ export default class ProjectList extends Component {
 			color:'#FFF'
 		}
     } 
+
+
+render() {
+    var {params} = this.props.navigation.state;
+    return (
+      <View style={styles.container}>
+          <TouchableOpacity 
+         onPress={this.onAddProject.bind(this)} 
+          style={styles.buttonLargeContainer}>
+          
+              <Text style={styles.buttonText}>Add Project</Text>
+        
+          </TouchableOpacity>
+
+      </View>
+    );
+  }
 }
