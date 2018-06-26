@@ -5,6 +5,7 @@ import {setState} from '../Login/state';
 import {URL} from '../Login/const';
 import {StackNavigator,} from 'react-navigation';
 import {getAuth} from '../Login/auth';
+import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
 
 export var projectname = '';
 export var projectstatus = '';
@@ -30,6 +31,14 @@ export default class ProjectList extends Component {
     componentDidMount() {
         this.fetchUserProjects();
 }
+
+componentDidUpdate() {
+    if(getUpdateBoolean() === true) {
+      this.fetchUserProjects();
+      setUpdateBoolean(false);
+    }
+  }
+
     async onAddProject() {
 
          const { navigate } = this.props.navigation;
@@ -51,9 +60,9 @@ export default class ProjectList extends Component {
 
  _renderProjects({item}) {
     if (item.finished === 'false') {
-        projectstatus = 'Project is finished';
-    } else {
         projectstatus = 'Project is open';
+    } else {
+        projectstatus = 'Project is finished';
     }
      return (
         <TouchableOpacity
