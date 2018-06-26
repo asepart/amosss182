@@ -40,7 +40,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                    <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -51,7 +51,7 @@
                     <assembleDirectory>target</assembleDirectory>
                     <programs>
                         <program>
-                            <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                            <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                             <name>webservice</name>
                         </program>
                     </programs>
@@ -84,7 +84,7 @@
                 <configuration>
                   <archive>
                     <manifest>
-                      <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                      <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                       <addClasspath>true</addClasspath>
                     </manifest>
                   </archive>

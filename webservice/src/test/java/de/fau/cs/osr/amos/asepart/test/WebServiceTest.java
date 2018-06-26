@@ -1,4 +1,6 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.test;
+
+import de.fau.cs.osr.amos.asepart.service.WebService;
 
 import java.io.File;
 import java.io.IOException;

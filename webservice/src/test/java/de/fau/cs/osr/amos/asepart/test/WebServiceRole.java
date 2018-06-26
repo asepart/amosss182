@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.test;
 
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
@@ -16,12 +16,12 @@ public class WebServiceRole implements ClientRequestFilter
         this.role = requireNonNull(role);
     }
 
-    public static WebServiceRole admin()
+    static WebServiceRole admin()
     {
         return new WebServiceRole("Admin");
     }
 
-    public static WebServiceRole user()
+    static WebServiceRole user()
     {
         return new WebServiceRole("User");
     }

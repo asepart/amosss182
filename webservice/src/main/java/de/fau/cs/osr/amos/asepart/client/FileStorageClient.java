@@ -1,10 +1,11 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.client;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.LinkedList;
+import javax.imageio.ImageIO;
 
 import io.minio.ErrorCode;
 import io.minio.MinioClient;
@@ -19,16 +20,21 @@ import org.jcodec.api.FrameGrab;
 import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 
-import javax.imageio.ImageIO;
+/**
+ * This class is a wrapper for accessing
+ * an minio file server, which is an
+ * open source implementation of the
+ * Amazon S3 protocol.
+ */
 
-class FileStorageClient
+public class FileStorageClient
 {
     private MinioClient client;
 
     private final String fileBucket;
     private final String thumbnailBucket;
 
-    FileStorageClient() throws Exception
+    public FileStorageClient() throws Exception
     {
         final String minioUrl = System.getenv("ASEPART_MINIO_URL");
         final String minioAccessKey = System.getenv("MINIO_ACCESS_KEY");
@@ -94,12 +100,28 @@ class FileStorageClient
         return client.presignedGetObject(bucket, fileId, 86400);
     }
 
-    String download(int ticketId, String fileName) throws Exception
+    /**
+     * Returns an url where the file can be found.
+     *
+     * @param ticketId Unique id of ticket.
+     * @param fileName The name of the file.
+     * @return URL which can be used to GET the file.
+     */
+
+    public String download(int ticketId, String fileName) throws Exception
     {
         return download(ticketId, fileName, fileBucket);
     }
 
-    void upload(int ticketId, String fileName, InputStream fileStream) throws Exception
+    /**
+     * Uploads a file to the server.
+     *
+     * @param ticketId Unique id of ticket.
+     * @param fileName The name of the file.
+     * @param fileStream Stream containing the file's contents.
+     */
+
+    public void upload(int ticketId, String fileName, InputStream fileStream) throws Exception
     {
         final String fileId = internalName(ticketId, fileName);
 
@@ -162,7 +184,15 @@ class FileStorageClient
         else throw new IllegalArgumentException("File is neither an image nor a video!");
     }
 
-    boolean hasThumbnail(int ticketId, String fileName) throws Exception
+    /**
+     * Checks if a file has a thumbnail available.
+     *
+     * @param ticketId Unique id of ticket.
+     * @param fileName The name of the file.
+     * @return true if thumbnail exists, false if not.
+     */
+
+    public boolean hasThumbnail(int ticketId, String fileName) throws Exception
     {
         final String fileId = internalName(ticketId, fileName);
 
@@ -173,7 +203,15 @@ class FileStorageClient
         else return false;
     }
 
-    String getThumbnail(int ticketId, String fileName) throws Exception
+    /**
+     * Returns an url where the thumbnail of the file can be found.
+     *
+     * @param ticketId Unique id of ticket.
+     * @param fileName The name of the file.
+     * @return URL which can be used to GET the thumbnail.
+     */
+
+    public String getThumbnail(int ticketId, String fileName) throws Exception
     {
         if (isImageFile(fileName))
             return download(ticketId, fileName, thumbnailBucket);
@@ -182,7 +220,15 @@ class FileStorageClient
         else throw new IllegalArgumentException("File is neither an image nor a video!");
     }
 
-    boolean exists(int ticketId, String fileName) throws Exception
+    /**
+     * Checks if a file exists.
+     *
+     * @param ticketId Unique id of ticket.
+     * @param fileName The name of the file.
+     * @return true if file exists, false if not.
+     */
+
+    public boolean exists(int ticketId, String fileName) throws Exception
     {
         final String fileId = internalName(ticketId, fileName);
         return exists(fileId, fileBucket);
@@ -206,7 +252,14 @@ class FileStorageClient
         return fileExists;
     }
 
-    void remove(int ticketId, String fileName) throws Exception
+    /**
+     * Delete a file.
+     *
+     * @param ticketId Unique id of ticket.
+     * @param fileName The name of the file.
+     */
+
+    public void remove(int ticketId, String fileName) throws Exception
     {
         final String fileId = internalName(ticketId, fileName);
         client.removeObject(fileBucket, fileId);
@@ -220,7 +273,13 @@ class FileStorageClient
         }
     }
 
-    void cascade(int ticketId) throws Exception
+    /**
+     * Delete all files related to a ticket.
+     *
+     * @param ticketId Unique id of ticket.
+     */
+
+    public void cascade(int ticketId) throws Exception
     {
         Iterable<Result<Item>> results = client.listObjects(fileBucket, "ticket:" + String.valueOf(ticketId) + ":");
         LinkedList<String> trash = new LinkedList<>();
@@ -240,5 +299,4 @@ class FileStorageClient
                 client.removeObject(thumbnailBucket, getVideoThumbnailName(fileId));
         }
     }
-
 }
