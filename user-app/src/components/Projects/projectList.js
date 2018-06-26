@@ -34,6 +34,14 @@ render() {
               <Text style={styles.buttonText}>Add Project</Text>
         
           </TouchableOpacity>
+          <View>
+          <FlatList
+					style={styles.textLarge}
+					data={this.state.userProjects}
+					renderItem={this._renderProjects.bind(this)}
+					 keyExtractor={(item, index) => index}
+				/>   
+          </View>    
 
       </View>
     );
