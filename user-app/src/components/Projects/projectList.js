@@ -15,7 +15,14 @@ export default class ProjectList extends Component {
 		}
     } 
 
+    async onAddProject() {
 
+         const { navigate } = this.props.navigation;
+          navigate("Third", { name: "JoinProject" })
+    
+       } 
+      
+        
 render() {
     var {params} = this.props.navigation.state;
     return (
