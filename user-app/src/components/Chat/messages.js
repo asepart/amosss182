@@ -9,7 +9,7 @@ import {ticket} from './sendMessages';
 import {StackNavigator} from 'react-navigation';
 import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
-
+import {downloadFile} from './files';
 
 export default class Messages extends Component {
 
@@ -92,10 +92,10 @@ export default class Messages extends Component {
 	}
 
 	onLongPress(ctx, currentMessage) {
-	    console.log(currentMessage);
 	    
-	    //TODO: implement file download
-    	alert("Saved " + currentMessage.text);
+		//TODO: add actionsheet here
+		downloadFile(currentMessage.text, ticket);
+	    
 	}
 	
 	render() {

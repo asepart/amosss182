@@ -1,7 +1,11 @@
 import {URL} from '../Login/const';
-import {getAuthForMediaPost} from '../Login/auth';
+import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
 //import fileType from 'react-native-file-type';
+import FileSystem from 'react-native-filesystem';
+import moment from 'moment';
+
+var link = '';
 
 export function uploadFile (uri, ticket) {
 	
@@ -14,8 +18,8 @@ export function uploadFile (uri, ticket) {
 	    //MimeType: type.mime
 		ext = type.ext;
 	})
-	var filename = (Date() + '.' + ext);
-*/	var filename = Date();
+	var filename = (moment().format() + '.' + ext);
+*/	var filename = moment().format();
 	
 	//send  filename to chat
 	var tmp = new Date();
@@ -55,4 +59,47 @@ export function uploadFile (uri, ticket) {
 	
 	console.log(ticket);
 	console.log(imgBody);
+}
+
+export function downloadFile (filename, ticket) {
+	
+	//get downloadlink from backend
+	fetch(URL + '/files/' + ticket + '/' + filename + '?thumbnail=false', {
+        method: 'GET',
+        headers: getAuth()
+	}).then(
+		    response => {
+		    	response.json();
+		    	link = '';
+		    	if (response.status == '200') {
+		    		link = response.url;
+		    	} else if (response.status == '404') {
+		    		alert("File download failed. File does not exist.");
+		    	}
+		    }
+	  ).catch(
+	    error => {
+	    	console.log('downloadImage error:', error);
+	    	alert("File download failed.");
+	    }
+	  );
+	
+	//TODO: implement file download and storage
+	if (link !== '') {
+		
+		console.log(link);
+		
+/*		const { uri: localUri } = FileSystem.downloadAsync(
+				  link,
+				  FileSystem.documentDirectory + filename
+				)
+				  .then(({ uri }) => {
+				    console.log('Finished downloading to ', uri);
+				  })
+				  .catch(error => {
+				    console.error(error);
+				  });
+*/		
+		alert("Saved " + filename);
+	}
 }
