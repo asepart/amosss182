@@ -39,7 +39,7 @@ export default class UpdateProjectButton extends Component {
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username, finished: this.state.finished})
+				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username, finished: (this.state.finished ? "true" : "false")})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
