@@ -76,6 +76,7 @@ export default styles=StyleSheet.create({
       backgroundColor: '#009fca',
       paddingVertical: 15,
       width: 350,
+      marginBottom: 15
     },
 
     buttonText: {

@@ -1,4 +1,7 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.service;
+
+import de.fau.cs.osr.amos.asepart.client.*;
+import de.fau.cs.osr.amos.asepart.ext.*;
 
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
@@ -38,6 +41,11 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import io.minio.ErrorCode;
 import io.minio.errors.ErrorResponseException;
+
+/**
+ * Implements the ASEPART REST API as described in
+ * api file webservice-api.txt.
+ */
 
 @Path("/")
 public class WebService
@@ -240,13 +248,28 @@ public class WebService
     @Path("/projects")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response listProjects(@Context SecurityContext sc) throws Exception
     {
-        try (DatabaseClient db = new DatabaseClient())
+        final String account = sc.getUserPrincipal().getName();
+
+        if (sc.isUserInRole("Admin"))
         {
-            return Response.ok(db.listProjects(sc.getUserPrincipal().getName())).build();
+            try (DatabaseClient db = new DatabaseClient())
+            {
+                return Response.ok(db.listProjects(account)).build();
+            }
         }
+
+        else if (sc.isUserInRole("User"))
+        {
+            try (DatabaseClient db = new DatabaseClient())
+            {
+                return Response.ok(db.listJoinedProjects(account)).build();
+            }
+        }
+
+        else return Response.status(Response.Status.FORBIDDEN).build();
     }
 
     @Path("/projects")
@@ -886,8 +909,8 @@ public class WebService
         }
     }
 
-    static String address = "http://localhost/";
-    static int port = 12345;
+    public static String address = "http://localhost/";
+    public static int port = 12345;
     
     public static void main(String[] args)
     {

@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.client;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -15,7 +15,18 @@ import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 import org.postgresql.ds.PGSimpleDataSource;
 
-class DatabaseClient implements AutoCloseable
+/**
+ * This class connects to a PostgreSQL database. The default
+ * values are localhost for the hostname, "postgres" for
+ * the username and "asepart" for the password. These values
+ * can be changed by setting JDBC_DATABASE_URL.
+ *
+ * If this variable is not present, the hostname can be set
+ * using ASEPART_POSTGRES_HOST, which can be useful for
+ * connecting Docker containers.
+ */
+
+public class DatabaseClient implements AutoCloseable
 {
     private static DataSource createDataSource()
     {
@@ -47,7 +58,7 @@ class DatabaseClient implements AutoCloseable
     private static final DataSource ds = createDataSource();
     private final Connection cn;
 
-    DatabaseClient() throws SQLException
+    public DatabaseClient() throws SQLException
     {
         cn = ds.getConnection();
     }
@@ -58,7 +69,7 @@ class DatabaseClient implements AutoCloseable
         cn.close();
     }
 
-    boolean authenticate(String loginName, String password) throws SQLException
+    private boolean authenticate(String loginName, String password) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from account where login_name = ? and password = crypt(?, password);"))
         {
@@ -73,7 +84,17 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    boolean authenticate(String loginName, String password, String role) throws SQLException
+    /**
+     * Checks if authentication is valid.
+     *
+     * @param loginName The account name.
+     * @param password The password as plain text.
+     * @param role "Admin" or "User".
+     * @return true if password is correct and given role matches account, false otherwise.
+     * @throws SQLException on database error.
+     */
+
+    public boolean authenticate(String loginName, String password, String role) throws SQLException
     {
         if (!authenticate(loginName, password))
             return false;
@@ -88,7 +109,19 @@ class DatabaseClient implements AutoCloseable
         return true;
     }
 
-    int changePassword(String loginName, String password) throws SQLException
+    /**
+     * Changes password of user or admin account.
+     *
+     * Passwords are stored in the database as a salted bcrypt hash.
+     *
+     * @param loginName The account name.
+     * @param password The password as plain text.
+     *
+     * @throws SQLException on database error.
+     * @throws IllegalArgumentException if password is empty.
+     */
+
+    public void changePassword(String loginName, String password) throws SQLException
     {
         if (password == null || password.isEmpty())
             throw new IllegalArgumentException("Password must not be empty");
@@ -98,11 +131,24 @@ class DatabaseClient implements AutoCloseable
             stmt.setString(1, password);
             stmt.setString(2, loginName);
 
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    void insertUser(String loginName, String firstName, String lastName, String phoneNumber) throws SQLException
+    /**
+     * Creates a new user.
+     *
+     * To enable the user to log in, a password must be set
+     * by calling changePassword().
+     *
+     * @param loginName The account name.
+     * @param firstName The first name of the user.
+     * @param lastName The last name of the user.
+     * @param phoneNumber The user's mobile phone number.
+     * @throws SQLException on database error.
+     */
+
+    public void insertUser(String loginName, String firstName, String lastName, String phoneNumber) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into user_account(login_name, first_name, last_name, phone_number) values (?, ?, ?, ?);"))
         {
@@ -115,7 +161,17 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void updateUser(String loginName, String firstName, String lastName, String phoneNumber) throws SQLException
+    /**
+     * Updates an existing user.
+     *
+     * @param loginName The account name.
+     * @param firstName The first name of the user.
+     * @param lastName The last name of the user.
+     * @param phoneNumber The user's mobile phone number.
+     * @throws SQLException on database error.
+     */
+
+    public void updateUser(String loginName, String firstName, String lastName, String phoneNumber) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                 "update user_account set first_name = ?, last_name = ?, phone_number = ? where login_name = ?;"))
@@ -129,7 +185,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    boolean isUser(String loginName) throws SQLException
+    /**
+     * Checks if an account name matches a user name.
+     *
+     * @param loginName The account name.
+     * @return true if user exists, false if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isUser(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from only user_account where login_name = ?;");)
         {
@@ -146,8 +210,15 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
+    /**
+     * Gets a user's account details.
+     *
+     * @param loginName The account name.
+     * @return A map containing the user's details.
+     * @throws SQLException on database error.
+     */
 
-    Map<String, String> getUser(String loginName) throws SQLException
+    public Map<String, String> getUser(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select login_name, first_name, last_name, phone_number from only user_account where login_name = ?;");)
         {
@@ -168,8 +239,14 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
+    /**
+     * Returns all users.
+     *
+     * @return List of maps containing each user's details.
+     * @throws SQLException on database error.
+     */
 
-    List<Map<String, String>> listUsers() throws SQLException
+    public List<Map<String, String>> listUsers() throws SQLException
     {
         try (Statement stmt = cn.createStatement();
              ResultSet rs = stmt.executeQuery("select login_name, first_name, last_name, phone_number from only user_account;"))
@@ -191,7 +268,19 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void insertAdmin(String loginName, String firstName, String lastName) throws SQLException
+    /**
+     * Creates a new admin.
+     *
+     * To enable the admin to log in, a password must be set
+     * by calling changePassword().
+     *
+     * @param loginName The account name.
+     * @param firstName The first name of the admin.
+     * @param lastName The last name of the admin.
+     * @throws SQLException on database error.
+     */
+
+    public void insertAdmin(String loginName, String firstName, String lastName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into admin_account(login_name, first_name, last_name) values (?, ?, ?);");)
         {
@@ -203,7 +292,16 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void updateAdmin(String loginName, String firstName, String lastName) throws SQLException
+    /**
+     * Updates an existing admin.
+     *
+     * @param loginName The account name.
+     * @param firstName The first name of the admin.
+     * @param lastName The last name of the admin.
+     * @throws SQLException on database error.
+     */
+
+    public void updateAdmin(String loginName, String firstName, String lastName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                 "update admin_account set first_name = ?, last_name = ? where login_name = ?;"))
@@ -216,7 +314,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    boolean isAdmin(String loginName) throws SQLException
+    /**
+     * Checks if an account name matches an admin name.
+     *
+     * @param loginName The account name.
+     * @return true if admin exists, false if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isAdmin(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from only admin_account where login_name = ?;");)
         {
@@ -233,8 +339,15 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
+    /**
+     * Gets an admin's account details.
+     *
+     * @param loginName The account name.
+     * @return A map containing the admin's details.
+     * @throws SQLException on database error.
+     */
 
-    Map<String, String> getAdmin(String loginName) throws SQLException
+    public Map<String, String> getAdmin(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select login_name, first_name, last_name from only admin_account where login_name = ?;");)
         {
@@ -254,7 +367,14 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    List<Map<String, String>> listAdmins() throws SQLException
+    /**
+     * Returns all admins.
+     *
+     * @return List of maps containing each admin's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listAdmins() throws SQLException
     {
         try (Statement stmt = cn.createStatement();
              ResultSet rs = stmt.executeQuery("select login_name, first_name, last_name from only admin_account;"))
@@ -275,16 +395,32 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    int deleteAccount(String loginName) throws SQLException
+    /**
+     * Delete an account (admin or user).
+     *
+     * @param loginName The account name.
+     * @throws SQLException on database error.
+     */
+
+    public void deleteAccount(String loginName) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("delete from account where login_name = ?;");)
         {
             stmt.setString(1, loginName);
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    void insertProject(String entryKey, String name, String owner) throws SQLException
+    /**
+     * Create a new project.
+     *
+     * @param entryKey Unique key a user is required to know to join a project.
+     * @param name Name of the project.
+     * @param owner Name of the admin who owns the project.
+     * @throws SQLException on database error.
+     */
+
+    public void insertProject(String entryKey, String name, String owner) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into project(entry_key, name, owner) values (?, ?, ?);"))
         {
@@ -295,7 +431,17 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void updateProject(String entryKey, String name, String owner, boolean finished) throws SQLException
+    /**
+     * Updates an existing project.
+     *
+     * @param entryKey Unique key a user is required to know to join a project.
+     * @param name Name of the project.
+     * @param owner Name of the admin who owns the project.
+     * @param finished Mark the project as finished or not (finished projects are read-only and not visible to users).
+     * @throws SQLException on database error.
+     */
+
+    public void updateProject(String entryKey, String name, String owner, boolean finished) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                 "update project set name = ?, owner = ?, finished = ? where entry_key = ?;"))
@@ -309,7 +455,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    boolean isProject(String entryKey) throws SQLException
+    /**
+     * Checks if a project with given key exists.
+     *
+     * @param entryKey Unique project key.
+     * @return true if project exists, false if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isProject(String entryKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(entry_key) from project where entry_key = ?;"))
         {
@@ -327,7 +481,15 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
-    Map<String, String> getProject(String entryKey) throws SQLException
+    /**
+     * Get project's details.
+     *
+     * @param entryKey Unique project key.
+     * @return A map containing the project's details.
+     * @throws SQLException on database error.
+     */
+
+    public Map<String, String> getProject(String entryKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select entry_key, name, owner, finished from project where entry_key = ?;"))
         {
@@ -348,7 +510,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    List<Map<String, String>> listProjects(String owner) throws SQLException
+    /**
+     * Returns all projects owned by an specific admin.
+     *
+     * @param owner The account name of the admin.
+     * @return List of maps containing each project's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listProjects(String owner) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select entry_key, name, owner, finished from project where owner = ?;"))
         {
@@ -374,16 +544,67 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    int deleteProject(String entryKey) throws SQLException
+    /**
+     * Returns all projects a specific user has joined.
+     *
+     * @param user The account name of the user.
+     * @return List of maps containing each project's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listJoinedProjects(String user) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select p.entry_key, p.name, p.owner, p.finished from project p join membership m on p.entry_key = m.project_key where m.login_name = ?;"))
+        {
+            stmt.setString(1, user);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                List<Map<String, String>> result = new LinkedList<>();
+
+                while (rs.next())
+                {
+                    Map<String, String> row = new HashMap<>(4);
+                    row.put("entryKey", rs.getString(1));
+                    row.put("name", rs.getString(2));
+                    row.put("owner", rs.getString(3));
+                    row.put("finished", String.valueOf(rs.getBoolean(4)));
+
+                    result.add(row);
+                }
+
+                return result;
+            }
+        }
+    }
+
+    /**
+     * Delete a project.
+     *
+     * Warning: Deleting a project will remove dependent data (tickets, chat messages...).
+     *
+     * @param entryKey Unique project key.
+     * @throws SQLException on database error.
+     */
+
+    public void deleteProject(String entryKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("delete from project where entry_key = ?;"))
         {
             stmt.setString(1, entryKey);
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    List<Map<String, String>> getUsersOfProject(String projectKey) throws SQLException
+    /**
+     * Returns all users that have joined a specific project.
+     *
+     * @param projectKey Unique key of project.
+     * @return List of maps containing each user's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> getUsersOfProject(String projectKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                 "select u.login_name, first_name, last_name, phone_number from only user_account u join membership m on u.login_name = m.login_name where m.project_key = ?;"))
@@ -410,7 +631,16 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    boolean isUserMemberOfProject(String loginName, String projectKey) throws SQLException
+    /**
+     * Checks if a user is member of project.
+     *
+     * @param loginName The account name of the user.
+     * @param projectKey Unique key of project.
+     * @return true if user is member of project, false if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isUserMemberOfProject(String loginName, String projectKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(*) from membership where login_name = ? and project_key = ?;"))
         {
@@ -429,7 +659,16 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
-    boolean isAdminOwnerOfProject(String loginName, String projectKey) throws SQLException
+    /**
+     * Checks if an admin is owner of project.
+     *
+     * @param loginName The account name of the admin.
+     * @param projectKey Unique key of project.
+     * @return true if admin is owner of project, false if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isAdminOwnerOfProject(String loginName, String projectKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(*) from project where owner = ? and entry_key = ?;"))
         {
@@ -448,29 +687,57 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
-    int joinProject(String loginName, String entryKey) throws SQLException
+    /**
+     * Join a project.
+     *
+     * @param loginName The account name of the user who wants to join.
+     * @param entryKey Unique key of project.
+     * @throws SQLException on database error.
+     */
+
+    public void joinProject(String loginName, String entryKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into membership values (?, ?);"))
         {
             stmt.setString(1, entryKey);
             stmt.setString(2, loginName);
 
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    int leaveProject(String loginName, String entryKey) throws SQLException
+    /**
+     * Leave a project.
+     *
+     * @param loginName The account name of the user who wants to leave.
+     * @param entryKey Unique key of project.
+     * @throws SQLException on database error.
+     */
+
+    public void leaveProject(String loginName, String entryKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("delete from membership where login_name = ? and project_key = ?;"))
         {
             stmt.setString(1, loginName);
             stmt.setString(2, entryKey);
 
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    int insertTicket(String name, String summary, String description, String category, int requiredObservations, String projectKey) throws SQLException
+    /**
+     * Creates a new ticket.
+     *
+     * @param name Name of ticket.
+     * @param summary Ticket summary.
+     * @param description Ticket description.
+     * @param category Ticket category.
+     * @param requiredObservations Number of required observations until a ticket is finished.
+     * @param projectKey Unique key of project the ticket relates to.
+     * @throws SQLException on database error.
+     */
+
+    public void insertTicket(String name, String summary, String description, String category, int requiredObservations, String projectKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into ticket(name, summary, description, category, required_obversations, project_key) values (?, ?, ?, cast(? as ticket_category), ?, ?);"))
         {
@@ -481,11 +748,23 @@ class DatabaseClient implements AutoCloseable
             stmt.setInt(5, requiredObservations);
             stmt.setString(6, projectKey);
 
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    void updateTicket(int id, String name, String summary, String description, String category, int requiredObservations) throws SQLException
+    /**
+     * Updates an existing ticket.
+     *
+     * @param id Unique id of ticket.
+     * @param name Name of ticket.
+     * @param summary Ticket summary.
+     * @param description Ticket description.
+     * @param category Ticket category.
+     * @param requiredObservations Number of required observations until a ticket is finished.
+     * @throws SQLException on database error.
+     */
+
+    public void updateTicket(int id, String name, String summary, String description, String category, int requiredObservations) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                 "update ticket set name = ?, summary = ?, description = ?, category = cast(? as ticket_category), required_obversations = ? where id = ?;"))
@@ -501,7 +780,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    boolean isTicket(int id) throws SQLException
+    /**
+     * Checks if ticket id is valid.
+     *
+     * @param id Unique id of ticket.
+     * @return true if valid, false if invalid.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isTicket(int id) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(id) from ticket where id = ?;");)
         {
@@ -519,7 +806,15 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
-    Map<String, String> getTicket(int id) throws SQLException
+    /**
+     * Get ticket details.
+     *
+     * @param id Unique id of ticket.
+     * @return A map containing the tickets's details.
+     * @throws SQLException on database error.
+     */
+
+    public Map<String, String> getTicket(int id) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select id, name, summary, description, category, status, required_obversations, project_key from ticket where id = ?;"))
         {
@@ -549,7 +844,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    List<Map<String, String>> getTicketsOfProject(String projectKey) throws SQLException
+    /**
+     * Gets a lists of all tickets related to a project.
+     *
+     * @param projectKey Unique project key.
+     * @return List of maps containing each ticket's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> getTicketsOfProject(String projectKey) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                 "select id, name, summary, description, category, status, required_obversations from ticket where project_key = ?;"))
@@ -587,27 +890,51 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    int deleteTicket(int id) throws SQLException
+    /**
+     * Deletes a ticket.
+     *
+     * @param id Unique ticket id.
+     * @throws SQLException on database error.
+     */
+
+    public void deleteTicket(int id) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("delete from ticket where id = ?;"))
         {
             stmt.setInt(1, id);
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    int acceptTicket(String loginName, int id) throws SQLException
+    /**
+     * Accept a ticket.
+     *
+     * @param loginName The account name of the user wishing to accept.
+     * @param id Unique ticket id.
+     * @throws SQLException on database error.
+     */
+
+    public void acceptTicket(String loginName, int id) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into assignment values (?, ?);"))
         {
             stmt.setInt(1, id);
             stmt.setString(2, loginName);
 
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         }
     }
 
-    boolean hasUserAcceptedTicket(String loginName, int id) throws SQLException
+    /**
+     * Checks if a user has accepted the ticket.
+     *
+     * @param loginName The account name of the user.
+     * @param id Unique ticket id.
+     * @return true if user has accepted ticket, false if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean hasUserAcceptedTicket(String loginName, int id) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(*) from assignment where login_name = ? and ticket_id = ?;"))
         {
@@ -626,7 +953,16 @@ class DatabaseClient implements AutoCloseable
         return false;
     }
 
-    int observationCount(String loginName, int ticketId) throws SQLException
+    /**
+     * The number of observations a user has submitted about a ticket.
+     *
+     * @param loginName The account name of the user.
+     * @param ticketId Unique ticket id.
+     * @return Number of observations.
+     * @throws SQLException on database error.
+     */
+
+    public int observationCount(String loginName, int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(*) from observation where login_name = ? and ticket_id = ?;"))
         {
@@ -698,10 +1034,20 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void submitObservation(String loginName, int ticketId, String outcome, int quantity) throws SQLException
+    /**
+     * Submit an obervation.
+     *
+     * @param loginName User that submits the observation.
+     * @param ticketId Ticket the observation relates to.
+     * @param outcome 'positive' or 'negative'
+     * @param quantity How many time the observations has been made.
+     * @throws SQLException on database error.
+     */
+
+    public void submitObservation(String loginName, int ticketId, String outcome, int quantity) throws SQLException
     {
-        int quantity_sum = 0;
-        int required_observations = -1;
+        int quantity_sum;
+        int required_observations;
 
         try (PreparedStatement stmt = cn.prepareStatement("insert into observation(ticket_id, login_name, outcome, quantity) values (?, ?, cast(? as observation_outcome), ?);"))
         {
@@ -746,7 +1092,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    List<Map<String, String>> listObservations(int ticketId) throws SQLException
+    /**
+     * Returns all observations of one ticket.
+     *
+     * @param ticketId Unique ticket id.
+     * @return List of maps containing each observation's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listObservations(int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select id, login_name, outcome, quantity from observation where ticket_id = ?;"))
         {
@@ -770,7 +1124,17 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void sendMessage(String sender, String content, String attachment, int ticketId) throws SQLException
+    /**
+     * Sends a chat message.
+     *
+     * @param sender Name of sender (user or admin)
+     * @param content Message text.
+     * @param attachment File name, must be present on external file server already.
+     * @param ticketId Unique ticket id.
+     * @throws SQLException on database error.
+     */
+
+    public void sendMessage(String sender, String content, String attachment, int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, attachment, ticket_id) values (?, ?, ?, ?);"))
         {
@@ -788,7 +1152,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    List<Map<String, String>> listMessages(int ticketId) throws SQLException
+    /**
+     * Returns all messages of one ticket.
+     *
+     * @param ticketId Unique ticket id.
+     * @return List of maps containing each message's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listMessages(int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
                      "select id, sender, timestamp, content, attachment, ticket_id from message where ticket_id = ?;"))
@@ -815,7 +1187,16 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    List<Map<String, String>> listenChannel(int ticketId) throws Exception
+    /**
+     * Waits until new messages are available for ticket
+     * and then returns them.
+     *
+     * @param ticketId Unique ticket id.
+     * @return List of maps containing each message's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listenChannel(int ticketId) throws Exception
     {
         try (Statement stmt = cn.createStatement())
         {

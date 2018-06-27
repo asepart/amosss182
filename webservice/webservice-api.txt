@@ -113,8 +113,8 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /projects
-  Roles:          Admin
-  Returns:        JSON array of projects (entryKey, name, owner).
+  Roles:          Admin, User
+  Returns:        JSON array of projects (entryKey, name, owner, finished).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
