@@ -11,6 +11,7 @@ import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRoll
 import {
   StackNavigator,
 } from 'react-navigation';
+import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = StackNavigator({
   First: { screen: Login },
@@ -28,10 +29,8 @@ const AppNavigation = StackNavigator({
   })},
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
+  Tenth: {screen:ProjectList},
   Eleventh: {screen: CameraRollPicker}
-
- 
-
 }); 
 export default AppNavigation;
 
