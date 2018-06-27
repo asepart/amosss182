@@ -2,7 +2,7 @@ import {URL} from '../Login/const';
 import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
 //import fileType from 'react-native-file-type';
-import FileSystem from 'react-native-filesystem';
+//import FileSystem from 'react-native-filesystem';
 import moment from 'moment';
 
 var link = '';

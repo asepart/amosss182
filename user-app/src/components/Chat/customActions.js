@@ -31,7 +31,7 @@ export default class CustomActions extends React.Component {
           break;
         case 1:
         	const { navigate } = this.props.navigation;
-			navigate("Tenth", { name: "CameraRollPicker" });
+			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
         case 2:
         	//TODO: Add document feature

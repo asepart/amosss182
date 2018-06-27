@@ -71,7 +71,7 @@ export default class CameraRollPicer extends Component {
 		buttonEnabled = (num >= 1);
 		
 		const { navigate } = this.props.navigation;
-		navigate("Tenth", { refresh: "CameraRollPicker" });
+		navigate("Eleventh", { refresh: "CameraRollPicker" });
 		
 		console.log(current);
 		console.log(this.state.selected);
