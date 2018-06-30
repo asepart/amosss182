@@ -173,5 +173,19 @@ export default styles=StyleSheet.create({
       backgroundColor: '#009fca',
       paddingVertical: 10,
     },
+    view: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      alignItems: 'center'
+    },
+    
+    capture: {
+      flex: 0,
+      backgroundColor: '#fff',
+      borderRadius: 5,
+      color: '#000',
+      padding: 10,
+      margin: 40
+    }
 
   });
