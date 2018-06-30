@@ -330,8 +330,6 @@ The following REST operations are available:
   Returns:        URL to file location.
   Status code:    [307 Temporary Redirect] in case of success.
                   [400 Bad Request]        if thumbnail of file was requested that does not support thumbnails.
-                  [401 Unauthorized]       if the provided username or password is invalid.
-                  [403 Forbidden]          if the authorized account is not a member of the associated project.
                   [404 Not Found]          if ticket or file does not exist.
                   [501 Not Implemented]    file upload feature is not enabled.
 

@@ -836,25 +836,13 @@ public class WebService
 
     @Path("/files/{ticket}/{file}")
     @GET
-    @RolesAllowed({"Admin", "User"})
-    public Response downloadFile(@Context SecurityContext sc,
-                                 @PathParam("ticket") int ticketId, @PathParam("file") String fileName,
+    public Response downloadFile(@PathParam("ticket") int ticketId, @PathParam("file") String fileName,
                                  @DefaultValue("false") @QueryParam("thumbnail") boolean thumbnail) throws Exception
     {
-        Principal principal = sc.getUserPrincipal();
-
         try (DatabaseClient db = new DatabaseClient())
         {
             if (!db.isTicket(ticketId))
                 return Response.status(Response.Status.NOT_FOUND).build();
-
-            Map<String, String> ticket = db.getTicket(ticketId);
-            Map<String, String> project = db.getProject(ticket.get("projectKey"));
-            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
-                return Response.status(Response.Status.FORBIDDEN).build();
-
-            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
-                return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         try
