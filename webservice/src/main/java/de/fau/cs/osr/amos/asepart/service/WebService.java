@@ -60,9 +60,6 @@ public class WebService
          * below is reached only if the credentials have been validated already.
          */
 
-        if (!sc.isSecure())
-            System.err.println("WARNING: Unencrypted authentication in use - should not be done in production!");
-
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
 
@@ -400,7 +397,6 @@ public class WebService
     @Path("/tickets/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin"})
     public Response writeTicket(@Context SecurityContext sc, Map<String, String> ticket) throws Exception
     {
@@ -623,10 +619,30 @@ public class WebService
     {
         try (DatabaseClient db = new DatabaseClient())
         {
-            if (!db.isProject(entryKey) || !db.isUser(user) || !db.isUserMemberOfProject(user, entryKey))
+            if (!db.isProject(entryKey) || !db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
             if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
+            if (db.isUserMemberOfProject(user, entryKey))
+                db.leaveProject(user, entryKey);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @Path("/leave")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"User"})
+    public Response leaveProject(@Context SecurityContext sc, String entryKey) throws Exception
+    {
+        final String user = sc.getUserPrincipal().getName();
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isProject(entryKey))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
             if (db.isUserMemberOfProject(user, entryKey))
                 db.leaveProject(user, entryKey);
         }
@@ -644,7 +660,7 @@ public class WebService
 
         try (DatabaseClient db = new DatabaseClient())
         {
-            if (!db.isProject(entryKey) || !db.isUser(user))
+            if (!db.isProject(entryKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> project = db.getProject(entryKey);

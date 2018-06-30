@@ -247,6 +247,11 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
+        try (Response response = getUserClient("junit_user", "secure").path("/leave").request().post(Entity.text("pizza")))
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         newUser.put("phoneNumber","+4917123456789");
 
         try (Response response = getAdminClient().path("/users").request().post(Entity.json(newUser)))

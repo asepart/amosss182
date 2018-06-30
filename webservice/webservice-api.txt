@@ -16,7 +16,7 @@ where <role> can be either Admin or User.
 
 The following REST operations are available:
 
-- Check if your username and password are correct
+- Check if your username and password are correct.
 
   HTTP operation: GET
   Path:           /login
@@ -24,7 +24,7 @@ The following REST operations are available:
   Status code:    [200 OK]           if credentials are valid.
                   [401 Unauthorized] if credentials are not valid.
 
-- Create or edit user
+- Create or edit user.
 
   HTTP operation: POST
   Path:           /users
@@ -35,7 +35,7 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [409 Conflict]     if admin with same name exists.
-- List users
+- List users.
 
   HTTP operation: GET
   Path:           /users
@@ -45,7 +45,7 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
-- Get user
+- Get user.
 
   HTTP operation: GET
   Path:           /users/{name}
@@ -56,7 +56,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not Found]    if user does not exist.
 
-- Delete user
+- Delete user.
 
   HTTP operation: DELETE
   Path:           /users/{name}
@@ -66,7 +66,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not Found]    if user does not exist.
 
-- Create or edit admin
+- Create or edit admin.
 
   HTTP operation: POST
   Path:           /admins
@@ -78,7 +78,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [409 Conflict]     if user with same name exists.
 
-- List admins
+- List admins.
 
   HTTP operation: GET
   Path:           /admins
@@ -88,7 +88,7 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
-- Get admin
+- Get admin.
 
   HTTP operation: GET
   Path:           /admins/{name}
@@ -99,7 +99,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not Found]    if admin does not exist.
 
-- Delete admin
+- Delete admin.
 
   HTTP operation: DELETE
   Path:           /admins/{name}
@@ -109,7 +109,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an admin account.
                   [404 Not Found]    if admin does not exist.
 
-- List existing projects the admin is able to view
+- List existing projects the admin is able to view.
 
   HTTP operation: GET
   Path:           /projects
@@ -119,7 +119,7 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
 
-- Create new project or change existing project
+- Create new project or change existing project.
 
   HTTP operation: POST
   Path:           /projects
@@ -129,7 +129,7 @@ The following REST operations are available:
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient (e.g. you are not an admin/do not own the project).
 
-- Get single project
+- Get single project.
 
   HTTP operation: GET
   Path:           /projects/{key}
@@ -139,7 +139,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project does not exist.
 
-- Delete project
+- Delete project.
 
   HTTP operation: DELETE
   Path:           /projects/{key}
@@ -149,7 +149,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project did not exist before request.
 
-- List tickets of project
+- List tickets of project.
 
   HTTP operation: GET
   Path:           /projects/{key}/tickets
@@ -172,7 +172,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket id ist set, but not valid.
 
-- Get specific ticket
+- Get specific ticket.
 
   HTTP operation: GET
   Path:           /tickets/{id}
@@ -182,7 +182,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket do not exist.
 
-- Delete ticket from project
+- Delete ticket from project.
 
   HTTP operation: DELETE
   Path:           /tickets/{id}
@@ -192,7 +192,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project or ticket did not exist before request.
 
-- Accept ticket
+- Accept ticket.
 
   HTTP operation: POST
   Path:           /tickets/{id}/accept
@@ -202,7 +202,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket does not exist.
 
-- Submit observation
+- Submit observation.
 
   HTTP operation: POST
   Path:           /tickets/{id}/observations
@@ -213,7 +213,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket does not exist.
 
-- Get observations of ticket
+- Get observations of ticket.
 
   HTTP operation: GET
   Path:           /tickets/{id}/observations
@@ -224,7 +224,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if ticket does not exist.
 
-- List users of project
+- List users of project.
 
   HTTP operation: GET
   Path:           /projects/{key}/users
@@ -235,7 +235,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project does not exist.
 
-- Delete user from project
+- Delete user from project.
 
   HTTP operation: DELETE
   Path:           /projects/{key}/users/{name}
@@ -245,7 +245,18 @@ The following REST operations are available:
                   [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if project does not exist or user was not member of project.
 
-- Join project as user
+- Leave project as user.
+
+  HTTP operation: POST
+  Path:           /leave
+  Roles:          User
+  Request-Body:   Entry key as ASCII string.
+  Status code:    [204 No Content]   in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the authorized account is not an user account.
+                  [404 Not Found]    if entry key is invalid.
+
+- Join project as user.
 
   HTTP operation: POST
   Path:           /join
@@ -256,7 +267,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an user account.
                   [404 Not Found]    if entry key is invalid.
 
-- Get the name of the project the user got an entry key for
+- Get the name of the project the user got an entry key for.
 
   HTTP operation: GET
   Path:           /join?key=<key>
@@ -267,7 +278,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not an user account.
                   [404 Not Found]    if entry key is invalid.
 
-- Send a message in a ticket group chat
+- Send a message in a ticket group chat.
 
   HTTP operation: POST
   Path:           /messages/{ticket}?attachment={attachment}
@@ -279,7 +290,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
 
-- Lists current messages of a ticket group chat
+- Lists current messages of a ticket group chat.
 
   HTTP operation: GET
   Path:           /messages/{ticket}
@@ -291,7 +302,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
 
-- Listens until new messages arrive in group chat, then returns current messages
+- Listens until new messages arrive in group chat, then returns current messages.
 
   HTTP operation: GET
   Path:           /listen/{ticket}
@@ -303,7 +314,7 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
 
-- Upload new file related to a ticket
+- Upload new file related to a ticket.
 
   HTTP operation: POST
   Path:           /files/{ticket}
