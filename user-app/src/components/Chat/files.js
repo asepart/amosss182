@@ -19,7 +19,7 @@ export function uploadFile (uri, ticket) {
 		ext = type.ext;
 	})
 	var filename = (moment().format() + '.' + ext);
-*/	var filename = moment().format();
+*/	var filename = btoa(moment());
 	
 	//send  filename to chat
 	var tmp = new Date();
@@ -46,6 +46,7 @@ export function uploadFile (uri, ticket) {
 	}).then(
 		    response => {
 		    	response.json();
+		    	//console.log(JSON.stringify(response));
 		    	if (response.status == '409') {
 		    		alert("File upload failed. Filename already exists.");
 		    	}
