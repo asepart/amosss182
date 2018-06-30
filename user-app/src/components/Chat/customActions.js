@@ -8,6 +8,7 @@ import {
   ViewPropTypes,
   Text,
 } from 'react-native';
+import {setType} from './files.js';
 
 export default class CustomActions extends React.Component {
 
@@ -17,7 +18,7 @@ export default class CustomActions extends React.Component {
   }
 
   onActionsPress() {
-	const options = ['Camera', 'Photo & Video Library', 'Document', 'Cancel'];
+	const options = ['Camera', 'Photo Library', 'Video Library', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
       options,
@@ -30,13 +31,15 @@ export default class CustomActions extends React.Component {
         	alert("TODO: Add camera feature.");
           break;
         case 1:
-        	const { navigate } = this.props.navigation;
+        	setType('Photos');
+        	var { navigate } = this.props.navigation;
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
         case 2:
-        	//TODO: Add document feature
-        	alert("TODO: Add document feature.");
-            break;
+        	setType('Videos');
+        	var { navigate } = this.props.navigation;
+			navigate("Eleventh", { name: "CameraRollPicker" });
+			break;
         default:
       }
     });

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Platform, ActivityIndicator, View } from 'react-native';
+import { Platform, ActivityIndicator, View, Linking } from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, username} from '../Login/auth';
 import styles from '../Login/Design';
@@ -9,7 +9,7 @@ import {ticket} from './sendMessages';
 import {StackNavigator} from 'react-navigation';
 import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
-import {downloadFile} from './files';
+import {getDownloadLink} from './files';
 
 export default class Messages extends Component {
 
@@ -85,11 +85,13 @@ export default class Messages extends Component {
 			);
 	}
 
-	onLongPress(ctx, currentMessage) {
-
-		//TODO: add actionsheet here
-		downloadFile(currentMessage.text, ticket);
-
+	async onLongPress(ctx, currentMessage) {
+	    
+		//TODO: for custom actions add actionsheet with additional functions here
+		let link = await getDownloadLink(currentMessage.text, ticket);
+		if (link != '') {
+			Linking.openURL(link);
+		}
 	}
 
 	render() {
@@ -145,7 +147,7 @@ export default class Messages extends Component {
 					_id: username,
 					name: username,
 				}}
-			onLongPress={(ctx, currentMessage) => this.onLongPress(ctx, currentMessage)}
+				onLongPress={(ctx, currentMessage) => this.onLongPress(ctx, currentMessage)}
 			/>
 		);
 	}

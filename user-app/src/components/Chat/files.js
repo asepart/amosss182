@@ -1,33 +1,34 @@
 import {URL} from '../Login/const';
 import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
-//import fileType from 'react-native-file-type';
-//import FileSystem from 'react-native-filesystem';
 import moment from 'moment';
 
 var link = '';
 
+export var type = '';
+
+export function setType(asset) {
+	type = asset;
+}
+
 export function uploadFile (uri, ticket) {
 	
-	//TODO: import fileType correctly, then enable commented code
-	
-	//create new filename
 	var ext = '';
-/*		fileType(this.state.selected[0].uri).then((type) => {
-	    //Ext: type.ext
-	    //MimeType: type.mime
-		ext = type.ext;
-	})
-	var filename = (moment().format() + '.' + ext);
-*/	var filename = moment().format();
+	if(type == 'Photos') {
+		ext = '.jpg';
+	}
+	if(type == 'Videos') {
+		ext = '.mp4';
+	}
+
+	var filename = (btoa(moment()) + ext);
 	
 	//send  filename to chat
-	var tmp = new Date();
-	var date = tmp.toDateString();
-	var time = tmp.toTimeString().slice(0,8);
-	var timestamp = "[" + date + ", " + time + "]";
-	setMsg(timestamp + ": " + filename);
-	sendMessage();
+	fetch(URL + '/messages/' + ticket + '?attachment=' + filename, {
+        method: 'POST',
+        headers: getAuth(),
+        body: filename
+	})
 	
 	//convert file into FormData
 	const image = {
@@ -46,6 +47,7 @@ export function uploadFile (uri, ticket) {
 	}).then(
 		    response => {
 		    	response.json();
+		    	//console.log(JSON.stringify(response));
 		    	if (response.status == '409') {
 		    		alert("File upload failed. Filename already exists.");
 		    	}
@@ -61,10 +63,10 @@ export function uploadFile (uri, ticket) {
 	console.log(imgBody);
 }
 
-export function downloadFile (filename, ticket) {
+export async function getDownloadLink (filename, ticket) {
 	
 	//get downloadlink from backend
-	fetch(URL + '/files/' + ticket + '/' + filename + '?thumbnail=false', {
+	const res = await fetch(URL + '/files/' + ticket + '/' + filename + '?thumbnail=false', {
         method: 'GET',
         headers: getAuth()
 	}).then(
@@ -74,7 +76,7 @@ export function downloadFile (filename, ticket) {
 		    	if (response.status == '200') {
 		    		link = response.url;
 		    	} else if (response.status == '404') {
-		    		alert("File download failed. File does not exist.");
+		    		alert("File does not exist.");
 		    	}
 		    }
 	  ).catch(
@@ -83,23 +85,5 @@ export function downloadFile (filename, ticket) {
 	    	alert("File download failed.");
 	    }
 	  );
-	
-	//TODO: implement file download and storage
-	if (link !== '') {
-		
-		console.log(link);
-		
-/*		const { uri: localUri } = FileSystem.downloadAsync(
-				  link,
-				  FileSystem.documentDirectory + filename
-				)
-				  .then(({ uri }) => {
-				    console.log('Finished downloading to ', uri);
-				  })
-				  .catch(error => {
-				    console.error(error);
-				  });
-*/		
-		alert("Saved " + filename);
-	}
+	return link;	
 }
