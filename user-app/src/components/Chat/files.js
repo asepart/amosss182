@@ -13,12 +13,11 @@ export function uploadFile (uri, ticket) {
 	var filename = (btoa(moment()) + ext);
 	
 	//send  filename to chat
-	var tmp = new Date();
-	var date = tmp.toDateString();
-	var time = tmp.toTimeString().slice(0,8);
-	var timestamp = "[" + date + ", " + time + "]";
-	setMsg(timestamp + ": " + filename);
-	sendMessage();
+	fetch(URL + '/messages/' + ticket + '?attachment=' + filename, {
+        method: 'POST',
+        headers: getAuth(),
+        body: filename
+	})
 	
 	//convert file into FormData
 	const image = {
