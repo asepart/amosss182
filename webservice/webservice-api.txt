@@ -34,7 +34,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /users
   Roles:          Admin
-  Returns:        JSON array of users (loginName, password, firstName, lastName, phoneNumber).
+  Returns:        JSON array of users (loginName, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -44,7 +44,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /users/{name}
   Roles:          Admin
-  Returns:        User information as JSON object (loginName, password, firstName, lastName, phoneNumber).
+  Returns:        User information as JSON object (loginName, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -77,7 +77,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /admins
   Roles:          Admin
-  Returns:        JSON array of admins (see Admin class).
+  Returns:        JSON array of admins (loginName, firstName, lastName).
                   [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -87,7 +87,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /admins/{name}
   Roles:          Admin
-  Returns:        Admin information as JSON object (loginName, password, firstName, lastName).
+  Returns:        Admin information as JSON object (loginName, firstName, lastName).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -287,7 +287,7 @@ The following REST operations are available:
 - Lists current messages of a ticket group chat.
 
   HTTP operation: GET
-  Path:           /messages/{ticket}
+  Path:           /messages/{ticket}?limit={limit}
   Roles:          Admin, User
   Returns:        JSON array of chat messages (id, sender, timestamp, content).
   Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
@@ -296,10 +296,10 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
 
-- Listens until new messages arrive in group chat, then returns current messages.
+- Listens until new messages arrive in group chat, then returns the new messages.
 
   HTTP operation: GET
-  Path:           /listen/{ticket}
+  Path:           /listen/{ticket}?since={since}
   Roles:          Admin, User
   Returns:        JSON array of chat messages (id, sender, timestamp, content).
   Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
@@ -328,12 +328,10 @@ The following REST operations are available:
   Path:           /files/{ticket}/{file}?thumbnail={true|false}
   Roles:          Admin, User
   Returns:        URL to file location.
-  Status code:    [302 Found]           in case of success.
-                  [400 Bad Request]     if thumbnail of file was requested that does not support thumbnails.
-                  [401 Unauthorized]    if the provided username or password is invalid.
-                  [403 Forbidden]       if the authorized account is not a member of the associated project.
-                  [404 Not Found]       if ticket or file does not exist.
-                  [501 Not Implemented] file upload feature is not enabled.
+  Status code:    [307 Temporary Redirect] in case of success.
+                  [400 Bad Request]        if thumbnail of file was requested that does not support thumbnails.
+                  [404 Not Found]          if ticket or file does not exist.
+                  [501 Not Implemented]    file upload feature is not enabled.
 
 - Delete a file.
 

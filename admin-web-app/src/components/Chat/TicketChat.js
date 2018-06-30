@@ -23,9 +23,9 @@ export default class TicketChat extends Component {
 			this.fetchTicketName();
 			this.fetchProjectName();
 		}
-		
+
 		this.fetchMessages();
-		this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
@@ -69,7 +69,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -82,28 +82,29 @@ export default class TicketChat extends Component {
 		});
 	}
 
-	listenForNewMessages() {
-		fetch(URL + '/listen/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				chatHistory: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+	async listenForNewMessages() {
+		while (true){
+			console.log("fetch " + (new Date()).toISOString());
+			var response = await fetch(URL + '/listen/' + this.state.idTicket, {
+				method: 'GET',
+				headers: getAuth()
+			})
+			switch (response.status) {
+				case 200:
+					this.setState({
+						isLoading: false,
+						chatHistory: response,
+					});
+					break;
+				default:
+					console.error("Error:" + response.status);
+					console.error(response.text);
+			}
+		}
 	}
 
 	async onSendPressed() {
-		var tmp = new Date();
-		//+1 is needed, since getMonth returns 0-11
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-
-		setMsg(timestamp + ": " + this.state.message);
+		setMsg(this.state.message);
 		setTicketID(this.state.idTicket);
 		sendMessage();
 		this.fetchMessages();
@@ -137,20 +138,23 @@ export default class TicketChat extends Component {
 	renderChat() {
 		var tmp_chat = this.state.chatHistory;
 		var tmp_date;
+		var date;
 
 		return this.state.chatHistory.map(function(news, id) {
 			if(id !== 0) {
-				tmp_date = tmp_chat[id-1].content.slice(1,16);
+				tmp_date = new Date(parseInt(tmp_chat[id-1].timestamp)).toDateString();
+				date = new Date(parseInt(tmp_chat[id].timestamp));
 			} else {
 				tmp_date = new Date(1993, 3, 20);
+				date = new Date(parseInt(tmp_chat[id].timestamp));
 			}
 			return (
 				<View key={id}>
 					<div>
-						{tmp_date !== news.content.slice(1,16) ? (
+						{tmp_date !== date.toDateString() ? (
 								<Button
 									disabled = {true}
-									title = {news.content.slice(1,16)}
+									title = {date.toDateString()}
 								/>
 						) : (
 							null
@@ -158,16 +162,22 @@ export default class TicketChat extends Component {
 					</div>
 
 					<div>
-						{news.content.search("http") === -1 ? (
+						{news.attachment === null ? (
 							<Text style={{fontWeight: 'bold'}}>
-								[{news.content.slice(18,27)} {news.sender}: <ChatMessage>{news.content.slice(29)}</ChatMessage>
+								[{date.toTimeString().slice(0,8)}] {news.sender}: <ChatMessage>{news.content}</ChatMessage>
 							</Text>
 						) : (
 							<div>
 								<Text style={{fontWeight: 'bold'}}>
-									[{news.content.slice(18,27)} {news.sender}:
+									[{date.toTimeString().slice(0,8)}] {news.sender}:
 								</Text>
-								<ChatMessage><a href={news.content.slice(29)}> {news.content.slice(29)}</a></ChatMessage>
+								<Text
+									onPress = {
+										null
+									}
+								>
+									<ChatMessage> {news.content}</ChatMessage>
+								</Text>
 							</div>
 						)}
 					</div>

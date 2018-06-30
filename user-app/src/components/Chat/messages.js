@@ -38,7 +38,7 @@ export default class Messages extends Component {
 		//TODO: following line causes bug, please fix
 		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
 	}
-	
+
 	componentWillUnmount() {
 		clearInterval(this.interval);
 	}
@@ -58,37 +58,31 @@ export default class Messages extends Component {
 	}
 
 	async listenForNewMessages() {
-	  return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
-	  .then((response) => response.json())
-	  .then((responseJson) => {
-	    this.setState({
-	      isLoading: false,
-	      dataSource: responseJson,
-	    }, function(){});
-	  })
-	  .catch((error) =>{
-	    console.error(error);
-	  });
+		return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				isLoading: false,
+				dataSource: responseJson,
+			}, function(){});
+		})
+		.catch((error) =>{
+			console.error(error);
+		});
 	}
 
 	async onSendPressed() {
-		var tmp = new Date();
-		//+1 is needed, since getMonth returns 0-11
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-
-		setMsg(timestamp + ": " + this.state.message);
+		setMsg(this.state.message);
 		sendMessage();
 		this.makeApiCall();
 	}
 
 	renderCustomActions(props) {
 		return (
-	      <CustomActions
-	        {...props}
-	      />
-	    );
+				<CustomActions
+					{...props}
+				/>
+			);
 	}
 
 	async onLongPress(ctx, currentMessage) {
@@ -99,7 +93,7 @@ export default class Messages extends Component {
 			Linking.openURL(link);
 		}
 	}
-	
+
 	render() {
 		if(this.state.isLoading) {
 			return(
@@ -111,12 +105,30 @@ export default class Messages extends Component {
 
 		//remap dataSource to GiftedChat supported object array
 		const messages = this.state.dataSource.map((message) => {
-			return {
-				_id: message.id,
-				text: message.content.slice(29),
-				user: Object.assign({_id: message.sender, name: message.sender}),
-				createdAt: message.content.slice(1,26),
-			};
+				if(message.attachment === null) {
+					return {
+						_id: message.id,
+						text: message.content,
+						user: Object.assign({_id: message.sender, name: message.sender}),
+						createdAt: new Date(parseInt(message.timestamp)),
+					};
+				}
+				else {
+					/*TODO: get URL of thumbnail when file extension problem is solved
+					var tmp = fetch(URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=true', {method:'GET', headers: getAuth()})
+					.then((response) => response.text());
+					window.alert(JSON.stringify(tmp))
+					*/
+
+					return {
+						_id: message.id,
+						text: message.content,
+						user: Object.assign({_id: message.sender, name: message.sender}),
+						createdAt: new Date(parseInt(message.timestamp)),
+						//TODO: change with real thumbnail URL
+						image: 'https://reactjs.org/logo-og.png',
+					};
+				}
 		});
 
 		//GiftedChat somehow shows the newest message at the top right now

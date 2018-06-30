@@ -3,8 +3,6 @@ import { Text } from 'react-native';
 import { setState } from '../shared/GlobalState';
 import { Link } from 'react-router-dom';
 
-var pickerPlaceholder = "Category";
-
 export default class ProjectButton extends Component {
 	displayProject() {
 		setState({
