@@ -5,10 +5,21 @@ import moment from 'moment';
 
 var link = '';
 
+export var type = '';
+
+export function setType(asset) {
+	type = asset;
+}
+
 export function uploadFile (uri, ticket) {
 	
-	//TODO: get extension from uri/file
 	var ext = '';
+	if(type == 'Photos') {
+		ext = '.jpg';
+	}
+	if(type == 'Videos') {
+		ext = '.mp4';
+	}
 
 	var filename = (btoa(moment()) + ext);
 	

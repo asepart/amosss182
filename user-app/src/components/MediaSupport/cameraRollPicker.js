@@ -7,17 +7,24 @@ import {
   Button
 } from 'react-native';
 import {setTicketID, msg, ticket} from '../Chat/sendMessages';
-import {uploadFile} from '../Chat/files';
+import {uploadFile, type} from '../Chat/files';
 import CameraRollPicker from 'react-native-camera-roll-picker';
 
 var buttonEnabled = false;
+var library = '';
 
 export default class CameraRollPicer extends Component {
 	
 	static navigationOptions = ({ navigation }) => {
+		if (type == 'Photos') {
+			library = 'Photo Library';
+		}
+		if (type == 'Videos') {
+			library = 'Video Library';
+		}
 		const { params = {} } = navigation.state
 		return {
-		title: 'Photo & Video Library',
+		title: library,
 		headerStyle: {
 			backgroundColor:'#5daedb'
 		},
@@ -95,7 +102,7 @@ export default class CameraRollPicer extends Component {
 					maximum={3}
 					selected={this.state.selected}
 					selectSingleItem={false}
-					assetType='All'
+					assetType={type}
 					imagesPerRow={3}
 					imageMargin={5}
 					callback={this.getSelectedImages.bind(this)} />
