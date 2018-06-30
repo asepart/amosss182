@@ -20,17 +20,17 @@ function isImage (str) {
 
 export default class ChatMessage extends Component {
 	render() {
-		if (this.props.children.attachment == null) {
-			return (<View><Text>{this.props.children.content}</Text></View>)
+		if (this.props.msg.attachment == null) {
+			return (<View><Text>{this.props.msg.content}</Text></View>)
 		} else {
 			return(
 				<View>
 					{
-						isImage(this.props.children.attachment)?
-							<ChatImage src={this.props.children.attachment}/>
+						isImage(this.props.msg.attachment)?
+							<ChatImage src={URL + '/files/1/' + this.props.msg.attachment}/>
 						: <View></View>
 					}
-					<Text>{this.props.children.content}</Text>
+					<Text>{this.props.msg.content}</Text>
 				</View>
 			);
 		}

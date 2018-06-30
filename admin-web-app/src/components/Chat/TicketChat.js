@@ -167,24 +167,12 @@ export default class TicketChat extends Component {
 					</div>
 
 					<div>
-						{news.attachment === null ? (
+						<div>
 							<Text style={{fontWeight: 'bold'}}>
-								[{date.toTimeString().slice(0,8)}] {news.sender}: <ChatMessage>{news}</ChatMessage>
+								[{date.toTimeString().slice(0,8)}] {news.sender}:
 							</Text>
-						) : (
-							<div>
-								<Text style={{fontWeight: 'bold'}}>
-									[{date.toTimeString().slice(0,8)}] {news.sender}:
-								</Text>
-								<Text
-									onPress = {
-										null
-									}
-								>
-									<ChatMessage> {news}</ChatMessage>
-								</Text>
-							</div>
-						)}
+							<ChatMessage msg={news}/>
+						</div>
 					</div>
 
 				</View>
