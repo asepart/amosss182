@@ -103,12 +103,30 @@ export default class Messages extends Component {
 
 		//remap dataSource to GiftedChat supported object array
 		const messages = this.state.dataSource.map((message) => {
-			return {
-				_id: message.id,
-				text: message.content,
-				user: Object.assign({_id: message.sender, name: message.sender}),
-				createdAt: new Date(parseInt(message.timestamp)),
-			};
+				if(message.attachment === null) {
+					return {
+						_id: message.id,
+						text: message.content,
+						user: Object.assign({_id: message.sender, name: message.sender}),
+						createdAt: new Date(parseInt(message.timestamp)),
+					};
+				}
+				else {
+					/*TODO: get URL of thumbnail when file extension problem is solved
+					var tmp = fetch(URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=true', {method:'GET', headers: getAuth()})
+					.then((response) => response.text());
+					window.alert(JSON.stringify(tmp))
+					*/
+
+					return {
+						_id: message.id,
+						text: message.content,
+						user: Object.assign({_id: message.sender, name: message.sender}),
+						createdAt: new Date(parseInt(message.timestamp)),
+						//TODO: change with real thumbnail URL
+						image: 'https://reactjs.org/logo-og.png',
+					};
+				}
 		});
 
 		//GiftedChat somehow shows the newest message at the top right now
