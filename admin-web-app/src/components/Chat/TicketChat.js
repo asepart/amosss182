@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
-import {getAuth, getAuthForPost, username, psw} from '../shared/auth';
+import {getAuth, getAuthForPost, getAuthForMediaPost, username} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 import ChatMessage from './ChatMessage';
@@ -16,7 +16,6 @@ export default class TicketChat extends Component {
 			idTicket: this.props.match.params.id,
 			chatHistory: [],
 		}
-
 	}
 
 	componentDidMount() {
@@ -115,34 +114,27 @@ export default class TicketChat extends Component {
 		setUpdateBoolean(true);
 	}
 
-		//maybe not needed anymore if html form post works
 	handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
-
 		const formData = new FormData();
-		formData.append('file', files[0], files[0].name);
-		console.log('Log: this file is in formData', formData.get('file'));
+		formData.append('file', files[0]);
 
-		//use this for hardcoded tests to dev stage
-		fetch('http://asepartback-dev.herokuapp.com/files/1', {
-		//if you use this and URL points to localhost, remember to set global minio environments (check Sebastian slack message I pinned to dev channel)
-		//fetch(URL + '/files/' + this.state.idTicket, {
+		//if you use this and URL points to localhost, remember to set global minio environments (check slack dev channel)
+		fetch(URL + '/files/' + this.state.idTicket, {
 			method:'POST',
-			headers: {
-				'Content-Type': undefined,
-				'X-ASEPART-Role': 'Admin',
-				'Authorization': 'Basic ' + btoa(username + ":" + psw)
-			},
+			headers: getAuthForMediaPost(),
 			body: formData,
 		})
 		.catch((error) => {
-			console.log('error: ' + error);
+			console.log(error);
 		});
 
+		//TODO: add display attachment filename as downloadable link
 		setMsg(files[0].name);
 		setAttachment(files[0].name)
 		setTicketID(this.state.idTicket);
 		sendAttachment();
+
 		this.fetchMessages();
 		setUpdateBoolean(true);
 	}
