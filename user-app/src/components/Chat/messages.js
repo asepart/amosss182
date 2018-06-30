@@ -83,7 +83,14 @@ export default class Messages extends Component {
 		this.makeApiCall();
 	}
 
-
+renderCustomActions(props) {
+	return (
+		<CustomActions
+		{...props}
+		/>
+	
+	);
+}
 	onLongPress(ctx, currentMessage) {
 	    
 		//TODO: add actionsheet here
