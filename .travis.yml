@@ -24,11 +24,11 @@ matrix:
       before_install:
         - nvm install 8
         - yes | sdkmanager "platforms;android-23"
-        - openssl aes-256-cbc -K $encrypted_571238349e47_key -iv $encrypted_571238349e47_iv -in my-release-key.keystore.enc -out .\\my-release-key.keystore -d
       install:
         - cd user-app
         - npm install
       script: 
+        - openssl aes-256-cbc -K $encrypted_571238349e47_key -iv $encrypted_571238349e47_iv -in my-release-key.keystore.enc -out .\\my-release-key.keystore -d
         - expect npm_run_eject.exp
         - cd android && ./gradlew assembleRelease
         - cd app/build/outputs/apk/
