@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart.test;
+package de.fau.cs.osr.amos.asepart;
 
 import de.fau.cs.osr.amos.asepart.service.WebService;
 
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class WebServiceTest
+public class WebServiceTest
 {
     private WebTarget getClient()
     {
