@@ -157,6 +157,7 @@ export default class TicketChat extends Component {
 					<div>
 						{tmp_date !== date.toDateString() ? (
 								<Button
+									onPress = { () => {}}
 									disabled = {true}
 									title = {date.toDateString()}
 								/>
@@ -168,7 +169,7 @@ export default class TicketChat extends Component {
 					<div>
 						{news.attachment === null ? (
 							<Text style={{fontWeight: 'bold'}}>
-								[{date.toTimeString().slice(0,8)}] {news.sender}: <ChatMessage>{news.content}</ChatMessage>
+								[{date.toTimeString().slice(0,8)}] {news.sender}: <ChatMessage>{news}</ChatMessage>
 							</Text>
 						) : (
 							<div>
@@ -180,7 +181,7 @@ export default class TicketChat extends Component {
 										null
 									}
 								>
-									<ChatMessage> {news.content}</ChatMessage>
+									<ChatMessage> {news}</ChatMessage>
 								</Text>
 							</div>
 						)}
