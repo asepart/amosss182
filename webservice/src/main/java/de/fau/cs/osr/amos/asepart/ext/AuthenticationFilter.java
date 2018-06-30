@@ -28,9 +28,7 @@ import org.glassfish.jersey.internal.util.Base64;
  * This class is a request filter which handles authentication.
  * Any request method annotated with @RolesAllowed will trigger
  * calling the filter() method of this class. The client must send
- * username and password using HTTP Basic Authorization and also
- * use the custom X-ASEPART-Role header to specify is the client is
- * acting in the Admin or User role.
+ * username and password using HTTP Basic Authorization.
  *
  * If username and password are missing or wrong, 401 Unauthorized
  * is returned to the client. If the role of the account is not
@@ -45,8 +43,6 @@ public class AuthenticationFilter implements ContainerRequestFilter
 {
     @Context
     private ResourceInfo resourceInfo;
-
-    private static final String ROLE_PROPERTY = "X-ASEPART-Role";
 
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Basic";
@@ -77,15 +73,6 @@ public class AuthenticationFilter implements ContainerRequestFilter
             return;
         }
 
-        final List<String> role = headers.get(ROLE_PROPERTY);
-
-        // If no role information present; block access
-        if (role == null || role.isEmpty())
-        {
-            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
-            return;
-        }
-
         // Get encoded username and password
         final String encodedUserPassword = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
 
@@ -96,22 +83,32 @@ public class AuthenticationFilter implements ContainerRequestFilter
         final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
         final String accountName = tokenizer.nextToken();
         final String password = tokenizer.nextToken();
-
-        // Get role name
-        final String roleName = role.get(0);
+        String roleName;
 
         try (DatabaseClient dbClient = new DatabaseClient())
         {
-            if (!dbClient.authenticate(accountName, password, roleName))
+            // Check if account exists and password is correct
+            if (!dbClient.authenticate(accountName, password))
             {
                 request.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(ACCESS_UNAUTHORIZED).build());
+                return;
+            }
+
+            // Find out if account has admin or user role
+            if (dbClient.isAdmin(accountName))
+                roleName = "Admin";
+            else if (dbClient.isUser(accountName))
+                roleName = "User";
+            else
+            {
+                request.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
                 return;
             }
         }
 
         catch (Exception e)
         {
-            request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
+            request.abortWith(Response.status(Response.Status.SERVICE_UNAVAILABLE).build());
             return;
         }
 
@@ -119,10 +116,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
         Set<String> rolesSet = new HashSet<>(Arrays.asList(method.getAnnotation(RolesAllowed.class).value()));
 
         if (!rolesSet.contains(roleName))
-        {
             request.abortWith(Response.status(Response.Status.FORBIDDEN).entity(ACCESS_FORBIDDEN).build());
-            return;
-        }
 
         SecurityContext sc = new WebServiceSecurityContext(accountName, roleName, request.getUriInfo().getRequestUri().getScheme());
         request.setSecurityContext(sc);

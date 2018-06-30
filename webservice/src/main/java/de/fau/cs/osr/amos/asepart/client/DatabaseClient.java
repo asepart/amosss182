@@ -69,7 +69,16 @@ public class DatabaseClient implements AutoCloseable
         cn.close();
     }
 
-    private boolean authenticate(String loginName, String password) throws SQLException
+    /**
+     * Checks if authentication is valid.
+     *
+     * @param loginName The account name.
+     * @param password The password as plain text.
+     * @return true if password is correct, false otherwise.
+     * @throws SQLException on database error.
+     */
+
+    public boolean authenticate(String loginName, String password) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from account where login_name = ? and password = crypt(?, password);"))
         {
@@ -82,31 +91,6 @@ public class DatabaseClient implements AutoCloseable
                 return (rs.getInt(1) == 1);
             }
         }
-    }
-
-    /**
-     * Checks if authentication is valid.
-     *
-     * @param loginName The account name.
-     * @param password The password as plain text.
-     * @param role "Admin" or "User".
-     * @return true if password is correct and given role matches account, false otherwise.
-     * @throws SQLException on database error.
-     */
-
-    public boolean authenticate(String loginName, String password, String role) throws SQLException
-    {
-        if (!authenticate(loginName, password))
-            return false;
-
-        switch (role)
-        {
-            case "Admin": if (!isAdmin(loginName)) throw new IllegalArgumentException("Account is not an admin account."); else break;
-            case "User": if (!isUser(loginName)) throw new IllegalArgumentException("Account is not an user account."); else break;
-            default: throw new IllegalArgumentException("Unknown role: " + role);
-        }
-
-        return true;
     }
 
     /**
