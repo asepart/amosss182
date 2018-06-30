@@ -2,7 +2,7 @@ import {URL, cki} from '../shared/const';
 
 var auth=false;
 export var username='';
-var psw='';
+export var psw='';
 
 export function setPSW(lpsw) {
 	cki.set('psw', lpsw);
@@ -23,6 +23,13 @@ export function getAuthForPost() {
 	return {
 		'Accept': 'text/plain',
 		'Content-Type': 'application/json; charset=utf-8',
+		'X-ASEPART-Role': 'Admin',
+		'Authorization': 'Basic ' + btoa(username + ":" + psw)
+	};
+}
+
+export function getAuthForMediaPost() {
+	return {
 		'X-ASEPART-Role': 'Admin',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};

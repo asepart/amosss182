@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
-import {getAuth, getAuthForPost} from '../shared/auth';
+import {getAuth, getAuthForPost, getAuthForMediaPost, username} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 import ChatMessage from './ChatMessage';
@@ -16,7 +16,6 @@ export default class TicketChat extends Component {
 			idTicket: this.props.match.params.id,
 			chatHistory: [],
 		}
-
 	}
 
 	componentDidMount() {
@@ -26,7 +25,7 @@ export default class TicketChat extends Component {
 		}
 
 		this.fetchMessages();
-		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
@@ -70,7 +69,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -83,18 +82,25 @@ export default class TicketChat extends Component {
 		});
 	}
 
-	listenForNewMessages() {
-		fetch(URL + '/listen/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				chatHistory: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+	async listenForNewMessages() {
+		while (true){
+			console.log("fetch " + (new Date()).toISOString());
+			var response = await fetch(URL + '/listen/' + this.state.idTicket, {
+				method: 'GET',
+				headers: getAuth()
+			})
+			switch (response.status) {
+				case 200:
+					this.setState({
+						isLoading: false,
+						chatHistory: response,
+					});
+					break;
+				default:
+					console.error("Error:" + response.status);
+					console.error(response.text);
+			}
+		}
 	}
 
 	async onSendPressed() {
@@ -109,7 +115,28 @@ export default class TicketChat extends Component {
 	}
 
 	handleFile(selectorFiles: FileList) {
-		//long fixes function, not needed for my task
+		var files = selectorFiles;
+		const formData = new FormData();
+		formData.append('file', files[0]);
+
+		//if you use this and URL points to localhost, remember to set global minio environments (check slack dev channel)
+		fetch(URL + '/files/' + this.state.idTicket, {
+			method:'POST',
+			headers: getAuthForMediaPost(),
+			body: formData,
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+
+		//TODO: add display attachment filename as downloadable link
+		setMsg(files[0].name);
+		setAttachment(files[0].name)
+		setTicketID(this.state.idTicket);
+		sendAttachment();
+
+		this.fetchMessages();
+		setUpdateBoolean(true);
 	}
 
 	renderChat() {
