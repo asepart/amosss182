@@ -7,7 +7,6 @@ matrix:
       services:
         - postgresql
       before_script:
-        - openssl version
         - cd postgres && ./setup-travis.sh && cd ..
       script:
         - cd webservice && mvn clean verify && mvn test && mvn cobertura:cobertura
