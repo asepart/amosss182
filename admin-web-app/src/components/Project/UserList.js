@@ -8,7 +8,6 @@ import DeleteUserButton from './DeleteUserButton';
 import UserAdd from './UserAdd';
 import 'react-table/react-table.css';
 import '../../index.css';
-import Cookies from 'universal-cookie';
 import {Link} from 'react-router-dom'
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
@@ -19,9 +18,6 @@ export default class UserList extends Component {
 		this.state = {
 			isLoading: true
 		}
-		const cookies = new Cookies();
-
-		console.log(cookies.get('myCat')); // Pacman
 	}
 
 	componentDidMount() {

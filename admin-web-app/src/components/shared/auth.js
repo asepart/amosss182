@@ -29,7 +29,6 @@ export function getAuthForPost() {
 }
 
 async function authenticate() {
-	console.error('U: ' + username + 'P: ' + psw);
 	var response = await fetch(URL + '/login', {
 		method: 'GET',
 		headers: getAuth()
@@ -63,7 +62,6 @@ export async function isAuth() {;
 			return false;
 		}
 	}
-	console.log ('U: ' + username + 'P: ' + psw)
 	if (typeof username === 'string' && typeof psw === 'string')
 		return await authenticate();
 	else {
