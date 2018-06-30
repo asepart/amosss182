@@ -40,7 +40,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                    <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -51,7 +51,7 @@
                     <assembleDirectory>target</assembleDirectory>
                     <programs>
                         <program>
-                            <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                            <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                             <name>webservice</name>
                         </program>
                     </programs>
@@ -84,7 +84,7 @@
                 <configuration>
                   <archive>
                     <manifest>
-                      <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                      <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                       <addClasspath>true</addClasspath>
                     </manifest>
                   </archive>
@@ -182,6 +182,16 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>4.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec-javase</artifactId>
+            <version>0.2.3</version>
         </dependency>
     </dependencies>
 </project>

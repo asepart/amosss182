@@ -1,4 +1,7 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.ext;
+
+import de.fau.cs.osr.amos.asepart.client.DatabaseClient;
+import de.fau.cs.osr.amos.asepart.service.WebServiceSecurityContext;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,7 +24,20 @@ import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
 
-// TODO: (maybe) introduce login limit to avoid brute force attacks
+/**
+ * This class is a request filter which handles authentication.
+ * Any request method annotated with @RolesAllowed will trigger
+ * calling the filter() method of this class. The client must send
+ * username and password using HTTP Basic Authorization and also
+ * use the custom X-ASEPART-Role header to specify is the client is
+ * acting in the Admin or User role.
+ *
+ * If username and password are missing or wrong, 401 Unauthorized
+ * is returned to the client. If the role of the account is not
+ * included in the list of allowed roles of the request method
+ * (provided by the @RolesAllowed annotation), 403 Forbidden is
+ * returned to the client.
+ */
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -37,6 +53,8 @@ public class AuthenticationFilter implements ContainerRequestFilter
 
     private static final String ACCESS_UNAUTHORIZED = "Your identification is invalid.";
     private static final String ACCESS_FORBIDDEN = "Your account has no rights to access this resource.";
+
+    // TODO: (maybe) introduce login limit to avoid brute force attacks
 
     @Override
     public void filter(ContainerRequestContext request)

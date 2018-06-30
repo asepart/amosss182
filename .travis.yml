@@ -18,7 +18,7 @@ matrix:
       script:
         - cd user-app && npm install
         - cd ../admin-web-app && npm install
-        
+
     - language: android
       if: branch = master AND tag =~ ^release
       before_install:

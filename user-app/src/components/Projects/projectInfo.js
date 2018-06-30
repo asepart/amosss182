@@ -30,6 +30,12 @@ export default class ProjectInfo extends Component {
 		  setUpdateBoolean(false);
 		}
 	  }
+
+	  componentWillUnmount() {
+		const { navigate } = this.props.navigation;
+		navigate("Tenth", { name: "ProjectList" })
+		setUpdateBoolean(true);
+	}
 	 
 
 	fetchTicketDetails() {
