@@ -724,7 +724,8 @@ public class WebService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Admin", "User"})
-    public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") int ticketId) throws Exception
+    public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") int ticketId,
+                                 @DefaultValue("20") @QueryParam("limit") int limit) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
 
@@ -742,7 +743,7 @@ public class WebService
             if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            return Response.ok(db.listMessages(ticketId)).build();
+            return Response.ok(db.listMessages(ticketId, limit)).build();
         }
     }
 
@@ -752,7 +753,8 @@ public class WebService
     @RolesAllowed({"Admin", "User"})
     @ManagedAsync
     public void listenChannel(@Suspended final AsyncResponse response, @Context SecurityContext sc,
-                              @PathParam("ticket") int ticketId) throws Exception
+                              @PathParam("ticket") int ticketId,
+                              @DefaultValue("1") @QueryParam("since") int limit) throws Exception
     {
 
         Principal principal = sc.getUserPrincipal();
@@ -773,7 +775,7 @@ public class WebService
 
             try
             {
-                List<Map<String, String>> messages = db.listenChannel(ticketId);
+                List<Map<String, String>> messages = db.listenChannel(ticketId, limit);
                 response.resume(Response.ok(messages).build());
             }
 

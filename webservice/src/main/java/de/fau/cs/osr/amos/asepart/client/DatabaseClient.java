@@ -1140,16 +1140,24 @@ public class DatabaseClient implements AutoCloseable
      * Returns all messages of one ticket.
      *
      * @param ticketId Unique ticket id.
+     * @param limit Number of last messages that should be returned.
+     *
      * @return List of maps containing each message's details.
      * @throws SQLException on database error.
      */
 
-    public List<Map<String, String>> listMessages(int ticketId) throws SQLException
+    public List<Map<String, String>> listMessages(int ticketId, int limit) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                     "select id, sender, timestamp, content, attachment, ticket_id from message where ticket_id = ?;"))
+                     "with last_messages as (select id, sender, timestamp, content, attachment, ticket_id\n" +
+                                              "from message\n" +
+                                              "where ticket_id = ?\n" +
+                                              "order by timestamp desc\n" +
+                                              "limit ?)\n" +
+                             "select * from last_messages order by timestamp asc;"))
         {
             stmt.setInt(1, ticketId);
+            stmt.setInt(2, limit);
 
             try (ResultSet rs = stmt.executeQuery())
             {
@@ -1176,11 +1184,13 @@ public class DatabaseClient implements AutoCloseable
      * and then returns them.
      *
      * @param ticketId Unique ticket id.
+     * @param since ID of last message the client has already seen.
+
      * @return List of maps containing each message's details.
      * @throws SQLException on database error.
      */
 
-    public List<Map<String, String>> listenChannel(int ticketId) throws Exception
+    public List<Map<String, String>> listenChannel(int ticketId, int since) throws Exception
     {
         try (Statement stmt = cn.createStatement())
         {
@@ -1207,6 +1217,32 @@ public class DatabaseClient implements AutoCloseable
             stmt.execute(String.format("unlisten ticket_%d", ticketId));
         }
 
-        return listMessages(ticketId);
+        try (PreparedStatement stmt = cn.prepareStatement(
+                "select id, sender, timestamp, content, attachment, ticket_id\n" +
+                   "from message\n" +
+                   "where ticket_id = ? and id > ?\n" +
+                   "order by asc;"))
+        {
+            stmt.setInt(1, ticketId);
+            stmt.setInt(2, since);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                List<Map<String, String>> result = new LinkedList<>();
+
+                while (rs.next())
+                {
+                    Map<String, String> row = new HashMap<>(4);
+                    row.put("id", String.valueOf(rs.getInt(1)));
+                    row.put("sender", rs.getString(2));
+                    row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
+                    row.put("content", rs.getString(4));
+                    row.put("attachment", rs.getString(5));
+                    result.add(row);
+                }
+
+                return result;
+            }
+        }
     }
 }
