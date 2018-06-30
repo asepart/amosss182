@@ -34,7 +34,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /users
   Roles:          Admin
-  Returns:        JSON array of users (loginName, password, firstName, lastName, phoneNumber).
+  Returns:        JSON array of users (loginName, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -44,7 +44,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /users/{name}
   Roles:          Admin
-  Returns:        User information as JSON object (loginName, password, firstName, lastName, phoneNumber).
+  Returns:        User information as JSON object (loginName, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -77,7 +77,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /admins
   Roles:          Admin
-  Returns:        JSON array of admins (see Admin class).
+  Returns:        JSON array of admins (loginName, firstName, lastName).
                   [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
@@ -87,7 +87,7 @@ The following REST operations are available:
   HTTP operation: GET
   Path:           /admins/{name}
   Roles:          Admin
-  Returns:        Admin information as JSON object (loginName, password, firstName, lastName).
+  Returns:        Admin information as JSON object (loginName, firstName, lastName).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the authorized account is not an admin account.
