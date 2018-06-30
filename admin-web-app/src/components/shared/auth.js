@@ -2,7 +2,7 @@ import {URL, cki} from '../shared/const';
 
 var auth=false;
 export var username='';
-var psw='';
+export var psw='';
 
 export function setPSW(lpsw) {
 	cki.set('psw', lpsw);
