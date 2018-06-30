@@ -1,9 +1,13 @@
-package de.fau.cs.osr.amos.asepart;
+package de.fau.cs.osr.amos.asepart.service;
 
 import java.security.Principal;
 import javax.ws.rs.core.SecurityContext;
 
 import static java.util.Objects.requireNonNull;
+
+/**
+ * Encapsulates web service security information.
+ */
 
 public class WebServiceSecurityContext implements SecurityContext
 {

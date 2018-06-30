@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Button, TextInput } from 'react-native';
+import { Text, View, Button, TextInput, CheckBox } from 'react-native';
 import Popup from "reactjs-popup";
 import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
@@ -8,13 +8,13 @@ import {setUpdateBoolean} from '../shared/GlobalState';
 import { Link } from 'react-router-dom';
 
 export default class UpdateProjectButton extends Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
 			open: false,
 			name: '',
 			entryKey: '',
+			finished: false
 		};
 	}
 	openPopup = () => {
@@ -30,6 +30,7 @@ export default class UpdateProjectButton extends Component {
 		this.setState({
 			name: this.props.proj.row.name,
 			entryKey: this.props.proj.row.entryKey,
+			finished: this.props.proj.row.finished,
 		})
 	}
 
@@ -38,7 +39,7 @@ export default class UpdateProjectButton extends Component {
 		fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username})
+				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username, finished: this.state.finished})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
@@ -82,6 +83,13 @@ export default class UpdateProjectButton extends Component {
 						value = { this.state.entryKey }
 						editable = { false }
 					/>
+					<View style={{ flexDirection: 'row' }}>
+						<CheckBox
+							value={this.state.finished}
+							onValueChange={() => this.setState({ finished: !this.state.finished })}
+						/>
+						<Text> Finished?</Text>
+					</View>
 					<Button onPress = { this.putProject.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
 					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
 					</View>

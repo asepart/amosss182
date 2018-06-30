@@ -7,7 +7,9 @@ import {setState} from '../Login/state';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ticket} from './sendMessages';
 import {StackNavigator} from 'react-navigation';
-import { GiftedChat, Actions } from 'react-native-gifted-chat'
+import { GiftedChat } from 'react-native-gifted-chat';
+import CustomActions from './customActions';
+import {downloadFile} from './files';
 
 export default class Messages extends Component {
 
@@ -81,27 +83,14 @@ export default class Messages extends Component {
 		this.makeApiCall();
 	}
 
-	//TODO: add actions like upload photo, video, document
-	renderActions(props) {
-		const options = {
-			'Camera': (props) => {
-				alert('Camera');
-				//const { navigate } = this.props.navigation;
-				//navigate("Ninth", { name: "Camera" })
-			},
-			'Upload 2': (props) => {
-				alert('option 2');
-			},
-			'Cancel': () => {},
-		};
-		return (
-			<Actions
-				{...props}
-				options={options}
-			/>
-		);
-	}
 
+	onLongPress(ctx, currentMessage) {
+	    
+		//TODO: add actionsheet here
+		downloadFile(currentMessage.text, ticket);
+	    
+	}
+	
 	render() {
 		if(this.state.isLoading) {
 			return(
@@ -132,12 +121,14 @@ export default class Messages extends Component {
 				onInputTextChanged={(text) => this.setState({message: text})}
 				onSend={this.onSendPressed.bind(this)}
 				showAvatarForEveryMessage={true}
-				renderActions={this.renderActions}
+				renderActions={ () => this.renderCustomActions(this.props)}
 				user={{
 					_id: username,
 					name: username,
 				}}
+			onLongPress={(ctx, currentMessage) => this.onLongPress(ctx, currentMessage)}
 			/>
 		);
 	}
 }
+		

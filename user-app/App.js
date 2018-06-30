@@ -6,13 +6,15 @@ import JoinProject from '../user-app/src/components/Projects/joinProject';
 import GetMessages from './src/components/Chat/messages';
 import TicketView from '../user-app/src/components/Projects/ticketView';
 import TicketProcessing from './src/components/Tickets/ticketProcessed';
+import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
 import Camera from '../user-app/src/components/MediaSupport/camera';
 
 import {
-  StackNavigator,
+  createStackNavigator,
 } from 'react-navigation';
+import ProjectList from './src/components/Projects/projectList';
 
-const AppNavigation = StackNavigator({
+const AppNavigation = createStackNavigator({
   First: { screen: Login },
   Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
@@ -28,9 +30,10 @@ const AppNavigation = StackNavigator({
   })},
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
- // Ninth: {screen: Camera }
+  Ninth: {screen: Camera },
+  Tenth: {screen:ProjectList},
+  Eleventh: {screen: CameraRollPicker}
 
- 
 
 }); 
 export default AppNavigation;
