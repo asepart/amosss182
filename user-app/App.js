@@ -9,11 +9,11 @@ import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
 
 import {
-  StackNavigator,
+  createStackNavigator,
 } from 'react-navigation';
 import ProjectList from './src/components/Projects/projectList';
 
-const AppNavigation = StackNavigator({
+const AppNavigation = createStackNavigator({
   First: { screen: Login },
   Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
