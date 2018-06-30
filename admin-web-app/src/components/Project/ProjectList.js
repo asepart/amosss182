@@ -65,7 +65,7 @@ export default class ProjectList extends Component {
 				accessor: 'entryKey' // String-based value accessors!
 			}, {
 				Header: '',
-				accessor: '',
+				accessor: 'finished',
 				maxWidth: 35,
 				Cell: props => <UpdateProjectButton proj={props} callToParent={this.fetchProjects.bind(this)} />
 			}, {

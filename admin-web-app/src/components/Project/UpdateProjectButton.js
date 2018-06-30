@@ -30,7 +30,7 @@ export default class UpdateProjectButton extends Component {
 		this.setState({
 			name: this.props.proj.row.name,
 			entryKey: this.props.proj.row.entryKey,
-			finished: this.props.proj.row.finished,
+			finished: this.props.proj.row.finished === "true",
 		})
 	}
 
@@ -40,10 +40,6 @@ export default class UpdateProjectButton extends Component {
 				method: 'POST',
 				headers: auth,
 				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: username, finished: (this.state.finished ? "true" : "false")})
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				this.setState({}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
@@ -86,7 +82,12 @@ export default class UpdateProjectButton extends Component {
 					<View style={{ flexDirection: 'row' }}>
 						<CheckBox
 							value={this.state.finished}
-							onValueChange={() => this.setState({ finished: !this.state.finished })}
+							onValueChange={
+								(val) => {
+									this.setState({ finished: val });
+									console.log(val)
+								}
+							}
 						/>
 						<Text> Finished?</Text>
 					</View>
