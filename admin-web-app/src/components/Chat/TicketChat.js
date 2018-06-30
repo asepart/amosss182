@@ -26,7 +26,7 @@ export default class TicketChat extends Component {
 		}
 
 		this.fetchMessages();
-		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
@@ -70,7 +70,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -83,18 +83,25 @@ export default class TicketChat extends Component {
 		});
 	}
 
-	listenForNewMessages() {
-		fetch(URL + '/listen/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				chatHistory: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+	async listenForNewMessages() {
+		while (true){
+			console.log("fetch " + (new Date()).toISOString());
+			var response = await fetch(URL + '/listen/' + this.state.idTicket, {
+				method: 'GET',
+				headers: getAuth()
+			})
+			switch (response.status) {
+				case 200:
+					this.setState({
+						isLoading: false,
+						chatHistory: response,
+					});
+					break;
+				default:
+					console.error("Error:" + response.status);
+					console.error(response.text);
+			}
+		}
 	}
 
 	async onSendPressed() {
@@ -108,18 +115,37 @@ export default class TicketChat extends Component {
 		setUpdateBoolean(true);
 	}
 
-	//maybe not needed anymore if html form post works 
 	handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
 
-		const formData = new FormData();
-		formData.append('file', files[0]);
-		console.log('Log: this file is in formData', formData.get('file'));
+		/*
+		//declare new FormData since files[0] maybe is not FormData
+		const data = new FormData();
+		var reader = new FileReader();
+		//tried two ways to get path to file
+		var path = (window.URL || window.webkitURL).createObjectURL(files[0]);
+		var path2 = reader.readAsDataURL(files[0]));
+		console.log('createObjectURL: ' + path);
+		console.log("readAsDataURL: " + path2);
+		//tried appending File Object itself
+		data.append('file', files[0]);
+		//tried appending with various file paths
+		data.append('file', {
+			uri: path,
+			type: files[0].type,
+			name: files[0].name
+		});
+		data.append('file', {
+			uri: path2,
+			type: files[0].type,
+			name: files[0].name
+		});
+		*/
 
 		//use this for hardcoded tests to dev stage
-		fetch('http://asepartback-dev.herokuapp.com/files/1', {
+		//fetch('http://asepartback-dev.herokuapp.com/files/1', {
 		//if you use this and URL points to localhost, remember to set global minio environments (check Sebastian slack message I pinned to dev channel)
-		//fetch(URL + '/files/' + this.state.idTicket, {
+		fetch(URL + '/files/' + this.state.idTicket, {
 			method:'POST',
 			headers: {
 				'Accept': 'text/plain',
@@ -127,7 +153,9 @@ export default class TicketChat extends Component {
 				'X-ASEPART-Role': 'Admin',
 				'Authorization': 'Basic ' + btoa(username + ":" + psw)
 			},
-			body: formData,
+			body: files[0],
+			//use this with self declared FormData
+			//body: data,
 		})
 		.then((response) => response.text())
 		.then((responseText) => {
