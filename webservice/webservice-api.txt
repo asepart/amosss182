@@ -287,7 +287,7 @@ The following REST operations are available:
 - Lists current messages of a ticket group chat.
 
   HTTP operation: GET
-  Path:           /messages/{ticket}
+  Path:           /messages/{ticket}?limit={limit}
   Roles:          Admin, User
   Returns:        JSON array of chat messages (id, sender, timestamp, content).
   Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
@@ -296,10 +296,10 @@ The following REST operations are available:
                   [403 Forbidden]    if the authorized account is not a member of the associated project.
                   [404 Not Found]    if ticket does not exist.
 
-- Listens until new messages arrive in group chat, then returns current messages.
+- Listens until new messages arrive in group chat, then returns the new messages.
 
   HTTP operation: GET
-  Path:           /listen/{ticket}
+  Path:           /listen/{ticket}?since={since}
   Roles:          Admin, User
   Returns:        JSON array of chat messages (id, sender, timestamp, content).
   Notice:         Timestamp is given in milliseconds since January 1, 1970, 00:00:00 UTC.
