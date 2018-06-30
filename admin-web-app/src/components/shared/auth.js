@@ -28,6 +28,13 @@ export function getAuthForPost() {
 	};
 }
 
+export function getAuthForMediaPost() {
+	return {
+		'X-ASEPART-Role': 'Admin',
+		'Authorization': 'Basic ' + btoa(username + ":" + psw)
+	};
+}
+
 async function authenticate() {
 	console.error('U: ' + username + 'P: ' + psw);
 	var response = await fetch(URL + '/login', {
