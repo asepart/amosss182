@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
-import {getAuth} from '../shared/auth';
-import {setMsg, sendMessage, setTicketID} from './sendMessages';
+import {getAuth, getAuthForPost, username, psw} from '../shared/auth';
+import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 import ChatMessage from './ChatMessage';
 
@@ -16,6 +16,7 @@ export default class TicketChat extends Component {
 			idTicket: this.props.match.params.id,
 			chatHistory: [],
 		}
+
 	}
 
 	componentDidMount() {
@@ -29,7 +30,7 @@ export default class TicketChat extends Component {
 	}
 
 	componentWillUnmount() {
-		clearInterval(this.interval);
+		//clearInterval(this.interval);
 	}
 
 	componentDidUpdate() {
@@ -116,21 +117,63 @@ export default class TicketChat extends Component {
 
 	handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
-		//test upload
-		fetch("https://putsreq.com/PGUfoPMSIL4OjwGnpU4M", {
-				method: 'POST',
-				//headers: getAuth(),
-				body: files[0],
-		})
 
-		//TODO: write actual upload after backend is finished
-		var tmp = new Date();
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-		setMsg(timestamp + ": Test - You wanted to upload this - " + files[0].name);
+		/*
+		//declare new FormData since files[0] maybe is not FormData
+		const data = new FormData();
+		var reader = new FileReader();
+
+		//tried two ways to get path to file
+		var path = (window.URL || window.webkitURL).createObjectURL(files[0]);
+		var path2 = reader.readAsDataURL(files[0]));
+		console.log('createObjectURL: ' + path);
+		console.log("readAsDataURL: " + path2);
+
+		//tried appending File Object itself
+		data.append('file', files[0]);
+
+		//tried appending with various file paths
+		data.append('file', {
+			uri: path,
+			type: files[0].type,
+			name: files[0].name
+		});
+
+		data.append('file', {
+			uri: path2,
+			type: files[0].type,
+			name: files[0].name
+		});
+		*/
+
+		//use this for hardcoded tests to dev stage
+		//fetch('http://asepartback-dev.herokuapp.com/files/1', {
+		//if you use this and URL points to localhost, remember to set global minio environments (check Sebastian slack message I pinned to dev channel)
+		fetch(URL + '/files/' + this.state.idTicket, {
+			method:'POST',
+			headers: {
+				'Accept': 'text/plain',
+				'Content-Type': 'multipart/form-data',
+				'X-ASEPART-Role': 'Admin',
+				'Authorization': 'Basic ' + btoa(username + ":" + psw)
+			},
+			body: files[0],
+			//use this with self declared FormData
+			//body: data,
+		})
+		.then((response) => response.text())
+		.then((responseText) => {
+			this.setState({}, function() {});
+			console.log('response: ' + responseText);
+		})
+		.catch((error) => {
+			console.log('error: ' + error);
+		});
+
+		setMsg(files[0].name);
+		setAttachment(files[0].name)
 		setTicketID(this.state.idTicket);
-		sendMessage();
+		sendAttachment();
 		this.fetchMessages();
 		setUpdateBoolean(true);
 	}
