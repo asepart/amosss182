@@ -17,7 +17,8 @@ create table user_account (
 create table project (
   entry_key character varying (32) primary key,
   name character varying (32) not null,
-  owner character varying (32) not null references admin_account(login_name) on delete cascade
+  owner character varying (32) not null references admin_account(login_name) on delete cascade,
+  finished boolean not null default 'no'
 );
 
 create type ticket_category as enum ('one-time-error', 'trace', 'behavior');
@@ -39,6 +40,7 @@ create table message(
   sender character varying (32) not null,
   timestamp timestamp not null default current_timestamp,
   content text not null,
+  attachment character varying (255) default null,
   ticket_id serial not null references ticket(id) on delete cascade
 );
 

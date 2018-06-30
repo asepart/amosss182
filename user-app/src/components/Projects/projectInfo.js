@@ -5,6 +5,7 @@ import { StackNavigator, } from 'react-navigation';
 import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
 import {key} from './keyValid';
+import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
 
 window.btoa = require('Base64').btoa;
 export var ticketstatus = '';
@@ -20,7 +21,19 @@ export default class ProjectInfo extends Component {
 	}
 
 	componentDidMount() {
-			fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
+			this.fetchTicketDetails();
+	}
+
+	componentDidUpdate() {
+		if(getUpdateBoolean() === true) {
+		  this.fetchTicketDetails();
+		  setUpdateBoolean(false);
+		}
+	  }
+	 
+
+	fetchTicketDetails() {
+		fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
 				.then((response) => response.json())
 					.then((responseJson) => {
 						this.setState({

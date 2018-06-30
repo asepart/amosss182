@@ -286,7 +286,7 @@ class DatabaseClient implements AutoCloseable
 
     void insertProject(String entryKey, String name, String owner) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into project values (?, ?, ?);"))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into project(entry_key, name, owner) values (?, ?, ?);"))
         {
             stmt.setString(1, entryKey);
             stmt.setString(2, name);
@@ -295,14 +295,15 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void updateProject(String entryKey, String name, String owner) throws SQLException
+    void updateProject(String entryKey, String name, String owner, boolean finished) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                "update project set name = ?, owner = ? where entry_key = ?;"))
+                "update project set name = ?, owner = ?, finished = ? where entry_key = ?;"))
         {
             stmt.setString(1, name);
             stmt.setString(2, owner);
-            stmt.setString(3, entryKey);
+            stmt.setBoolean(3, finished);
+            stmt.setString(4, entryKey);
 
             stmt.executeUpdate();
         }
@@ -328,7 +329,7 @@ class DatabaseClient implements AutoCloseable
 
     Map<String, String> getProject(String entryKey) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("select entry_key, name, owner from project where entry_key = ?;"))
+        try (PreparedStatement stmt = cn.prepareStatement("select entry_key, name, owner, finished from project where entry_key = ?;"))
         {
             stmt.setString(1, entryKey);
 
@@ -336,10 +337,11 @@ class DatabaseClient implements AutoCloseable
             {
                 rs.next();
 
-                Map<String, String> result = new HashMap<>(3);
+                Map<String, String> result = new HashMap<>(4);
                 result.put("entryKey", rs.getString(1));
                 result.put("name", rs.getString(2));
                 result.put("owner", rs.getString(3));
+                result.put("finished", String.valueOf(rs.getBoolean(4)));
 
                 return result;
             }
@@ -348,7 +350,7 @@ class DatabaseClient implements AutoCloseable
 
     List<Map<String, String>> listProjects(String owner) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("select entry_key, name, owner from project where owner = ?;"))
+        try (PreparedStatement stmt = cn.prepareStatement("select entry_key, name, owner, finished from project where owner = ?;"))
         {
             stmt.setString(1, owner);
 
@@ -358,10 +360,11 @@ class DatabaseClient implements AutoCloseable
 
                 while (rs.next())
                 {
-                    Map<String, String> row = new HashMap<>(3);
+                    Map<String, String> row = new HashMap<>(4);
                     row.put("entryKey", rs.getString(1));
                     row.put("name", rs.getString(2));
                     row.put("owner", rs.getString(3));
+                    row.put("finished", String.valueOf(rs.getBoolean(4)));
 
                     result.add(row);
                 }
@@ -767,13 +770,14 @@ class DatabaseClient implements AutoCloseable
         }
     }
 
-    void sendMessage(String sender, String content, int ticketId) throws SQLException
+    void sendMessage(String sender, String content, String attachment, int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, ticket_id) values (?, ?, ?);"))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into message(sender, content, attachment, ticket_id) values (?, ?, ?, ?);"))
         {
             stmt.setString(1, sender);
             stmt.setString(2, content);
-            stmt.setInt(3, ticketId);
+            stmt.setString(3, attachment);
+            stmt.setInt(4, ticketId);
 
             stmt.executeUpdate();
         }
@@ -787,7 +791,7 @@ class DatabaseClient implements AutoCloseable
     List<Map<String, String>> listMessages(int ticketId) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                     "select id, sender, timestamp, content, ticket_id from message where ticket_id = ?;"))
+                     "select id, sender, timestamp, content, attachment, ticket_id from message where ticket_id = ?;"))
         {
             stmt.setInt(1, ticketId);
 
@@ -802,6 +806,7 @@ class DatabaseClient implements AutoCloseable
                     row.put("sender", rs.getString(2));
                     row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
                     row.put("content", rs.getString(4));
+                    row.put("attachment", rs.getString(5));
                     result.add(row);
                 }
 

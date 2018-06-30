@@ -9,6 +9,7 @@ import DeleteTicketButton from './DeleteTicketButton';
 import TicketChatButton from '../Chat/TicketChatButton';
 import TicketDetailButton from './TicketDetailButton';
 import TicketStatus from './TicketStatus';
+import TicketDetail from './TicketDetail';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
@@ -150,6 +151,12 @@ export default class TicketList extends Component {
 						minRows={this.state.dataSource.length}
 						showPagination={false}
 						columns={columns}
+						SubComponent={row => {
+							return (
+								//TODO: add link
+								<TicketDetail keyProj={this.props.match.params.project} idTicket={row.original.id} isSub={true}/>
+							)
+						}}
 				/>
 			</View>
 		);

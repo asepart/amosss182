@@ -6,6 +6,7 @@ import {URL} from '../Login/const';
 import {ticket, setTicketID} from '../Chat/sendMessages';
 import {key} from '../Projects/keyValid';
 import {getAuthForPost} from '../Login/auth';
+import {setUpdateBoolean} from '../Login/state';
 
 var pickerPlaceholder = "Outcome";
 export var tickID = "";
@@ -43,6 +44,7 @@ export default class TicketProcessing extends Component {
 			body:	JSON.stringify({outcome: this.state.outcome, quantity: this.state.quantity})
 		})
 
+		setUpdateBoolean(true);
 		const { navigate } = this.props.navigation;
 		navigate("Fourth", { name: "ProjectInfo" })
 		//on submit pressed return back to ticket overview

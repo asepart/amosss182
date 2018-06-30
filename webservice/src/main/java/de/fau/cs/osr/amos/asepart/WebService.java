@@ -1,22 +1,26 @@
 package de.fau.cs.osr.amos.asepart;
 
+import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.security.Principal;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.sql.SQLException;
 
+import java.security.Principal;
 import javax.annotation.security.RolesAllowed;
+
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -25,10 +29,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ManagedAsync;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import io.minio.ErrorCode;
+import io.minio.errors.ErrorResponseException;
 
 @Path("/")
 public class WebService
@@ -42,6 +51,9 @@ public class WebService
          * This is done by the AuthenticationFilter, so if the return statement
          * below is reached only if the credentials have been validated already.
          */
+
+        if (!sc.isSecure())
+            System.err.println("WARNING: Unencrypted authentication in use - should not be done in production!");
 
         return Response.ok("Your identification is valid: " + sc.getUserPrincipal().getName()).build();
     }
@@ -57,7 +69,7 @@ public class WebService
         try (DatabaseClient db = new DatabaseClient())
         {
             if (db.isAdmin(loginName))
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Response.Status.CONFLICT).build();
 
             if (db.isUser(loginName))
             {
@@ -77,7 +89,7 @@ public class WebService
             }
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/users")
@@ -119,7 +131,7 @@ public class WebService
             db.deleteAccount(user);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/admins")
@@ -133,7 +145,7 @@ public class WebService
         try (DatabaseClient db = new DatabaseClient())
         {
             if (db.isUser(loginName))
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Response.Status.CONFLICT).build();
 
             if (db.isAdmin(loginName))
             {
@@ -157,7 +169,7 @@ public class WebService
             }
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/admins")
@@ -196,10 +208,33 @@ public class WebService
             if (!db.isAdmin(admin))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
+            try
+            {
+                FileStorageClient fs = new FileStorageClient();
+
+                final List<Map<String, String>> projects = db.listProjects(admin);
+
+                for (Map<String, String> project : projects)
+                {
+                    final List<Map<String, String>> tickets = db.getTicketsOfProject(project.get("entryKey"));
+
+                    for (Map<String, String> ticket : tickets)
+                    {
+                        int ticketId = Integer.parseInt(ticket.get("id"));
+                        fs.cascade(ticketId);
+                    }
+                }
+            }
+
+            catch (UnsupportedOperationException e)
+            {
+                // ignore if file storage is not enabled
+            }
+
             db.deleteAccount(admin);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects")
@@ -229,13 +264,13 @@ public class WebService
                 if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                     return Response.status(Response.Status.FORBIDDEN).build();
 
-                db.updateProject(entryKey, project.get("name"), project.get("owner"));
+                db.updateProject(entryKey, project.get("name"), project.get("owner"), Boolean.parseBoolean(project.get("finished")));
             }
 
             else db.insertProject(entryKey, project.get("name"), project.get("owner")); 
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}")
@@ -265,10 +300,28 @@ public class WebService
             if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
+            try
+            {
+                FileStorageClient fs = new FileStorageClient();
+                final List<Map<String, String>> tickets = db.getTicketsOfProject(entryKey);
+
+                for (Map<String, String> ticket : tickets)
+                {
+                    int ticketId = Integer.parseInt(ticket.get("id"));
+                    fs.cascade(ticketId);
+                }
+            }
+
+            catch (UnsupportedOperationException e)
+            {
+                // ignore if file storage is not enabled
+            }
+
+
             db.deleteProject(entryKey);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/projects/{key}/tickets")
@@ -278,7 +331,6 @@ public class WebService
     public Response getTicketsOfProject(@Context SecurityContext sc, @PathParam("key") String projectKey) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -286,20 +338,21 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> project = db.getProject(projectKey);
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            else if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), projectKey))
+            else if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), projectKey)))
             {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             List<Map<String, String>> tickets = db.getTicketsOfProject(projectKey);
 
-            if (role.equals("User"))
+            if (sc.isUserInRole("User"))
             {
                 for (Map<String, String> ticket : tickets)
                 {
@@ -352,7 +405,7 @@ public class WebService
                                           ticket.get("description"), ticket.get("category"),
                                           Integer.parseInt(ticket.get("requiredObservations")));
 
-                return Response.ok().build();
+                return Response.noContent().build();
             }
 
             else
@@ -361,7 +414,7 @@ public class WebService
                          ticket.get("description"), ticket.get("category"),
                          Integer.parseInt(ticket.get("requiredObservations")), projectKey);
 
-                return Response.ok().build();
+                return Response.noContent().build();
             }
         }
     }
@@ -372,7 +425,6 @@ public class WebService
     public Response getTicket(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -382,12 +434,14 @@ public class WebService
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            else if (role.equals("User"))
+            else if (sc.isUserInRole("User"))
             {
-                if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                final boolean finished = Boolean.parseBoolean(project.get("finished"));
+
+                if (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 {
                     return Response.status(Response.Status.FORBIDDEN).build();
                 }
@@ -425,7 +479,18 @@ public class WebService
             db.deleteTicket(ticketId);
         }
 
-        return Response.ok().build();
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.cascade(ticketId);
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            // ignore if file storage is not enabled
+        }
+
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/accept")
@@ -441,15 +506,17 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             if (!db.hasUserAcceptedTicket(principal.getName(), ticketId))
                 db.acceptTicket(principal.getName(), ticketId);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/observations")
@@ -466,15 +533,17 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
 
             Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (!db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !db.hasUserAcceptedTicket(principal.getName(), ticketId))
+            if (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")) || !db.hasUserAcceptedTicket(principal.getName(), ticketId))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             db.submitObservation(principal.getName(), ticketId,
                     observation.get("outcome"), Integer.parseInt(observation.get("quantity")));
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/tickets/{id}/observations")
@@ -484,7 +553,6 @@ public class WebService
     public Response listObservations(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -493,11 +561,12 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(db.listObservations(ticketId)).build();
@@ -526,21 +595,20 @@ public class WebService
     @Path("/projects/{key}/users/{name}")
     @DELETE
     @RolesAllowed({"Admin"})
-    public Response removeUserFromProject(@Context SecurityContext sc, @PathParam("key") String entryKey, @PathParam("name") String user) throws Exception
+    public Response removeUserFromProject(@Context SecurityContext sc,
+                                          @PathParam("key") String entryKey, @PathParam("name") String user) throws Exception
     {
         try (DatabaseClient db = new DatabaseClient())
         {
-            if (!db.isProject(entryKey) || !db.isUser(user))
+            if (!db.isProject(entryKey) || !db.isUser(user) || !db.isUserMemberOfProject(user, entryKey))
                 return Response.status(Response.Status.NOT_FOUND).build();
             if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
-            if (!db.isUserMemberOfProject(user, entryKey))
-                return Response.status(Response.Status.BAD_REQUEST).build();
-
-            db.leaveProject(user, entryKey);
+            if (db.isUserMemberOfProject(user, entryKey))
+                db.leaveProject(user, entryKey);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/join")
@@ -555,13 +623,18 @@ public class WebService
         {
             if (!db.isProject(entryKey) || !db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
-            if (db.isUserMemberOfProject(user, entryKey))
-                return Response.status(Response.Status.BAD_REQUEST).build();
 
-            db.joinProject(user, entryKey);
+            Map<String, String> project = db.getProject(entryKey);
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
+
+            if (finished)
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (!db.isUserMemberOfProject(user, entryKey))
+                db.joinProject(user, entryKey);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/join")
@@ -581,10 +654,11 @@ public class WebService
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @RolesAllowed({"Admin", "User"})
-    public Response sendMessage(@Context SecurityContext sc, @PathParam("ticket") int ticketId, String message) throws Exception
+    public Response sendMessage(@Context SecurityContext sc,
+                                @PathParam("ticket") int ticketId,
+                                @QueryParam("attachment") String attachment, String message) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -593,17 +667,18 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            db.sendMessage(principal.getName(), message, ticketId);
+            db.sendMessage(principal.getName(), message, attachment, ticketId);
         }
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Path("/messages/{ticket}")
@@ -613,7 +688,6 @@ public class WebService
     public Response listMessages(@Context SecurityContext sc, @PathParam("ticket") int ticketId) throws Exception
     {
         Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -623,10 +697,10 @@ public class WebService
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(db.listMessages(ticketId)).build();
@@ -643,7 +717,6 @@ public class WebService
     {
 
         Principal principal = sc.getUserPrincipal();
-        final String role = sc.isUserInRole("Admin") ? "Admin" : "User";
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -653,10 +726,10 @@ public class WebService
             Map<String, String> ticket = db.getTicket(ticketId);
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
-            if (role.equals("Admin") && !project.get("owner").equals(principal.getName()))
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
                 response.resume(Response.status(Response.Status.FORBIDDEN).build());
 
-            if (role.equals("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 response.resume(Response.status(Response.Status.FORBIDDEN).build());
 
             try
@@ -672,10 +745,151 @@ public class WebService
         }
     }
 
+    @Path("/files/{ticket}")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @RolesAllowed({"Admin", "User"})
+    public Response uploadFile(@Context SecurityContext sc, @PathParam("ticket") int ticketId,
+                               @FormDataParam("file") InputStream stream,
+                               @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception
+    {
+        if (stream == null || fileDetail == null)
+            return Response.status(Response.Status.BAD_REQUEST).build();
+
+        Principal principal = sc.getUserPrincipal();
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            final boolean finished = Boolean.parseBoolean(project.get("finished"));
+
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.upload(ticketId, fileDetail.getFileName(), stream);
+
+            return Response.noContent().build();
+        }
+
+        catch (FileAlreadyExistsException e)
+        {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+    }
+
+    @Path("/files/{ticket}/{file}")
+    @GET
+    @RolesAllowed({"Admin", "User"})
+    public Response downloadFile(@Context SecurityContext sc,
+                                 @PathParam("ticket") int ticketId, @PathParam("file") String fileName,
+                                 @DefaultValue("false") @QueryParam("thumbnail") boolean thumbnail) throws Exception
+    {
+        Principal principal = sc.getUserPrincipal();
+
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            String location;
+
+            if (thumbnail)
+            {
+                if (!fs.hasThumbnail(ticketId, fileName))
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+
+                location = fs.getThumbnail(ticketId, fileName);
+            }
+
+            else location = fs.download(ticketId, fileName);
+            return Response.temporaryRedirect(new URI(location)).build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+
+        catch (ErrorResponseException e)
+        {
+            if (e.errorResponse().errorCode().code().equals(ErrorCode.NO_SUCH_KEY.code()))
+                return Response.status(Response.Status.NOT_FOUND).build();
+            else return Response.serverError().build();
+        }
+    }
+
+    @Path("/files/{ticket}/{file}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response removeFile(@Context SecurityContext sc,
+                               @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+    {
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> project = db.getProject(ticket.get("projectKey"));
+
+            if (!project.get("owner").equals(sc.getUserPrincipal().getName()))
+                return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        try
+        {
+            FileStorageClient fs = new FileStorageClient();
+            fs.remove(ticketId, fileName);
+
+            return Response.noContent().build();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+
+        catch (ErrorResponseException e)
+        {
+            if (e.errorResponse().errorCode() == ErrorCode.NO_SUCH_KEY)
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            else return Response.serverError().build();
+        }
+    }
+
     static String address = "http://localhost/";
     static int port = 12345;
     
-    public static void main(String[] args) throws Exception
+    public static void main(String[] args)
     {
         try
         {
@@ -691,15 +905,17 @@ public class WebService
         {
             final String ip = InetAddress.getLocalHost().getHostAddress();
             address = "http://" + ip + "/";
-
             final URI uri = UriBuilder.fromUri(address).port(port).build();
 
             ResourceConfig config = new ResourceConfig(WebService.class);
-            config.register(CORSFilter.class);
-            config.register(AuthenticationFilter.class);
-            config.register(DebugExceptionMapper.class);
 
-            HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, config);
+            config.register(CORSFilter.class); // allow cross-origin requests
+            config.register(AuthenticationFilter.class); // enable authentication
+
+            config.register(DebugExceptionMapper.class); // display exceptions in server log
+            config.register(MultiPartFeature.class); // enable file upload
+
+            GrizzlyHttpServerFactory.createHttpServer(uri, config);
         }
 
         catch (UnknownHostException e)
