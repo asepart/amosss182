@@ -38,7 +38,7 @@ export default class Messages extends Component {
 		//TODO: following line causes bug, please fix
 		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
 	}
-	
+
 	componentWillUnmount() {
 		clearInterval(this.interval);
 	}
@@ -58,46 +58,40 @@ export default class Messages extends Component {
 	}
 
 	async listenForNewMessages() {
-	  return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
-	  .then((response) => response.json())
-	  .then((responseJson) => {
-	    this.setState({
-	      isLoading: false,
-	      dataSource: responseJson,
-	    }, function(){});
-	  })
-	  .catch((error) =>{
-	    console.error(error);
-	  });
+		return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				isLoading: false,
+				dataSource: responseJson,
+			}, function(){});
+		})
+		.catch((error) =>{
+			console.error(error);
+		});
 	}
 
 	async onSendPressed() {
-		var tmp = new Date();
-		//+1 is needed, since getMonth returns 0-11
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-
-		setMsg(timestamp + ": " + this.state.message);
+		setMsg(this.state.message);
 		sendMessage();
 		this.makeApiCall();
 	}
 
 	renderCustomActions(props) {
 		return (
-	      <CustomActions
-	        {...props}
-	      />
-	    );
+				<CustomActions
+					{...props}
+				/>
+			);
 	}
 
 	onLongPress(ctx, currentMessage) {
-	    
+
 		//TODO: add actionsheet here
 		downloadFile(currentMessage.text, ticket);
-	    
+
 	}
-	
+
 	render() {
 		if(this.state.isLoading) {
 			return(
@@ -111,9 +105,9 @@ export default class Messages extends Component {
 		const messages = this.state.dataSource.map((message) => {
 			return {
 				_id: message.id,
-				text: message.content.slice(29),
+				text: message.content,
 				user: Object.assign({_id: message.sender, name: message.sender}),
-				createdAt: message.content.slice(1,26),
+				createdAt: new Date(parseInt(message.timestamp)),
 			};
 		});
 
