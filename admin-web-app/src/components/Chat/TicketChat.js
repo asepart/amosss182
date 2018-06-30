@@ -115,52 +115,25 @@ export default class TicketChat extends Component {
 		setUpdateBoolean(true);
 	}
 
+		//maybe not needed anymore if html form post works
 	handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
 
-		/*
-		//declare new FormData since files[0] maybe is not FormData
-		const data = new FormData();
-		var reader = new FileReader();
-		//tried two ways to get path to file
-		var path = (window.URL || window.webkitURL).createObjectURL(files[0]);
-		var path2 = reader.readAsDataURL(files[0]));
-		console.log('createObjectURL: ' + path);
-		console.log("readAsDataURL: " + path2);
-		//tried appending File Object itself
-		data.append('file', files[0]);
-		//tried appending with various file paths
-		data.append('file', {
-			uri: path,
-			type: files[0].type,
-			name: files[0].name
-		});
-		data.append('file', {
-			uri: path2,
-			type: files[0].type,
-			name: files[0].name
-		});
-		*/
+		const formData = new FormData();
+		formData.append('file', files[0], files[0].name);
+		console.log('Log: this file is in formData', formData.get('file'));
 
 		//use this for hardcoded tests to dev stage
-		//fetch('http://asepartback-dev.herokuapp.com/files/1', {
+		fetch('http://asepartback-dev.herokuapp.com/files/1', {
 		//if you use this and URL points to localhost, remember to set global minio environments (check Sebastian slack message I pinned to dev channel)
-		fetch(URL + '/files/' + this.state.idTicket, {
+		//fetch(URL + '/files/' + this.state.idTicket, {
 			method:'POST',
 			headers: {
-				'Accept': 'text/plain',
-				'Content-Type': 'multipart/form-data',
+				'Content-Type': undefined,
 				'X-ASEPART-Role': 'Admin',
 				'Authorization': 'Basic ' + btoa(username + ":" + psw)
 			},
-			body: files[0],
-			//use this with self declared FormData
-			//body: data,
-		})
-		.then((response) => response.text())
-		.then((responseText) => {
-			this.setState({}, function() {});
-			console.log('response: ' + responseText);
+			body: formData,
 		})
 		.catch((error) => {
 			console.log('error: ' + error);
@@ -274,10 +247,9 @@ export default class TicketChat extends Component {
 					{this.renderChat()}
 				</ScrollView>
 
-				<form action="https://admin:admin@asepartback-dev.herokuapp.com/files/1" method="post" encType="multipart/form-data">
-					<input type="file" />
-					<input type="submit" value="Upload" />
-				</form>
+				<FileSelector
+					onLoadFile = {(files:FileList) => this.handleFile(files)}
+				/>
 
 				<TextInput
 					autoFocus = {true}
