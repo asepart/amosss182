@@ -17,7 +17,7 @@ export default class CustomActions extends React.Component {
   }
 
   onActionsPress() {
-	const options = ['Camera', 'Photo & Video Library', 'Document', 'Cancel'];
+	const options = ['Camera', 'Photo & Video Library', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
       options,
@@ -33,10 +33,6 @@ export default class CustomActions extends React.Component {
         	const { navigate } = this.props.navigation;
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
-        case 2:
-        	//TODO: Add document feature
-        	alert("TODO: Add document feature.");
-            break;
         default:
       }
     });
