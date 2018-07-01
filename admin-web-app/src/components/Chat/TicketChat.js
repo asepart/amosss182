@@ -139,7 +139,7 @@ export default class TicketChat extends Component {
 		setUpdateBoolean(true);
 	}
 
-	renderChat() {
+	renderChat(ticket) {
 		var tmp_chat = this.state.chatHistory;
 		var tmp_date;
 		var date;
@@ -171,7 +171,7 @@ export default class TicketChat extends Component {
 							<Text style={{fontWeight: 'bold'}}>
 								[{date.toTimeString().slice(0,8)}] {news.sender}:
 							</Text>
-							<ChatMessage msg={news}/>
+							<ChatMessage msg={news} ticket={ticket}/>
 						</div>
 					</div>
 
@@ -225,7 +225,7 @@ export default class TicketChat extends Component {
 						this.scrollView.scrollToEnd({animated: false});
 					}}
 				>
-					{this.renderChat()}
+					{this.renderChat(this.state.idTicket)}
 				</ScrollView>
 
 				<FileSelector
