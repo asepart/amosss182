@@ -112,6 +112,15 @@ android{
   
   .....
 }
+
+.....
+// Use implementation instead of compile
+dependencies {
+    implementation project(':react-native-camera')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:23.0.1"
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+}
 ```
 
 **Then run:**
