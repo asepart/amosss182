@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, AppRegistry} from 'react-native';
+import { StyleSheet, Text, View, AppRegistry, Button} from 'react-native';
 import ProjectInfo from './src/components/Projects/projectInfo';
 import Login from './src/components/Login/login';
 import JoinProject from '../user-app/src/components/Projects/joinProject';
@@ -10,12 +10,23 @@ import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRoll
 import Camera from '../user-app/src/components/MediaSupport/camera';
 
 import {
-  createStackNavigator,
+  createStackNavigator, DrawerNavigator
 } from 'react-navigation';
+import stackNav from '../user-app/src/components/Navigation/stackNav';
+import styles from '../user-app/src/components/Login/Design';
+
 import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = createStackNavigator({
   First: { screen: Login },
+  Second: { screen: stackNav,
+    navigationOptions: ({navigation}) => ({
+      headerStyle: {backgroundColor: '#5daedb'},
+      title: 'Welcome!',
+      headerTintColor: 'white',
+      headerLeft: <Text style={styles.text} onPress={() => 
+      navigation.navigate('DrawerOpen')}>Menu</Text>
+    }) },
   Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
   Sixth: {screen: TicketView, 
@@ -33,7 +44,7 @@ const AppNavigation = createStackNavigator({
   Ninth: {screen: Camera },
   Tenth: {screen:ProjectList},
   Eleventh: {screen: CameraRollPicker}
-
+      
 
 }); 
 export default AppNavigation;

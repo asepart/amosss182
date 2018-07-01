@@ -12,7 +12,8 @@ export default styles=StyleSheet.create({
   containerScroll: {
     flex:1,
     backgroundColor: '#0c3868',
-  },
+
+  },  
 
     container2: {
       flex: 1,

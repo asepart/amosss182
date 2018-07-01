@@ -230,3 +230,4 @@ export default class ProjectInfo extends Component {
 		);
 	}
 }
+

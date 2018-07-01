@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View} from 'react-native';
+import styles from '../components/Login/Design';
+import {username} from '../components/Login/login';
 
 export default class SecondScreen extends Component {
 
@@ -16,17 +18,10 @@ export default class SecondScreen extends Component {
       var {params} = this.props.navigation.state;
       return (
         <View style={styles.container}>
-        <Text> Second Screen </Text>
+        <Text style={styles.textLarge}>Welcome back </Text>
         </View>
       );
     }
   }
   
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#34515e',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  });
+ 
