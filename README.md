@@ -45,3 +45,77 @@ To build the app you have to change the directory to `user-app` and run
 `$ npm start`
 
 The console outputs an QR code which can be scanned using the "Expo" app which must be installed from the Play Store.
+
+#### Workaround to get the react-native-camera working on Android
+
+`$ npm run android`     // It will most probably fail, but we need to have the /Android folder
+
+`$ npm install react-native-cli`
+
+`$ react-native link react-native-camera`
+
+`$ react-native upgrade`    // Answer no to all the answers
+
+Modify the following files:
+
+**android/build.gradle**
+```
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.1'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url "$rootDir/../node_modules/react-native/android"
+        }
+        google()
+    }
+}
+
+
+subprojects {
+  project.configurations.all {
+     resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'com.android.support'
+              && !details.requested.name.contains('multidex') ) {
+           details.useVersion "27.1.0"
+        }
+     }
+  }
+}
+````
+
+**android/gradle/wrapper/gradle-wrapper.properties**
+
+`distributionUrl=https\://services.gradle.org/distributions/gradle-4.1-all.zip`
+
+**android/app/build.gradle**
+```
+android{
+  compileSdkVersion 27
+  buildToolsVersion "27.0.0"
+  
+  .....
+}
+```
+
+**Then run:**
+
+` $ react-native link react-native-camera`
+
+` $ npm run android `
