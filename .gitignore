@@ -3,3 +3,17 @@
 webservice/target
 
 **/.DS_Store
+
+.vscode/
+
+android/
+ios/
+
+
+*/npm-debug.log*
+*/yarn-debug.log*
+*/yarn-error.log*
+
+*/.expo
+*/node_modules
+*/package-lock.json

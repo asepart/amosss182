@@ -7,30 +7,24 @@ The team develops an app to manage testdrivers.
 The app has the following main features:
 * Android App
 * Java-based server backend
-* Secure chat betweeen clients
+* Secure chat between clients
 * Problem reports via app
 
-## Building
+## Database
 
-### Web Service Backend
+We use PostgreSQL as our database. To run the web service on your machine, a PostgreSQL instance must be installed and configured first. For running locally on your local machine, using a docker image is recommended. To do that, run the script `setup-docker.sh` inside the `database` directory with root privileges. This will install the PostgreSQL docker image, start a container on default port 5432, and handle database configuration. `cleanup-docker.sh` will stop the database container and delete it.
 
-The backend for the mobile and the web app is implemented in a REST service, which can be build and executed using:
+## Web Service Backend
 
-`$ cd webservice`
+For running the web service locally, it is recommended to build and run the web service docker container. Execute the script `run-docker.sh` inside the `webservice` directory with root privileges (call `stop-docker.sh` to revert). You can also run the web service as a user process with `mvn exec:java`. JUnit tests can be executed by running `mvn test` inside the `webservice` directory.
 
-`$ mvn clean compile`
+The environment variable `ASEPART_POSTGRES_HOST` can be set to change the default hostname of the database the web service tries to connect to. Default is localhost. If `JDBC_DATABASE_URL` is set, the web service will use that and ignore all other configuration options.
 
-`$ mvn exec:java`
+For the file upload feature, we use a Minio server, which is an Open Source S3-compatible file storage server. The environment variables `ASEPART_MINIO_URL`, `ASEPART_MINIO_BUCKET`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` must be set to enable this feature.
 
-On port 12345, the service will respond with "Hello World" to any GET request and show the number of requests made in total. To build a docker image containing the service, run:
+## Admin Web App
 
-`$ mvn package docker:build`
-
-Please make sure that your user has permission to talk to the docker daemon.
-
-### Admin Web App
-
-The demo Web Application can be build and executed by:
+The admin web application can be build and executed by:
 
 `$ cd admin-web-app`
 
@@ -38,46 +32,16 @@ The demo Web Application can be build and executed by:
 
 `$ npm start`
 
-You can now view admin-web-app in the browser on http://localhost:3000/
+Your browser will be opened displaying the web app.
 
-### User App
+## User App
 
-#### Android
+### Android
 
-To build the app one have to change the directory to `user-app` and run
-
-`npm install`
-
-`npm run eject`
-
-`npm run android`
-
-## Testing
-
-### Web Service Backend
-
-JUnit is used as our testing framework. To run the tests, execute:
-
-`$ cd webservice`
-
-`$ mvn test`
-
-### Admin Web App
-
-The web application uses Jest to run unit and rendering tests. To run from command line, execute:
-
-`$ cd admin-web-app`
+To build the app you have to change the directory to `user-app` and run
 
 `$ npm install`
 
-`$ npm test`
+`$ npm start`
 
-### User App
-
-Like the web application, the mobile user app also uses Jest.
-
-`$ cd user-app`
-
-`$ npm install`
-
-`$ npm test`
+The console outputs an QR code which can be scanned using the "Expo" app which must be installed from the Play Store.

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setKey, isValid} from './keyValid';
+import {setUpdateBoolean} from '../Login/state';
 
 import {
 	StackNavigator,
@@ -32,13 +33,13 @@ export default class JoinProject extends Component {
   
  async onJoinPressed() {
 
-
+      setUpdateBoolean(true);
       setKey(this.state.entryKey);
   
      if(await isValid()){
         setState({isValid: true});
   
-  
+      
         //navigate to different site
        const { navigate } = this.props.navigation;
         navigate("Fourth", { name: "ProjectInfo" })
@@ -49,7 +50,7 @@ export default class JoinProject extends Component {
     
       
     
-    }s
+    }
 
 
     render() {

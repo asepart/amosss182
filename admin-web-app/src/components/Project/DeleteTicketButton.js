@@ -1,28 +1,67 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
-import { setState } from '../shared/GlobalState';
+import { View, Button } from 'react-native';
+import Popup from "reactjs-popup";
+import {getAuth} from '../shared/auth';
+import {URL} from '../shared/const';
+import {setUpdateBoolean} from '../shared/GlobalState';
+import { Link } from 'react-router-dom';
 
 export default class DeleteTicketButton extends Component {
 
-  showDeleteTicketConfirm() {
-		setState({
-			isAuth: true,
-			show: 'deleteTicket',
-			param: this.props.keyFromParent,
-			name: this.props.nameFromParent,
-			id: this.props.proj.row.id,
-			tName: this.props.proj.row.ticketName
-		});
+	constructor(props) {
+		super(props);
+		this.state = { open: false };
+	}
+	openPopup = () => {
+		this.setState({ open: true });
+	};
+	closePopup = () => {
+		this.setState({ open: false });
+	};
+
+	deleteTicket() {
+		fetch(URL + '/tickets/' + this.props.proj.row.id, {method:'DELETE', headers: getAuth()})
+			.then((response) => response.json())
+			.catch((error) => {
+				console.error(error);
+			});
+
+		this.props.callToParent();
+		setUpdateBoolean(true);
+		this.setState({
+				open: false
+		})
 	}
 
 	render() {
-		return (	// TODO: add edit icon instead of text here
-			<Text
-				onPress = { this.showDeleteTicketConfirm.bind(this) }
-				style={{color: '#5daedb'}}
-			>
-				DELETE
-			</Text>
-		);
+		return (
+			<div>
+				<Link to = {"/projects/" + this.props.project} style={{textDecoration: 'none'}}>
+					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/delete.png')} alt=""/>
+				</Link>
+				<Popup
+					open={this.state.open}
+					closeOnDocumentClick
+					onClose={this.closePopup}
+				>
+					<View>
+						<Button
+							onPress = { function doNothing() {} }
+							disabled = {true}
+							title = {"Delete " + this.props.proj.row.name + " from " + this.props.nameFromParent + "?"}
+						/>
+						<Button
+							onPress = { this.deleteTicket.bind(this) }
+							title = "Delete"
+							color = "#0c3868"/>
+						<Button
+							onPress = { this.closePopup }
+							title = "Cancel"
+							color = "#0e4a80"
+						/>
+					</View>
+			</Popup>
+		</div>
+	);
 	}
 }

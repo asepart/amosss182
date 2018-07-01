@@ -5,14 +5,19 @@ import Login from './src/components/Login/login';
 import JoinProject from '../user-app/src/components/Projects/joinProject';
 import GetMessages from './src/components/Chat/messages';
 import TicketView from '../user-app/src/components/Projects/ticketView';
+import TicketProcessing from './src/components/Tickets/ticketProcessed';
+import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
+import Camera from '../user-app/src/components/MediaSupport/camera';
+
+import {
+  createStackNavigator, DrawerNavigator
+} from 'react-navigation';
 import stackNav from '../user-app/src/components/Navigation/stackNav';
 import styles from '../user-app/src/components/Login/Design';
 
-import {
-  StackNavigator,DrawerNavigator
-} from 'react-navigation';
+import ProjectList from './src/components/Projects/projectList';
 
-const AppNavigation = StackNavigator({
+const AppNavigation = createStackNavigator({
   First: { screen: Login },
   Second: { screen: stackNav,
     navigationOptions: ({navigation}) => ({
@@ -25,18 +30,21 @@ const AppNavigation = StackNavigator({
   Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
   Sixth: {screen: TicketView, 
-       navigationOptions: ({navigation}) => ({
-        id: navigation.state.params.id,
-        headerStyle: {
-        backgroundColor:'#5daedb'
-        },
-	      headerTitleStyle: {
-	    	color:'#FFF'
-	      }
-      })
+     navigationOptions: ({navigation}) => ({
+    id: navigation.state.params.id,
+    headerStyle: {
+      backgroundColor:'#5daedb'
   },
-  Seventh: {screen: GetMessages}
- 
+	headerTitleStyle: {
+		color:'#FFF'
+	}
+  })},
+  Seventh: {screen: GetMessages},
+  Eigth: {screen: TicketProcessing },
+  Ninth: {screen: Camera },
+  Tenth: {screen:ProjectList},
+  Eleventh: {screen: CameraRollPicker}
+      
 
 }); 
 export default AppNavigation;

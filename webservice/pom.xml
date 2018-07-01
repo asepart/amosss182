@@ -32,7 +32,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <check />
+                    <check/>
                 </configuration>
             </plugin>
             <plugin>
@@ -40,7 +40,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                    <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -51,7 +51,7 @@
                     <assembleDirectory>target</assembleDirectory>
                     <programs>
                         <program>
-                            <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                            <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                             <name>webservice</name>
                         </program>
                     </programs>
@@ -84,7 +84,7 @@
                 <configuration>
                   <archive>
                     <manifest>
-                      <mainClass>de.fau.cs.osr.amos.asepart.WebService</mainClass>
+                      <mainClass>de.fau.cs.osr.amos.asepart.service.WebService</mainClass>
                       <addClasspath>true</addClasspath>
                     </manifest>
                   </archive>
@@ -110,12 +110,12 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.25.2</version>
+                <version>0.26.0</version>
                 <configuration>
                     <images>
                         <image>
                             <alias>webservice</alias>
-                            <name>asepart-webservice:${project.version}</name>
+                            <name>asepart-webservice</name>
 
                             <build>
                                 <from>openjdk:8</from>
@@ -145,7 +145,12 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-jdk-http</artifactId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>2.27</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
             <version>2.27</version>
         </dependency>
         <dependency>
@@ -169,19 +174,24 @@
             <version>3.5.1.Final</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.3.0.Final</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.2</version>
         </dependency>
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.4.0</version>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>0.4</version>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec-javase</artifactId>
+            <version>0.2.3</version>
         </dependency>
     </dependencies>
 </project>

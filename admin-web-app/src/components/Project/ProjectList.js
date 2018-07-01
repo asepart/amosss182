@@ -4,11 +4,13 @@ import ReactTable from 'react-table';
 import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 import ProjectButton from './ProjectButton';
+import ProjectAdd from './ProjectAdd';
 import UpdateProjectButton from './UpdateProjectButton';
 import DeleteProjectButton from './DeleteProjectButton';
-import { setState } from '../shared/GlobalState';
 import 'react-table/react-table.css';
 import '../../index.css';
+import {Link} from 'react-router-dom'
+import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 
 export default class ProjectList extends Component {
 
@@ -20,6 +22,17 @@ export default class ProjectList extends Component {
 	}
 
 	componentDidMount() {
+		this.fetchProjects();
+	}
+
+	componentDidUpdate() {
+		if(getUpdateBoolean() === true) {
+      this.fetchProjects();
+      setUpdateBoolean(false);
+    }
+	}
+
+	fetchProjects() {
 		return fetch(URL + '/projects', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
@@ -29,22 +42,6 @@ export default class ProjectList extends Component {
 			}, function() {});
 		}).catch((error) => {
 			console.error(error);
-		});
-	}
-
-	showAddProject () {
-		setState({
-			isAuth: true,
-			show: 'addProject',
-			param: ''
-		});
-	}
-
-	showUserManagement () {
-		setState({
-			isAuth: true,
-			show: 'listUsers',
-			param: ''
 		});
 	}
 
@@ -60,39 +57,52 @@ export default class ProjectList extends Component {
 		const columns = [
 			{
 				Header: 'Name',
-				accessor: 'projectName',
-				Cell: props => <ProjectButton proj={props}/>
+				accessor: 'name',
+				Cell: props => <ProjectButton proj={props}/>,
+				Footer: props => <ProjectAdd project={this.state.param} name={this.state.name} callToParent={this.fetchProjects.bind(this)}/>
 			}, {
 				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
 			}, {
 				Header: '',
-				accessor: '',
-				Cell: props => <UpdateProjectButton proj={props}/>
+				accessor: 'finished',
+				maxWidth: 35,
+				Cell: props => <UpdateProjectButton proj={props} callToParent={this.fetchProjects.bind(this)} />
 			}, {
 				Header: '',
 				accessor: '',
-				Cell: props => <DeleteProjectButton proj={props}/>
+				maxWidth: 35,
+				Cell: props => <DeleteProjectButton proj={props} callToParent={this.fetchProjects.bind(this)}/>
 			}
 		]
 
 		return (
 			<View>
-				<Button
-					disabled = {true}
-					title = {"Projects"}
+				<View style={{flexDirection: 'row'}}>
+					<View style={{flex:1}}>
+						<Button
+							onPress = { function doNothing() {} }
+							disabled = {true}
+							title = {"Projects"}
+						/>
+					</View>
+					<View style={{flex:1}}>
+						<Link to="/usermanagement" style={{textDecoration: 'none'}}>
+						<Button
+							onPress = {function doNothing() {} }
+							title = "Users"
+							color = "#0e4a80"
+						/>
+						</Link>
+					</View>
+				</View>
+				<ReactTable
+					data={this.state.dataSource}
+					noDataText="No Projects found!"
+					minRows={this.state.dataSource.length}
+					showPagination={false}
+					columns={columns}
 				/>
-				<Button
-					onPress = { this.showAddProject }
-					title = "Add Project"
-					color = "#0c3868"
-				/>
-				<Button
-					onPress = { this.showUserManagement }
-					title = "User Management"
-					color = "#0c3868"
-				/>
-				<ReactTable data={this.state.dataSource} columns={columns}/>
 			</View>
 		);
 	}
