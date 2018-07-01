@@ -1,157 +1,112 @@
-import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity } from 'react-native';
-import { ticket } from '../Chat/sendMessages';
-import { key } from './keyValid';
-import { URL } from '../Login/const';
-import { getAuth } from '../Login/auth';
+import React, {Component} from 'react';
+import {StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity} from 'react-native';
+import {ticket} from '../Chat/sendMessages';
+import {key} from './keyValid';
+import {URL} from '../Login/const';
+import {getAuth} from '../Login/auth';
 import styles from '../Login/Design';
-import { setState } from '../Login/state';
-import { setTicketID } from '../Chat/sendMessages';
-import { setTicketId } from '../Tickets/ticketProcessed';
-import { StackNavigator } from 'react-navigation'
-import {ticketstatus} from '../Projects/projectInfo';
-import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
+import {setState} from '../Login/state';
+import { setTicketID} from '../Chat/sendMessages';
+import {
+	StackNavigator,
+  } from 'react-navigation'
 
 export default class TicketView extends Component {
 
-	static navigationOptions = {
+  static navigationOptions= {
 		title: 'Ticket Details',
 		headerStyle: {
-			backgroundColor: '#8eacbb'
+			backgroundColor:'#8eacbb'
 		},
 		headerTitleStyle: {
-			color: '#FFF'
+			color:'#FFF'
 		}
-	}
-
-	constructor(props) {
+    } 
+    
+    constructor(props) {
 		super(props);
 		this.state = {
 			isLoading: true,
-			isAccepted:"", 
-			ticketDetail: "",
-			idTicket: ""
+            ticketDetail: "",
+            idTicket: ""
+           
 		};
-	}
-
-	onChatPressed() {
-		setTicketID(this.state.idTicket);
-		const { navigate } = this.props.navigation;
+    }
+    
+    onChatPressed() {
+        setTicketID(this.state.idTicket);
+        const { navigate } = this.props.navigation;
 		navigate("Seventh", { name: "GetMessages" })
+    }
+	
+    
+    async GetTicketInfo() {
+        let ticketID = this.props.navigation.state.params.id;  
+        this.setState({
+         idTicket: ticketID
+  })
+  fetch(URL + '/projects/' + key + '/tickets/' + ticketID, {method:'GET', headers: getAuth()})
+          .then((response) => response.json())
+          .then((responseJson) => {
+            this.setState({
+              isLoading: false,
+              ticketDetail: responseJson
+            }, function() {});
+          }).catch((error) => {
+             console.error(error);
+          });
+    }
+
+  componentDidMount() {
+    this.GetTicketInfo();
+         
 	}
+    render() {
+      var {params} = this.props.navigation.state;
+      if (this.state.isLoading) {
+        return (
+            <View style={{flex: 1,padding: 20}}>
+                <ActivityIndicator/>
+            </View>
+        )
+    }
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity 
+        onPress={this.onChatPressed.bind(this)} 
+        style={styles.buttonContainer}>
+			
+				<Text style={styles.buttonText}>Chat</Text>
 
-	onAcceptPressed() {
-		//alert("Ticket successfully accepted")
-		let ticketID = this.props.navigation.state.params.id;
-		var response = fetch(URL + '/tickets/'+ ticketID + '/accept', {
-			method: 'POST',
-			headers: getAuth()
-		})
-		setUpdateBoolean(true);
-		this.setState({isAccepted: 'accepted'})
-		this.forceUpdate(this.getTicketInfo);
-	}
-
-	onProcessTicketPressed() {
-		setTicketId(this.state.idTicket);
-		const { navigate } = this.props.navigation;
-		navigate("Eigth", { name: "TicketProcessing" })
-	}
-
-	async getTicketInfo() {
-		let ticketID = this.props.navigation.state.params.id;
-		this.setState({
-			idTicket: ticketID
-		})
-		fetch(URL + '/tickets/' + ticketID, { method: 'GET', headers: getAuth() })
-			.then((response) => response.json())
-			.then((responseJson) => {
-				this.setState({
-					isLoading: false,
-					ticketDetail: responseJson
-				}, function () { });
-			}).catch((error) => {
-				console.error(error);
-			});
-	}
-
-	componentDidMount() {
-		this.setState({isAccepted: ticketstatus})
-		this.getTicketInfo();
-	}
-
-
-
-	componentWillUnmount() {
-		const { navigate } = this.props.navigation;
-        navigate("Fourth", { name: "ProjectInfo" })
-	}
-
-	render() {
-		var { params } = this.props.navigation.state;
-		if (this.state.isLoading) {
-			return (
-				<View style={{ flex: 1, padding: 20 }}>
-					<ActivityIndicator />
-				</View>
-			)
-		}
-
-		return (
-			<View style={styles.container}>
-				<TouchableOpacity
-					onPress={this.onChatPressed.bind(this)}
-					style={styles.buttonContainer}>
-					<Text style={styles.buttonText}>Chat</Text>
-				</TouchableOpacity>
-
-				<View>
-				{this.state.isAccepted === 'open' ? (
-			<TouchableOpacity
-				onPress={this.onAcceptPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Accept</Text>
 			</TouchableOpacity>
-		) : (
-			<TouchableOpacity
-				onPress={this.onProcessTicketPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Process Ticket</Text>
-			</TouchableOpacity>
-		)}
-				</View>
-
-				<Text style={styles.text}>
-					Id: {this.state.ticketDetail.id}
-				</Text>
-				<Text style={styles.text}>
-					Key: {this.state.ticketDetail.projectKey}
-				</Text>
-				<Text style={styles.text}>
-					Required Observations: {this.state.ticketDetail.requiredObservations}
-				</Text>
-				<Text style={styles.text}>
-					Category: {this.state.ticketDetail.category}
-				</Text>
-				<Text style={styles.text}>
-					Ticket Name: {this.state.ticketDetail.name}
-				</Text>
-				<Text style={styles.text}>
-					Ticket Status: {this.state.ticketDetail.status}
-				</Text>
-				<Text style={styles.text}>
-					Summary: {this.state.ticketDetail.summary}
-				</Text>
-				<ScrollView style={styles.containerScroll}>
-					<Text style={styles.textLarge}>
-						Description:
-					</Text>
-					<Text style={styles.text} >
-						{this.state.ticketDetail.description}
-					</Text>
-				</ScrollView>
-			</View>
-		);
-	}
-}
-
+            <Text style={styles.text}>
+        Id: {this.state.ticketDetail.id}
+        </Text>
+        <Text style={styles.text}>
+        Key: {this.state.ticketDetail.projectKey}
+        </Text>
+        <Text style={styles.text}>
+        Required Observations: {this.state.ticketDetail.requiredObservations}
+        </Text>
+        <Text style={styles.text}>
+        Category: {this.state.ticketDetail.ticketCategory}
+        </Text>
+        <Text style={styles.text }>
+        Ticket Name: {this.state.ticketDetail.ticketName}
+        </Text>
+        <Text style={styles.text}>
+        Summary: {this.state.ticketDetail.ticketSummary}
+        </Text>
+        <ScrollView style={styles.containerScroll}>
+        <Text style={styles.textLarge}>
+        Description:
+        </Text>
+        <Text style={styles.text} >
+        {this.state.ticketDetail.ticketDescription}
+        </Text>
+        </ScrollView>
+        </View>
+        
+      );
+    }
+  }

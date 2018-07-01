@@ -2,7 +2,7 @@ import {URL, cki} from '../shared/const';
 
 var auth=false;
 export var username='';
-export var psw='';
+var psw='';
 
 export function setPSW(lpsw) {
 	cki.set('psw', lpsw);
@@ -28,14 +28,8 @@ export function getAuthForPost() {
 	};
 }
 
-export function getAuthForMediaPost() {
-	return {
-		'X-ASEPART-Role': 'Admin',
-		'Authorization': 'Basic ' + btoa(username + ":" + psw)
-	};
-}
-
 async function authenticate() {
+	console.error('U: ' + username + 'P: ' + psw);
 	var response = await fetch(URL + '/login', {
 		method: 'GET',
 		headers: getAuth()
@@ -69,6 +63,7 @@ export async function isAuth() {;
 			return false;
 		}
 	}
+	console.log ('U: ' + username + 'P: ' + psw)
 	if (typeof username === 'string' && typeof psw === 'string')
 		return await authenticate();
 	else {

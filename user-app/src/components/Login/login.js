@@ -55,8 +55,7 @@ export default class Login extends Component {
 			//navigate to different site
 		const { navigate } = this.props.navigation;
 
-		navigate("Tenth", { name: "ProjectList" })
-
+		navigate("Second", { name: "stackNav" })
 
 		} else {
 			this.setState({error: "Invalid credentials!"});

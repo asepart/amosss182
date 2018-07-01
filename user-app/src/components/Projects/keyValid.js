@@ -20,11 +20,8 @@ var response = await fetch(URL + '/join', {
     })
   
 	switch (response.status) {
-		    case 200:
-			      val=true;
-            return true;
-        case 204:
-			      val=true;
+		case 200:
+			val=true;
             return true;
         // username or password is invalid    
         case 401:

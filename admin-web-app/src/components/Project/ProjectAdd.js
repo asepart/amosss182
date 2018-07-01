@@ -1,85 +1,87 @@
 import React, {Component} from 'react';
-import {Button,TextInput,View} from 'react-native';
+import {Button,TextInput,ActivityIndicator,View} from 'react-native';
 import {getAuthForPost, username} from '../shared/auth';
 import {URL} from '../shared/const';
+import { setState } from '../shared/GlobalState';
 import '../../index.css';
-import Popup from "reactjs-popup";
-import {setUpdateBoolean} from '../shared/GlobalState';
-import { Link } from 'react-router-dom';
+
+var button = "Add";
+var editKey = true;
 
 export default class ProjectAdd extends Component {
-
+	
 	constructor(props) {
 		super(props);
 		this.state = {
-			open: false,
-			name: this.props.name,
+			projectName: this.props.name,
 			entryKey: this.props.project,
 			owner: username
 		};
+		if(this.state.entryKey !== '') {
+			button = "Update";
+			editKey = false;
+		} else {
+			button = "Add";
+			editKey = true;
+		}
 	}
-	openPopup = () => {
-		this.setState({ open: true });
-	};
-	closePopup = () => {
-		this.setState({
-				open: false,
-				name: undefined,
-				entryKey: undefined,
-		})
-	};
 
-	putProject() {
+	showProjectList () {
+		setState({
+			isAuth: true,
+			show: '',
+			param: ''
+		});
+	}
+
+	async putProject() {
 		let auth = getAuthForPost();
-		fetch(URL + '/projects', {
+		await fetch(URL + '/projects', {
 				method: 'POST',
 				headers: auth,
-				body: JSON.stringify({name: this.state.name, entryKey: this.state.entryKey, owner: this.state.owner})
+				body: JSON.stringify({projectName: this.state.projectName, entryKey: this.state.entryKey, owner: this.state.owner})
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				this.setState({}, function() {});
+				this.setState({
+					projectName: "",
+					entryKey: "",
+					owner: ""
+				}, function() {});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
-
-		this.props.callToParent();
-		setUpdateBoolean(true);
-		this.closePopup();
+		this.showProjectList ();
 	}
 
 	render() {
-		var buttonEnabled = (this.state.entryKey !== undefined && this.state.name !== undefined && this.state.entryKey !== '' && this.state.name !== '');
-
+		var buttonEnabled = (this.state.entryKey !== '' && this.state.projectName !== '');
+		if (this.state.isLoading) {
+			return (
+				<View style = {{flex: 1, padding: 20}}>
+					<ActivityIndicator / >
+				</View>
+			)
+		}
 		return (
-			<div>
-				<Link to = "/" style={{textDecoration: 'none'}} >
-					<img onClick={this.openPopup} style={{height: 25, marginBottom: -5}} src={require('../images/add.png')} alt=""/>
-				</Link>
-				<Popup
-					open={this.state.open}
-					closeOnDocumentClick
-					onClose={this.closePopup}
-				>
-					<View>
-					<TextInput
-						placeholder = "Name"
-						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = {(text) => this.setState({name: text})}
-						value = { this.state.name }
-					/>
-					<TextInput
-						placeholder = "Entry Code"
-						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
-						onChangeText = { (text) => this.setState({entryKey: text})}
-						value = { this.state.entryKey }
-					/>
-					<Button onPress = { this.putProject.bind(this) } title = "Add" color = "#0c3868" disabled = {!buttonEnabled}/>
-					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
-					</View>
-				</Popup>
-			</div>
+			<View>
+			<TextInput
+				placeholder = "Name"
+				style = {{height: 40, width: '25em', borderColor: 'gray',borderWidth: 1}}
+				onChangeText = {(text) => this.setState({projectName: text})}
+				value = {this.state.projectName}
+			/>
+			<TextInput
+				placeholder = "Entry Code"
+				style = {{height: 40,width: '25em',borderColor: 'gray',borderWidth: 1}}
+				onChangeText = { (text) => this.setState({entryKey: text})}
+				value = { this.state.entryKey }
+				editable = {editKey}
+			/>
+			<Button onPress = { this.putProject.bind(this) } title = {button} color = "#0c3868" disabled = {!buttonEnabled}/>
+			<Button onPress = { this.showProjectList } title = "Cancel" color = "#0e4a80" />
+			</View>
 		);
 	}
 }

@@ -4,13 +4,11 @@ codecov:
 
 coverage:
   precision: 2
-  round: nearest
+  round: down
   status:
     project:
       default:
-       enabled: yes
        threshold: 0.2
-       target: 70%
        if_not_found: success
     patch:
       default:

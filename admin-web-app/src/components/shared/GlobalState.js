@@ -18,11 +18,3 @@ export function setState (newState){
 }
 
 export function getState(){return state;}
-
-export var updateBoolean = false;
-export function setUpdateBoolean(bool) {
-	updateBoolean = bool;
-}
-export function getUpdateBoolean() {
-	return updateBoolean;
-}
