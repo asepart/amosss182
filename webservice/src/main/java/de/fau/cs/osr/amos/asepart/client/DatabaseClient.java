@@ -1220,8 +1220,8 @@ public class DatabaseClient implements AutoCloseable
         try (PreparedStatement stmt = cn.prepareStatement(
                 "select id, sender, timestamp, content, attachment, ticket_id\n" +
                    "from message\n" +
-                   "where ticket_id = ? and id > ?\n" +
-                   "order by asc;"))
+                   "where ticket_id = ? and id >= ?\n" +
+                   "order by timestamp asc;"))
         {
             stmt.setInt(1, ticketId);
             stmt.setInt(2, since);

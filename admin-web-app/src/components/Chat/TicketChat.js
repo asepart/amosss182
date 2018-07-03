@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
-import {getAuth} from '../shared/auth';
-import {setMsg, sendMessage, setTicketID} from './sendMessages';
+import {getAuth, getAuthForPost, getAuthForMediaPost, username} from '../shared/auth';
+import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 import ChatMessage from './ChatMessage';
 
@@ -29,7 +29,7 @@ export default class TicketChat extends Component {
 	}
 
 	componentWillUnmount() {
-		clearInterval(this.interval);
+		//clearInterval(this.interval);
 	}
 
 	componentDidUpdate() {
@@ -69,7 +69,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
+		fetch(URL + '/messages/' + this.state.idTicket + '?limit=30', {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -116,26 +116,30 @@ export default class TicketChat extends Component {
 
 	handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
-		//test upload
-		fetch("https://putsreq.com/PGUfoPMSIL4OjwGnpU4M", {
-				method: 'POST',
-				//headers: getAuth(),
-				body: files[0],
-		})
+		const formData = new FormData();
+		formData.append('file', files[0]);
 
-		//TODO: write actual upload after backend is finished
-		var tmp = new Date();
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-		setMsg(timestamp + ": Test - You wanted to upload this - " + files[0].name);
+		//if you use this and URL points to localhost, remember to set global minio environments (check slack dev channel)
+		fetch(URL + '/files/' + this.state.idTicket, {
+			method:'POST',
+			headers: getAuthForMediaPost(),
+			body: formData,
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+
+		//TODO: add display attachment filename as downloadable link
+		setMsg(files[0].name);
+		setAttachment(files[0].name)
 		setTicketID(this.state.idTicket);
-		sendMessage();
+		sendAttachment();
+
 		this.fetchMessages();
 		setUpdateBoolean(true);
 	}
 
-	renderChat() {
+	renderChat(ticket) {
 		var tmp_chat = this.state.chatHistory;
 		var tmp_date;
 		var date;
@@ -153,6 +157,7 @@ export default class TicketChat extends Component {
 					<div>
 						{tmp_date !== date.toDateString() ? (
 								<Button
+									onPress = { () => {}}
 									disabled = {true}
 									title = {date.toDateString()}
 								/>
@@ -162,24 +167,12 @@ export default class TicketChat extends Component {
 					</div>
 
 					<div>
-						{news.attachment === null ? (
+						<View style={{flexDirection: 'row'}}>
 							<Text style={{fontWeight: 'bold'}}>
-								[{date.toTimeString().slice(0,8)}] {news.sender}: <ChatMessage>{news.content}</ChatMessage>
+								[{date.toTimeString().slice(0,8)}] {news.sender}: {/*just to get a space*/}
 							</Text>
-						) : (
-							<div>
-								<Text style={{fontWeight: 'bold'}}>
-									[{date.toTimeString().slice(0,8)}] {news.sender}:
-								</Text>
-								<Text
-									onPress = {
-										null
-									}
-								>
-									<ChatMessage> {news.content}</ChatMessage>
-								</Text>
-							</div>
-						)}
+							<ChatMessage msg={news} ticket={ticket}/>
+						</View>
 					</div>
 
 				</View>
@@ -232,7 +225,7 @@ export default class TicketChat extends Component {
 						this.scrollView.scrollToEnd({animated: false});
 					}}
 				>
-					{this.renderChat()}
+					{this.renderChat(this.state.idTicket)}
 				</ScrollView>
 
 				<FileSelector

@@ -79,7 +79,7 @@ public class FileStorageClient
 
     private static boolean isVideoFile(String fileName)
     {
-        return fileName.endsWith(".mp4") || fileName.endsWith(".mkv");
+        return fileName.endsWith(".mp4") || fileName.endsWith(".mkv") || fileName.endsWith(".mov");
     }
 
     private static String getExtension(String fileName)

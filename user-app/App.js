@@ -11,8 +11,9 @@ import Camera from '../user-app/src/components/MediaSupport/camera';
 import UserInfo from './src/components/Login/userInfo';
 
 import {
-  createStackNavigator,
+  createStackNavigator
 } from 'react-navigation';
+
 import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = createStackNavigator({
@@ -32,11 +33,9 @@ const AppNavigation = createStackNavigator({
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
   Ninth: {screen: Camera },
-  Tenth: {screen:ProjectList},
+  Tenth: {screen: ProjectList},
   Eleventh: {screen: CameraRollPicker},
   Twelveth: {screen: UserInfo}
-
-
 }); 
 export default AppNavigation;
 

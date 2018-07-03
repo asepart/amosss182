@@ -6,7 +6,6 @@ import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ticket} from './sendMessages';
-import {StackNavigator} from 'react-navigation';
 import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
 import {getDownloadLink} from './files';
@@ -44,7 +43,7 @@ export default class Messages extends Component {
 	}
 
 	async makeApiCall() {
-		return fetch(URL + '/messages/' + ticket , {method:'GET', headers: getAuth()})
+		return fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({

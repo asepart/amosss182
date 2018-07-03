@@ -154,3 +154,4 @@ export default class TicketView extends Component {
 		);
 	}
 }
+
