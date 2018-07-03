@@ -8,6 +8,7 @@ import TicketView from '../user-app/src/components/Projects/ticketView';
 import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
 import Camera from '../user-app/src/components/MediaSupport/camera';
+import UserInfo from './src/components/Login/userInfo';
 
 import {
   createStackNavigator,
@@ -32,7 +33,8 @@ const AppNavigation = createStackNavigator({
   Eigth: {screen: TicketProcessing },
   Ninth: {screen: Camera },
   Tenth: {screen:ProjectList},
-  Eleventh: {screen: CameraRollPicker}
+  Eleventh: {screen: CameraRollPicker},
+  Twelveth: {screen: UserInfo}
 
 
 }); 
