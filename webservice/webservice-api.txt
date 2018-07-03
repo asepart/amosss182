@@ -22,12 +22,12 @@ The following REST operations are available:
 
   HTTP operation: POST
   Path:           /users
-  Roles:          Admin
+  Roles:          Admin, User
   Request-Body:   User information as JSON object (loginName, password, firstName, lastName, phoneNumber).
   Status code:    [204 No Content]   in case of success.
                   [400 Bad Request]  if password for new user is missing.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized account is not an admin account.
+                  [403 Forbidden]    if the authorized account is not an admin/user account.
                   [409 Conflict]     if admin with same name exists.
 - List users.
 
@@ -43,11 +43,11 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /users/{name}
-  Roles:          Admin
+  Roles:          Admin, User
   Returns:        User information as JSON object (loginName, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized account is not an admin account.
+                  [403 Forbidden]    if the authorized account is not an admin/user account.
                   [404 Not Found]    if user does not exist.
 
 - Delete user.
