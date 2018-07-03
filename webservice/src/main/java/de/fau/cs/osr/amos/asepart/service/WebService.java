@@ -66,7 +66,7 @@ public class WebService
     @Path("/users")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response writeUser(@Context SecurityContext sc, Map<String, String> user) throws Exception
     {
         final String loginName = user.get("loginName");
@@ -111,7 +111,7 @@ public class WebService
 
     @Path("/users/{name}")
     @GET
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response getUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
     {
         try (DatabaseClient db = new DatabaseClient())
