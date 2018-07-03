@@ -69,7 +69,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
+		fetch(URL + '/messages/' + this.state.idTicket + '?limit=30', {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -167,12 +167,12 @@ export default class TicketChat extends Component {
 					</div>
 
 					<div>
-						<div>
+						<View style={{flexDirection: 'row'}}>
 							<Text style={{fontWeight: 'bold'}}>
-								[{date.toTimeString().slice(0,8)}] {news.sender}:
+								[{date.toTimeString().slice(0,8)}] {news.sender}: {/*just to get a space*/}
 							</Text>
 							<ChatMessage msg={news} ticket={ticket}/>
-						</div>
+						</View>
 					</div>
 
 				</View>
