@@ -69,7 +69,11 @@ public class WebService
     @RolesAllowed({"Admin", "User"})
     public Response writeUser(@Context SecurityContext sc, Map<String, String> user) throws Exception
     {
+        Principal principal = sc.getUserPrincipal();
         final String loginName = user.get("loginName");
+
+        if (sc.isUserInRole("User") && !principal.getName().equals(loginName))
+            return Response.status(Response.Status.FORBIDDEN).build();
 
         try (DatabaseClient db = new DatabaseClient())
         {
@@ -114,10 +118,15 @@ public class WebService
     @RolesAllowed({"Admin", "User"})
     public Response getUser(@Context SecurityContext sc, @PathParam("name") String user) throws Exception
     {
+        Principal principal = sc.getUserPrincipal();
+
         try (DatabaseClient db = new DatabaseClient())
         {
             if (!db.isUser(user))
                 return Response.status(Response.Status.NOT_FOUND).build();
+
+            if (sc.isUserInRole("User") && !principal.getName().equals(user))
+                return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(db.getUser(user)).build();
         }

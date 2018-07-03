@@ -27,7 +27,7 @@ The following REST operations are available:
   Status code:    [204 No Content]   in case of success.
                   [400 Bad Request]  if password for new user is missing.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized account is not an admin/user account.
+                  [403 Forbidden]    if the permissions are not sufficient.
                   [409 Conflict]     if admin with same name exists.
 - List users.
 
@@ -47,7 +47,7 @@ The following REST operations are available:
   Returns:        User information as JSON object (loginName, firstName, lastName, phoneNumber).
   Status code:    [200 OK]           in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
-                  [403 Forbidden]    if the authorized account is not an admin/user account.
+                  [403 Forbidden]    if the permissions are not sufficient.
                   [404 Not Found]    if user does not exist.
 
 - Delete user.
