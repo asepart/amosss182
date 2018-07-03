@@ -57,6 +57,7 @@ export default class Login extends Component {
 
 		navigate("Tenth", { name: "ProjectList" })
 
+
 		} else {
 			this.setState({error: "Invalid credentials!"});
 		}
@@ -83,4 +84,3 @@ export default class Login extends Component {
 		</View>);
 	}
 }
-

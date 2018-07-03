@@ -69,7 +69,16 @@ public class DatabaseClient implements AutoCloseable
         cn.close();
     }
 
-    private boolean authenticate(String loginName, String password) throws SQLException
+    /**
+     * Checks if authentication is valid.
+     *
+     * @param loginName The account name.
+     * @param password The password as plain text.
+     * @return true if password is correct, false otherwise.
+     * @throws SQLException on database error.
+     */
+
+    public boolean authenticate(String loginName, String password) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement("select count(login_name) from account where login_name = ? and password = crypt(?, password);"))
         {
@@ -82,31 +91,6 @@ public class DatabaseClient implements AutoCloseable
                 return (rs.getInt(1) == 1);
             }
         }
-    }
-
-    /**
-     * Checks if authentication is valid.
-     *
-     * @param loginName The account name.
-     * @param password The password as plain text.
-     * @param role "Admin" or "User".
-     * @return true if password is correct and given role matches account, false otherwise.
-     * @throws SQLException on database error.
-     */
-
-    public boolean authenticate(String loginName, String password, String role) throws SQLException
-    {
-        if (!authenticate(loginName, password))
-            return false;
-
-        switch (role)
-        {
-            case "Admin": if (!isAdmin(loginName)) throw new IllegalArgumentException("Account is not an admin account."); else break;
-            case "User": if (!isUser(loginName)) throw new IllegalArgumentException("Account is not an user account."); else break;
-            default: throw new IllegalArgumentException("Unknown role: " + role);
-        }
-
-        return true;
     }
 
     /**
@@ -1156,16 +1140,24 @@ public class DatabaseClient implements AutoCloseable
      * Returns all messages of one ticket.
      *
      * @param ticketId Unique ticket id.
+     * @param limit Number of last messages that should be returned.
+     *
      * @return List of maps containing each message's details.
      * @throws SQLException on database error.
      */
 
-    public List<Map<String, String>> listMessages(int ticketId) throws SQLException
+    public List<Map<String, String>> listMessages(int ticketId, int limit) throws SQLException
     {
         try (PreparedStatement stmt = cn.prepareStatement(
-                     "select id, sender, timestamp, content, attachment, ticket_id from message where ticket_id = ?;"))
+                     "with last_messages as (select id, sender, timestamp, content, attachment, ticket_id\n" +
+                                              "from message\n" +
+                                              "where ticket_id = ?\n" +
+                                              "order by timestamp desc\n" +
+                                              "limit ?)\n" +
+                             "select * from last_messages order by timestamp asc;"))
         {
             stmt.setInt(1, ticketId);
+            stmt.setInt(2, limit);
 
             try (ResultSet rs = stmt.executeQuery())
             {
@@ -1192,11 +1184,13 @@ public class DatabaseClient implements AutoCloseable
      * and then returns them.
      *
      * @param ticketId Unique ticket id.
+     * @param since ID of last message the client has already seen.
+
      * @return List of maps containing each message's details.
      * @throws SQLException on database error.
      */
 
-    public List<Map<String, String>> listenChannel(int ticketId) throws Exception
+    public List<Map<String, String>> listenChannel(int ticketId, int since) throws Exception
     {
         try (Statement stmt = cn.createStatement())
         {
@@ -1223,6 +1217,32 @@ public class DatabaseClient implements AutoCloseable
             stmt.execute(String.format("unlisten ticket_%d", ticketId));
         }
 
-        return listMessages(ticketId);
+        try (PreparedStatement stmt = cn.prepareStatement(
+                "select id, sender, timestamp, content, attachment, ticket_id\n" +
+                   "from message\n" +
+                   "where ticket_id = ? and id >= ?\n" +
+                   "order by timestamp asc;"))
+        {
+            stmt.setInt(1, ticketId);
+            stmt.setInt(2, since);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                List<Map<String, String>> result = new LinkedList<>();
+
+                while (rs.next())
+                {
+                    Map<String, String> row = new HashMap<>(4);
+                    row.put("id", String.valueOf(rs.getInt(1)));
+                    row.put("sender", rs.getString(2));
+                    row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
+                    row.put("content", rs.getString(4));
+                    row.put("attachment", rs.getString(5));
+                    result.add(row);
+                }
+
+                return result;
+            }
+        }
     }
 }

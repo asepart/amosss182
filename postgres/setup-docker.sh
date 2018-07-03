@@ -3,7 +3,7 @@
 docker network create asepart-network
 
 docker pull postgres
-docker run -p 5432:5432 --network asepart-network --name asepart-postgres -d postgres
+docker run -e POSTGRES_PASSWORD=asepart -p 5432:5432 --network asepart-network --name asepart-postgres -d postgres 
 
 echo "Waiting for postgres startup..."
 sleep 60 # TODO find better way to do this

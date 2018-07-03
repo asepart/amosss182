@@ -21,10 +21,8 @@ import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 
 /**
- * This class is a wrapper for accessing
- * an minio file server, which is an
- * open source implementation of the
- * Amazon S3 protocol.
+ * This class is a wrapper for accessing an minio file server, which is an
+ * open source implementation of the Amazon S3 protocol.
  */
 
 public class FileStorageClient
@@ -81,7 +79,7 @@ public class FileStorageClient
 
     private static boolean isVideoFile(String fileName)
     {
-        return fileName.endsWith(".mp4") || fileName.endsWith(".mkv");
+        return fileName.endsWith(".mp4") || fileName.endsWith(".mkv") || fileName.endsWith(".mov");
     }
 
     private static String getExtension(String fileName)
@@ -281,7 +279,13 @@ public class FileStorageClient
 
     public void cascade(int ticketId) throws Exception
     {
-        Iterable<Result<Item>> results = client.listObjects(fileBucket, "ticket:" + String.valueOf(ticketId) + ":");
+        cascadeBucket(ticketId, fileBucket);
+        cascadeBucket(ticketId, thumbnailBucket);
+    }
+
+    private void cascadeBucket(int ticketId, String bucket) throws Exception
+    {
+        Iterable<Result<Item>> results = client.listObjects(bucket, "ticket:" + String.valueOf(ticketId) + ":");
         LinkedList<String> trash = new LinkedList<>();
 
         for (Result<Item> result : results)
@@ -290,13 +294,6 @@ public class FileStorageClient
             trash.add(item.objectName());
         }
 
-        client.removeObject(fileBucket, trash);
-        client.removeObject(thumbnailBucket, trash);
-
-        for (String fileId : trash)
-        {
-            if (isVideoFile(fileId))
-                client.removeObject(thumbnailBucket, getVideoThumbnailName(fileId));
-        }
+        client.removeObject(bucket, trash);
     }
 }

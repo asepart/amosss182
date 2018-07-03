@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
-import {getAuth} from '../shared/auth';
-import {setMsg, sendMessage, setTicketID} from './sendMessages';
+import {getAuth, getAuthForPost, getAuthForMediaPost, username} from '../shared/auth';
+import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 import ChatMessage from './ChatMessage';
 
@@ -23,13 +23,13 @@ export default class TicketChat extends Component {
 			this.fetchTicketName();
 			this.fetchProjectName();
 		}
-		
+
 		this.fetchMessages();
-		this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
-		clearInterval(this.interval);
+		//clearInterval(this.interval);
 	}
 
 	componentDidUpdate() {
@@ -69,7 +69,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket, {method:'GET', headers: getAuth()})
+		fetch(URL + '/messages/' + this.state.idTicket + '?limit=30', {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -82,28 +82,29 @@ export default class TicketChat extends Component {
 		});
 	}
 
-	listenForNewMessages() {
-		fetch(URL + '/listen/' + this.state.idTicket, {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				chatHistory: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+	async listenForNewMessages() {
+		while (true){
+			console.log("fetch " + (new Date()).toISOString());
+			var response = await fetch(URL + '/listen/' + this.state.idTicket, {
+				method: 'GET',
+				headers: getAuth()
+			})
+			switch (response.status) {
+				case 200:
+					this.setState({
+						isLoading: false,
+						chatHistory: response,
+					});
+					break;
+				default:
+					console.error("Error:" + response.status);
+					console.error(response.text);
+			}
+		}
 	}
 
 	async onSendPressed() {
-		var tmp = new Date();
-		//+1 is needed, since getMonth returns 0-11
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-
-		setMsg(timestamp + ": " + this.state.message);
+		setMsg(this.state.message);
 		setTicketID(this.state.idTicket);
 		sendMessage();
 		this.fetchMessages();
@@ -115,42 +116,50 @@ export default class TicketChat extends Component {
 
 	handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
-		//test upload
-		fetch("https://putsreq.com/PGUfoPMSIL4OjwGnpU4M", {
-				method: 'POST',
-				//headers: getAuth(),
-				body: files[0],
-		})
+		const formData = new FormData();
+		formData.append('file', files[0]);
 
-		//TODO: write actual upload after backend is finished
-		var tmp = new Date();
-		var date = tmp.toDateString();
-		var time = tmp.toTimeString().slice(0,8);
-		var timestamp = "[" + date + ", " + time + "]";
-		setMsg(timestamp + ": Test - You wanted to upload this - " + files[0].name);
+		//if you use this and URL points to localhost, remember to set global minio environments (check slack dev channel)
+		fetch(URL + '/files/' + this.state.idTicket, {
+			method:'POST',
+			headers: getAuthForMediaPost(),
+			body: formData,
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+
+		//TODO: add display attachment filename as downloadable link
+		setMsg(files[0].name);
+		setAttachment(files[0].name)
 		setTicketID(this.state.idTicket);
-		sendMessage();
+		sendAttachment();
+
 		this.fetchMessages();
 		setUpdateBoolean(true);
 	}
 
-	renderChat() {
+	renderChat(ticket) {
 		var tmp_chat = this.state.chatHistory;
 		var tmp_date;
+		var date;
 
 		return this.state.chatHistory.map(function(news, id) {
 			if(id !== 0) {
-				tmp_date = tmp_chat[id-1].content.slice(1,16);
+				tmp_date = new Date(parseInt(tmp_chat[id-1].timestamp)).toDateString();
+				date = new Date(parseInt(tmp_chat[id].timestamp));
 			} else {
 				tmp_date = new Date(1993, 3, 20);
+				date = new Date(parseInt(tmp_chat[id].timestamp));
 			}
 			return (
 				<View key={id}>
 					<div>
-						{tmp_date !== news.content.slice(1,16) ? (
+						{tmp_date !== date.toDateString() ? (
 								<Button
+									onPress = { () => {}}
 									disabled = {true}
-									title = {news.content.slice(1,16)}
+									title = {date.toDateString()}
 								/>
 						) : (
 							null
@@ -158,18 +167,12 @@ export default class TicketChat extends Component {
 					</div>
 
 					<div>
-						{news.content.search("http") === -1 ? (
+						<View style={{flexDirection: 'row'}}>
 							<Text style={{fontWeight: 'bold'}}>
-								[{news.content.slice(18,27)} {news.sender}: <ChatMessage>{news.content.slice(29)}</ChatMessage>
+								[{date.toTimeString().slice(0,8)}] {news.sender}: {/*just to get a space*/}
 							</Text>
-						) : (
-							<div>
-								<Text style={{fontWeight: 'bold'}}>
-									[{news.content.slice(18,27)} {news.sender}:
-								</Text>
-								<ChatMessage><a href={news.content.slice(29)}> {news.content.slice(29)}</a></ChatMessage>
-							</div>
-						)}
+							<ChatMessage msg={news} ticket={ticket}/>
+						</View>
 					</div>
 
 				</View>
@@ -222,7 +225,7 @@ export default class TicketChat extends Component {
 						this.scrollView.scrollToEnd({animated: false});
 					}}
 				>
-					{this.renderChat()}
+					{this.renderChat(this.state.idTicket)}
 				</ScrollView>
 
 				<FileSelector

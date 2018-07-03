@@ -10,8 +10,9 @@ import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRoll
 import CameraAccess from '../user-app/src/components/MediaSupport/camera';
 
 import {
-  createStackNavigator,
+  createStackNavigator
 } from 'react-navigation';
+
 import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = createStackNavigator({
@@ -30,10 +31,10 @@ const AppNavigation = createStackNavigator({
   })},
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
-  Ninth: {screen: CameraAccess },
+  Ninth: {screen: Camera },
   Tenth: {screen:ProjectList},
   Eleventh: {screen: CameraRollPicker}
-
+      
 
 }); 
 export default AppNavigation;

@@ -1,4 +1,4 @@
-package de.fau.cs.osr.amos.asepart.test;
+package de.fau.cs.osr.amos.asepart;
 
 import de.fau.cs.osr.amos.asepart.service.WebService;
 
@@ -32,50 +32,34 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class WebServiceTest
+public class WebServiceTest
 {
     private WebTarget getClient()
     {
         final URI uri = UriBuilder.fromUri(WebService.address).port(WebService.port).build();
         return ClientBuilder.newBuilder().register(MultiPartFeature.class).build().target(uri);
     }
-
-    private WebTarget getUserClient()
-    {
-        return getUserClient("user", "user");
-    }
-
-    private WebTarget getUserClient(String username, String password)
+    
+    private WebTarget getClient(String account, String password)
     {
         WebTarget client = getClient();
 
-        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic(username, password);
-        WebServiceRole role = WebServiceRole.user();
-
+        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic(account, password);
         client.register(af);
-        client.register(role);
 
         return client;
+    }
+
+    private WebTarget getUserClient()
+    {
+        return getClient("user", "user");
     }
 
     private WebTarget getAdminClient()
     {
-        return getAdminClient("admin", "admin");
+        return getClient("admin", "admin");
     }
-
-    private WebTarget getAdminClient(String adminname, String password)
-    {
-        WebTarget client = getClient();
-
-        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic(adminname, password);
-        WebServiceRole role = WebServiceRole.admin();
-
-        client.register(af);
-        client.register(role);
-
-        return client;
-    }
-
+    
     @BeforeAll
     static void start()
     {
@@ -97,6 +81,14 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
             assertEquals("Your identification is valid: admin", answer);
         }
+
+        try (Response response = getUserClient().path("/login").request().get())
+        {
+            String answer = response.readEntity(String.class);
+
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals("Your identification is valid: user", answer);
+        }
     }
 
     @Test
@@ -110,69 +102,13 @@ class WebServiceTest
             assertEquals("Your identification is invalid.", answer);
         }
     }
-
-    @Test
-    void testMissingRole()
-    {
-        WebTarget client = getClient();
-        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
-
-        client.register(af);
-
-        try (Response response = client.path("/login").request().get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    void testInvalidRole()
-    {
-        WebTarget client = getClient();
-        HttpAuthenticationFeature af = HttpAuthenticationFeature.basic("admin", "admin");
-
-        client.register(af);
-
-        try (Response response = client.path("/login").request().header("X-ASEPART-Role", "God").get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    void testWrongRole()
-    {
-        try (Response response = getUserClient().path("/users").request().get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-
+    
     @Test
     void testWrongPassword()
     {
-        try (Response response = getAdminClient("invalid", "wrong").path("/login").request().get())
+        try (Response response = getClient("invalid", "wrong").path("/login").request().get())
         {
             assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    void testUserAsAdmin()
-    {
-        try (Response response = getAdminClient("user", "user").path("/login").request().get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
-        }
-    }
-
-    @Test
-    void testAdminAsUser()
-    {
-        try (Response response = getUserClient("admin", "admin").path("/login").request().get())
-        {
-            assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
     }
 
@@ -227,27 +163,27 @@ class WebServiceTest
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
+        try (Response response = getClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("junit_user", "secure").path("/tickets").path("1").request().get())
+        try (Response response = getClient("junit_user", "secure").path("/tickets").path("1").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("junit_user", "secure").path("/join").request().post(Entity.text("pizza")))
+        try (Response response = getClient("junit_user", "secure").path("/join").request().post(Entity.text("pizza")))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
+        try (Response response = getClient("junit_user", "secure").path("/projects/pizza/tickets").request().get())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("junit_user", "secure").path("/leave").request().post(Entity.text("pizza")))
+        try (Response response = getClient("junit_user", "secure").path("/leave").request().post(Entity.text("pizza")))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -316,7 +252,7 @@ class WebServiceTest
 
         newAdmin.put("password","supergeheim");
 
-        try (Response response = getAdminClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
+        try (Response response = getClient("junit_admin", "secure").path("/admins").request().post(Entity.json(newAdmin)))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -328,7 +264,7 @@ class WebServiceTest
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())
+        try (Response response = getClient("junit_admin", "secure").path("/projects").path("pizza").request().delete())
         {
             assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -338,17 +274,17 @@ class WebServiceTest
         pizza.put("owner", "junit_admin");
         pizza.put("name", "Pizza Project");
 
-        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").request().post(Entity.json(pizza)))
+        try (Response response = getClient("junit_admin", "supergeheim").path("/projects").request().post(Entity.json(pizza)))
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").request().delete())
+        try (Response response = getClient("junit_admin", "supergeheim").path("/projects").path("pizza").request().delete())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("junit_admin", "supergeheim").path("/projects").path("pizza").path("tickets").request().get())
+        try (Response response = getClient("junit_admin", "supergeheim").path("/projects").path("pizza").path("tickets").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -457,7 +393,7 @@ class WebServiceTest
             assertEquals("user", users.get(0).get("loginName"));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/projects/junit_test/users").request().get())
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/projects/junit_test/users").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -512,7 +448,7 @@ class WebServiceTest
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").request().post(Entity.json(ticket)))
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/tickets").request().post(Entity.json(ticket)))
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -585,7 +521,7 @@ class WebServiceTest
             assertEquals("Test Ticket Modified", ticket.get("name"));
         }
 
-        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("accept").request().post(Entity.text("")))
+        try (Response response = getClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -600,7 +536,7 @@ class WebServiceTest
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().get())
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -617,7 +553,7 @@ class WebServiceTest
         observation.put("outcome", "positive");
         observation.put("quantity", "2");
 
-        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
+        try (Response response = getClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().post(Entity.json(observation)))
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -627,12 +563,12 @@ class WebServiceTest
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
+        try (Response response = getClient("nobodyuser", "nobodyuser").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).path("observations").request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -695,7 +631,7 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/tickets").path(String.valueOf(lastTicketId)).request().delete())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -772,7 +708,7 @@ class WebServiceTest
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/projects/pizza/users/user").request().delete())
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/projects/pizza/users/user").request().delete())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -840,12 +776,12 @@ class WebServiceTest
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user1", "test").path("/join").request().post(Entity.text("stat_project")))
+        try (Response response = getClient("stat_user1", "test").path("/join").request().post(Entity.text("stat_project")))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user2", "test").path("/join").request().post(Entity.text("stat_project")))
+        try (Response response = getClient("stat_user2", "test").path("/join").request().post(Entity.text("stat_project")))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -861,7 +797,7 @@ class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("accept").request().post(Entity.text("")))
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -870,12 +806,12 @@ class WebServiceTest
         observation.put("outcome", "negative");
         observation.put("quantity", "2");
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
         {
             GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
             ticket = response.readEntity(type);
@@ -889,12 +825,12 @@ class WebServiceTest
 
         observation.put("outcome", "positive");
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
         {
             GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
             ticket = response.readEntity(type);
@@ -906,12 +842,12 @@ class WebServiceTest
             assertEquals("2", ticket.get("ON"));
         }
 
-        try (Response response = getUserClient("stat_user2", "test").path("/tickets").path(String.valueOf(ticketId)).path("accept").request().post(Entity.text("")))
+        try (Response response = getClient("stat_user2", "test").path("/tickets").path(String.valueOf(ticketId)).path("accept").request().post(Entity.text("")))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
         {
             GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
             ticket = response.readEntity(type);
@@ -923,12 +859,12 @@ class WebServiceTest
             assertEquals("2", ticket.get("ON"));
         }
 
-        try (Response response = getUserClient("stat_user2", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
+        try (Response response = getClient("stat_user2", "test").path("/tickets").path(String.valueOf(ticketId)).path("observations").request().post(Entity.json(observation)))
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
+        try (Response response = getClient("stat_user1", "test").path("/tickets").path(String.valueOf(ticketId)).request().get())
         {
             GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
             ticket = response.readEntity(type);
@@ -999,12 +935,12 @@ class WebServiceTest
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
+        try (Response response = getClient("nobodyuser", "nobodyuser").path("/messages").path(String.valueOf(ticketId)).request().post(Entity.text("Hello, World!")))
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -1026,12 +962,12 @@ class WebServiceTest
             assertEquals("admin", messages.get(0).get("sender"));
         }
 
-        try (Response response = getAdminClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().get())
+        try (Response response = getClient("nobodyadmin", "nobodyadmin").path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getUserClient("nobodyuser", "nobodyuser").path("/messages").path(String.valueOf(ticketId)).request().get())
+        try (Response response = getClient("nobodyuser", "nobodyuser").path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.FORBIDDEN, Response.Status.fromStatusCode(response.getStatus()));
         }

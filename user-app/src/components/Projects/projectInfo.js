@@ -26,17 +26,17 @@ export default class ProjectInfo extends Component {
 
 	componentDidUpdate() {
 		if(getUpdateBoolean() === true) {
-		  this.fetchTicketDetails();
-		  setUpdateBoolean(false);
+			this.fetchTicketDetails();
+			setUpdateBoolean(false);
 		}
-	  }
+		}
 
-	  componentWillUnmount() {
+		componentWillUnmount() {
 		const { navigate } = this.props.navigation;
 		navigate("Tenth", { name: "ProjectList" })
 		setUpdateBoolean(true);
 	}
-	 
+
 
 	fetchTicketDetails() {
 		fetch(URL + '/projects/' + key + '/tickets', {method:'GET', headers: getAuth()})
@@ -51,6 +51,16 @@ export default class ProjectInfo extends Component {
 					});
 	}
 
+	leaveProject() {
+		fetch(URL + '/leave', {
+			method: 'POST',
+			headers: getAuth(),
+			body:	key
+		})
+		const { navigate } = this.props.navigation;
+		navigate("Tenth", { name: "ProjectList" })
+	}
+
 	static navigationOptions= {
 		title: 'Tickets',
 		headerStyle: {
@@ -63,7 +73,6 @@ export default class ProjectInfo extends Component {
 
 	_renderItem({item}) {
 		return (this._getTicketStatus({item}));
-		
 	}
 
 	_getTicketStatus({item}) {
@@ -75,7 +84,7 @@ export default class ProjectInfo extends Component {
 					style={styles.buttonLargeContainer}
 			>
 					<Text style={styles.buttonText}>
-						id:  {item.id}
+						id:	{item.id}
 					</Text>
 					<Text style={styles.buttonText}>
 						 summary: {item.summary}
@@ -83,7 +92,7 @@ export default class ProjectInfo extends Component {
 				 <Text style={styles.buttonText}>
 						category: {item.category}
 				 </Text>
-				  <Text style={styles.buttonText}>
+					<Text style={styles.buttonText}>
 						 status: {item.status}
 				 </Text>
 				<Text style={styles.buttonText}>
@@ -99,7 +108,7 @@ export default class ProjectInfo extends Component {
 					style={styles.buttonAcceptedContainer}
 			>
 					<Text style={styles.buttonText}>
-						id:  {item.id}
+						id:	{item.id}
 					</Text>
 					<Text style={styles.buttonText}>
 						 summary: {item.summary}
@@ -107,7 +116,7 @@ export default class ProjectInfo extends Component {
 				 <Text style={styles.buttonText}>
 						category: {item.category}
 				 </Text>
-				  <Text style={styles.buttonText}>
+					<Text style={styles.buttonText}>
 						 status: {item.status}
 				 </Text>
 				<Text style={styles.buttonText}>
@@ -123,7 +132,7 @@ export default class ProjectInfo extends Component {
 					style={styles.buttonProcessedContainer}
 			>
 					<Text style={styles.buttonText}>
-						id:  {item.id}
+						id:	{item.id}
 					</Text>
 					<Text style={styles.buttonText}>
 						 summary: {item.summary}
@@ -131,7 +140,7 @@ export default class ProjectInfo extends Component {
 				 <Text style={styles.buttonText}>
 						category: {item.category}
 				 </Text>
-				  <Text style={styles.buttonText}>
+					<Text style={styles.buttonText}>
 						 status: {item.status}
 				 </Text>
 				<Text style={styles.buttonText}>
@@ -147,7 +156,7 @@ export default class ProjectInfo extends Component {
 					style={styles.buttonFinishedContainer}
 			>
 					<Text style={styles.buttonText}>
-						id:  {item.id}
+						id:	{item.id}
 					</Text>
 					<Text style={styles.buttonText}>
 						 summary: {item.summary}
@@ -155,7 +164,7 @@ export default class ProjectInfo extends Component {
 				 <Text style={styles.buttonText}>
 						category: {item.category}
 				 </Text>
-				  <Text style={styles.buttonText}>
+					<Text style={styles.buttonText}>
 						 status: {item.status}
 				 </Text>
 				<Text style={styles.buttonText}>
@@ -172,7 +181,7 @@ export default class ProjectInfo extends Component {
 					style={styles.buttonLargeContainer}
 			>
 					<Text style={styles.buttonText}>
-						id:  {item.id}
+						id:	{item.id}
 					</Text>
 					<Text style={styles.buttonText}>
 						 summary: {item.summary}
@@ -180,7 +189,7 @@ export default class ProjectInfo extends Component {
 				 <Text style={styles.buttonText}>
 						category: {item.category}
 				 </Text>
-				  <Text style={styles.buttonText}>
+					<Text style={styles.buttonText}>
 						 status: {item.status}
 				 </Text>
 				<Text style={styles.buttonText}>
@@ -189,11 +198,10 @@ export default class ProjectInfo extends Component {
 				 <Text style={styles.buttonText}>
 						 positive: {item.UP}
 				 </Text>
-				</TouchableOpacity> 
+				</TouchableOpacity>
 				);
 		}
 	}
-
 
 	render() {
 		if (this.state.isLoading) {
@@ -212,7 +220,14 @@ export default class ProjectInfo extends Component {
 					renderItem={this._renderItem.bind(this)}
 					 keyExtractor={(item, index) => index}
 				/>
+
+				<TouchableOpacity
+					onPress={this.leaveProject.bind(this)}
+					style={styles.buttonContainer}>
+					<Text style={styles.buttonText}>Leave Project</Text>
+				</TouchableOpacity>
 			</View>
 		);
 	}
 }
+
