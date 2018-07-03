@@ -139,7 +139,7 @@ export default class TicketChat extends Component {
 		setUpdateBoolean(true);
 	}
 
-	renderChat() {
+	renderChat(ticket) {
 		var tmp_chat = this.state.chatHistory;
 		var tmp_date;
 		var date;
@@ -157,6 +157,7 @@ export default class TicketChat extends Component {
 					<div>
 						{tmp_date !== date.toDateString() ? (
 								<Button
+									onPress = { () => {}}
 									disabled = {true}
 									title = {date.toDateString()}
 								/>
@@ -166,24 +167,12 @@ export default class TicketChat extends Component {
 					</div>
 
 					<div>
-						{news.attachment === null ? (
+						<div>
 							<Text style={{fontWeight: 'bold'}}>
-								[{date.toTimeString().slice(0,8)}] {news.sender}: <ChatMessage>{news.content}</ChatMessage>
+								[{date.toTimeString().slice(0,8)}] {news.sender}:
 							</Text>
-						) : (
-							<div>
-								<Text style={{fontWeight: 'bold'}}>
-									[{date.toTimeString().slice(0,8)}] {news.sender}:
-								</Text>
-								<Text
-									onPress = {
-										null
-									}
-								>
-									<ChatMessage> {news.content}</ChatMessage>
-								</Text>
-							</div>
-						)}
+							<ChatMessage msg={news} ticket={ticket}/>
+						</div>
 					</div>
 
 				</View>
@@ -236,7 +225,7 @@ export default class TicketChat extends Component {
 						this.scrollView.scrollToEnd({animated: false});
 					}}
 				>
-					{this.renderChat()}
+					{this.renderChat(this.state.idTicket)}
 				</ScrollView>
 
 				<FileSelector
