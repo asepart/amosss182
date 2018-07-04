@@ -56,8 +56,6 @@ export default styles=StyleSheet.create({
     inputLong: {
       height: 40,
       width:350,
-      flex: 3,
-      alignItems: 'baseline',
       color: '#FFF',
       backgroundColor: '#14639e',
       marginBottom: 10,
