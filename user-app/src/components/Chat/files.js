@@ -71,7 +71,6 @@ export async function getDownloadLink (filename, ticket) {
         headers: getAuth()
 	}).then(
 		    response => {
-		    	response.json();
 		    	link = '';
 		    	if (response.status == '200') {
 		    		link = response.url;
