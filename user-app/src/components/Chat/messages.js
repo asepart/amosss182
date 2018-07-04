@@ -119,19 +119,13 @@ export default class Messages extends Component {
 					};
 				}
 				else {
-					/*TODO: get URL of thumbnail when file extension problem is solved
-					var tmp = fetch(URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=true', {method:'GET', headers: getAuth()})
-					.then((response) => response.text());
-					window.alert(JSON.stringify(tmp))
-					*/
-
 					return {
 						_id: message.id,
 						text: message.content,
 						user: Object.assign({_id: message.sender, name: message.sender}),
 						createdAt: new Date(parseInt(message.timestamp)),
 						//TODO: change with real thumbnail URL
-						image: 'https://reactjs.org/logo-og.png',
+						image: URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=true',
 					};
 				}
 		});
