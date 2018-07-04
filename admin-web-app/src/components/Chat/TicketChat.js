@@ -129,8 +129,7 @@ export default class TicketChat extends Component {
 			console.log(error);
 		});
 
-		//TODO: add display attachment filename as downloadable link
-		setMsg(files[0].name);
+		setMsg(URL + '/files/' + this.state.idTicket + '/' + files[0].name);
 		setAttachment(files[0].name)
 		setTicketID(this.state.idTicket);
 		sendAttachment();
