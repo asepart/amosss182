@@ -7,6 +7,7 @@ import TicketView from '../user-app/src/components/Projects/ticketView';
 import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
 import Camera from '../user-app/src/components/MediaSupport/camera';
+import UserInfo from './src/components/Login/userInfo';
 import ProjectListTicketList from '../user-app/src/components/Projects/projectListTicketList';
 
 import {
@@ -43,8 +44,6 @@ const AppNavigation = createStackNavigator({
           color:'#FFF'
       }
     })}
-      
-
 }); 
 export default AppNavigation;
 

@@ -94,6 +94,11 @@ componentDidUpdate() {
                       </TouchableOpacity>
      );
  }      
+ 
+updateUser() {
+	var { navigate } = this.props.navigation;
+	navigate("Twelveth", { name: "UserInfo" });
+}
       
 render() {
     return (
@@ -116,8 +121,12 @@ render() {
 					data={this.state.userProjects}
                     renderItem={this._renderProjects.bind(this)}
 					 keyExtractor={(item, index) => index}
-				/>   
-
+          />   
+          <TouchableOpacity
+			onPress={this.updateUser.bind(this)}
+			style={styles.buttonContainer}>
+			<Text style={styles.buttonText}>User Information</Text>
+		</TouchableOpacity>
       </View>
     );
   }
