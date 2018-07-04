@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import { StyleSheet, Text, View, AppRegistry} from 'react-native';
 import ProjectInfo from './src/components/Projects/projectInfo';
 import Login from './src/components/Login/login';
-import JoinProject from '../user-app/src/components/Projects/joinProject';
 import GetMessages from './src/components/Chat/messages';
 import TicketView from '../user-app/src/components/Projects/ticketView';
 import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
-import CameraAccess from '../user-app/src/components/MediaSupport/camera';
+import Camera from '../user-app/src/components/MediaSupport/camera';
+import ProjectListTicketList from '../user-app/src/components/Projects/projectListTicketList';
 
 import {
   createStackNavigator
@@ -17,7 +17,6 @@ import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = createStackNavigator({
   First: { screen: Login },
-  Third: {screen: JoinProject},
   Fourth: {screen: ProjectInfo},
   Sixth: {screen: TicketView, 
      navigationOptions: ({navigation}) => ({
@@ -33,7 +32,17 @@ const AppNavigation = createStackNavigator({
   Eigth: {screen: TicketProcessing },
   Ninth: {screen: Camera },
   Tenth: {screen:ProjectList},
-  Eleventh: {screen: CameraRollPicker}
+  Eleventh: {screen: CameraRollPicker},
+  Twelfth: {screen: ProjectListTicketList,
+    navigationOptions: ({navigation}) => ({
+      entryKey: navigation.state.params.entrykey,
+      headerStyle: {
+        backgroundColor:'#5daedb'
+    },
+      headerTitleStyle: {
+          color:'#FFF'
+      }
+    })}
       
 
 }); 

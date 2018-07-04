@@ -14,9 +14,11 @@ export default class Header extends Component {
     					<Link to = "/" style={{textDecoration: 'none'}} >
     					<img style={{height: 30, width: undefined}} src={require('../images/icon.png')} alt=""/>
     					</Link>
-    				</div>
+    		</div>
             <div style={{flex: 1, direction: 'rtl'}}>
-              <img style={{height: 30, width: undefined}} src={require('../images/logout.png')} alt="" onClick={logout}/>
+            			<Link to = "/" style={{textDecoration: 'none'}} >
+              			<img style={{height: 30, width: undefined}} src={require('../images/logout.png')} alt="" onClick={logout}/>
+              			</Link>
             </div>
           </View>
         )

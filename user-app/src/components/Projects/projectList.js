@@ -6,25 +6,29 @@ import {URL} from '../Login/const';
 import {StackNavigator,} from 'react-navigation';
 import {getAuth} from '../Login/auth';
 import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
+import {setKey, isValid} from '../Projects/keyValid';
 
 export var projectname = '';
 export var projectstatus = '';
 
 export default class ProjectList extends Component {
-    static navigationOptions= {
-		title: 'Project Overview',
-		headerStyle: {
-			backgroundColor:'#5daedb'
-		},
-		headerTitleStyle: {
-			color:'#FFF'
-		}
-    } 
 
+//setting page title 
+static navigationOptions= {
+  title: 'Projects',
+  headerStyle: {
+    backgroundColor:'#5daedb'
+  },
+  headerTitleStyle: {
+    color:'#FFF'
+  }
+} 
     constructor(props) {
 		super(props);
 		this.state = {
-			userProjects: [],
+      userProjects: [],
+      entryKey: "",
+			error: ""
 		};
 	}
 
@@ -41,10 +45,23 @@ componentDidUpdate() {
 
     async onAddProject() {
 
-         const { navigate } = this.props.navigation;
-          navigate("Third", { name: "JoinProject" })
-    
-       } 
+      setUpdateBoolean(true);
+      setKey(this.state.entryKey);
+  
+     if(await isValid()){
+        setState({isValid: true});
+  
+      
+        //navigate to different site
+       const { navigate } = this.props.navigation;
+        navigate("Fourth", { name: "ProjectInfo" })
+  
+     } else {
+        this.setState({error: "something went wrong"});
+      }
+      
+    }
+       
      
        fetchUserProjects() {
         fetch(URL + '/projects', {method:'GET', headers: getAuth()})
@@ -66,6 +83,7 @@ componentDidUpdate() {
     }
      return (
         <TouchableOpacity
+      onPress={()=> this.props.navigation.navigate("Twelfth", {entryKey:item.entryKey}) }
                      style={styles.buttonLargeContainer}>
                      <Text style={styles.buttonText}>
                     Project Name: {item.name} 
@@ -80,13 +98,19 @@ componentDidUpdate() {
 render() {
     return (
       <View style={styles.container}>
+      <TextInput 
+         onChangeText={(text) => this.setState({entryKey: text})} 
+        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.inputLong}/>
           <TouchableOpacity 
          onPress={this.onAddProject.bind(this)} 
           style={styles.buttonLargeContainer}>
           
-              <Text style={styles.buttonText}>Add Project</Text>
+              <Text style={styles.buttonText}>Join Project</Text>
         
           </TouchableOpacity>
+          <Text style={styles.error}>
+          {this.state.error}
+				</Text>
           <FlatList
 					style={styles.textLarge}
 					data={this.state.userProjects}
