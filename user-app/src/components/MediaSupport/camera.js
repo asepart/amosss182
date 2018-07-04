@@ -10,7 +10,7 @@ import {
 // import styles from '../Login/Design';
 import { RNCamera } from 'react-native-camera';
 import uploadFile from '../Chat/files';
-import ticket from '../Chat/sendMessages';
+import { ticket } from '../Chat/sendMessages';
 
 export var uri = '';
 
@@ -49,15 +49,14 @@ export default class CameraAccess extends Component {
   }
 
   takePicture = async function() {
+    console.log(" ========================== takePicture =================================");
     if (this.camera) {
-      const options = { quality: 0.5, base64: true };
-      const data = await this.camera.takePictureAsync(options)      
-      console.log(data.uri);
-      uploadFile(data.uri, ticket).catch(function(error) {
-        console.log('There has been a problem with your fetch operation: ' + error.message);
-         // ADD THIS THROW error
-          throw error;
-        });;
+      const options = { quality: 0.5 };
+      this.camera.takePictureAsync(options).then(data => {
+        console.log(data.uri);
+        console.log(ticket);
+        uploadFile(data.uri, ticket);
+      });
     }
   };
 }
