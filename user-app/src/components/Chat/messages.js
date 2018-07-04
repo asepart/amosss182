@@ -93,6 +93,8 @@ export default class Messages extends Component {
 			let link = await getDownloadLink(currentMessage.text, ticket);
 			if (link != '') {
 				Linking.openURL(link);
+			} else {
+				Linking.openURL(currentMessage.text);
 			}
 		} else {
 			//do something if it is only a text message
