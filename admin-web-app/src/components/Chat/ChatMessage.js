@@ -46,7 +46,7 @@ export default class ChatMessage extends Component {
 							<ChatVideo src={URL + '/files/' + this.props.ticket + '/' + this.props.msg.attachment}/>
 						: <View></View>
 					}
-					<Text>{this.props.msg.content}</Text>
+					<a href={this.props.msg.content}>{this.props.msg.content}</a>
 				</View>
 			);
 		}
