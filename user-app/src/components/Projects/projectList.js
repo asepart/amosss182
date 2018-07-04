@@ -97,7 +97,7 @@ componentDidUpdate() {
  
 updateUser() {
 	var { navigate } = this.props.navigation;
-	navigate("Twelveth", { name: "UserInfo" });
+	navigate("Thirteenth", { name: "UserInfo" });
 }
       
 render() {
