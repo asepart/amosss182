@@ -31,7 +31,7 @@ const AppNavigation = createStackNavigator({
   })},
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
-  Ninth: {screen: Camera },
+  Ninth: {screen: CameraAccess },
   Tenth: {screen:ProjectList},
   Eleventh: {screen: CameraRollPicker}
       

@@ -25,19 +25,18 @@ export default class CustomActions extends React.Component {
       cancelButtonIndex,
     },
     (buttonIndex) => {
-      const { navigate } = this.props.navigation;
+    var { navigate } = this.props.navigation;
       switch (buttonIndex) {
         case 0:
-        navigate("Ninth", { name: "CameraAccess" });
-          break;
+        	setType('Photos');
+        	navigate("Ninth", { name: "CameraAccess" });
+        	break;
         case 1:
         	setType('Photos');
-        	var { navigate } = this.props.navigation;
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
         case 2:
         	setType('Videos');
-        	var { navigate } = this.props.navigation;
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
         default:

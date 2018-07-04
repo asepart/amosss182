@@ -10,7 +10,7 @@ import {
 // import styles from '../Login/Design';
 import { RNCamera } from 'react-native-camera';
 import uploadFile from '../Chat/files';
-import ticket from '../Chat/sendMessages';
+import {ticket} from '../Chat/sendMessages';
 
 export var uri = '';
 
