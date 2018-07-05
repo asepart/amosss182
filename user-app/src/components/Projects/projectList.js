@@ -103,12 +103,14 @@ updateUser() {
 }
       
 render() {
+	var buttonEnabled = (this.state.entryKey !== '');
     return (
       <View style={styles.container}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
         placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.inputLong}/>
           <TouchableOpacity 
+          disabled={!buttonEnabled}
          onPress={this.onAddProject.bind(this)} 
           style={styles.buttonLargeContainer}>
           

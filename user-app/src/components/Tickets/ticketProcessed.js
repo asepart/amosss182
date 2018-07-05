@@ -29,7 +29,7 @@ export default class TicketProcessing extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			outcome: '',
+			outcome: pickerPlaceholder,
 			quantity: '',
 		}
 	}
@@ -54,6 +54,7 @@ export default class TicketProcessing extends Component {
 	 }
 
 	render() {
+		var buttonEnabled = (this.state.outcome !== pickerPlaceholder && this.state.quantity !== '');
 		var pickerStyle = styles.inputPicker;
 		if (Platform.OS === 'ios') {
 			pickerStyle = styles.inputPickerIOS;
@@ -79,6 +80,7 @@ export default class TicketProcessing extends Component {
 					value = {this.state.quantity}
 				/>
 				<TouchableOpacity
+					disabled={!buttonEnabled}
 					onPress={this.onSubmitPressed.bind(this)}
 					style={styles.buttonContainer}
 				>
