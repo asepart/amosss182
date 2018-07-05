@@ -39,7 +39,8 @@ export default class Login extends Component {
 		this.state = {
 			email: "",
 			password: "",
-			error: "",
+			info: "",
+			infoType: {}
 		}
 	}
 
@@ -52,14 +53,16 @@ export default class Login extends Component {
 		if(await isAuth()){
 			setState({isAuth: true});
 
-			//navigate to different site
+		this.setState({info: "Valid credentials", infoType: styles.success});
+
+		//navigate to different site
 		const { navigate } = this.props.navigation;
 
 		navigate("Tenth", { name: "ProjectList" })
 
 
 		} else {
-			this.setState({error: "Invalid credentials!"});
+			this.setState({info: "Invalid credentials", infoType: styles.error});
 		}
 	
 		
@@ -79,8 +82,8 @@ export default class Login extends Component {
 
 			</TouchableOpacity>
 
-			<Text style={styles.error}>
-					{this.state.error}
+			<Text style={this.state.infoType}>
+					{this.state.info}
 				</Text>
 		</View>);
 	}
