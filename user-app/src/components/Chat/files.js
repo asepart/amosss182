@@ -1,3 +1,4 @@
+import {Platform} from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
@@ -19,6 +20,9 @@ export function uploadFile (uri, ticket) {
 	}
 	if(type == 'Videos') {
 		ext = '.mp4';
+		if (Platform.OS === 'ios') {
+			ext = '.MOV';
+		}
 	}
 
 	var filename = (btoa(moment()) + ext);
