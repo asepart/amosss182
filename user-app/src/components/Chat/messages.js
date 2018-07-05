@@ -125,7 +125,7 @@ export default class Messages extends Component {
 						user: Object.assign({_id: message.sender, name: message.sender}),
 						createdAt: new Date(parseInt(message.timestamp)),
 						//TODO: change with real thumbnail URL
-						image: URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=true',
+						image: URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=false',
 					};
 				}
 		});
