@@ -120,10 +120,9 @@ render() {
 				</Text>
 				<Text/>
           <FlatList
-					style={styles.textLarge}
 					data={this.state.userProjects}
                     renderItem={this._renderProjects.bind(this)}
-					 keyExtractor={(item, index) => index}
+					 keyExtractor={(item, index) => index.toString()}
           />   
           <TouchableOpacity
 			onPress={this.updateUser.bind(this)}

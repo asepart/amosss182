@@ -216,10 +216,9 @@ export default class ProjectListTicketList extends Component {
 		return (
 			<View style={styles.container}>
 				<FlatList
-					style={styles.textLarge}
 					data={this.state.tickets}
 					renderItem={this._renderItem.bind(this)}
-					 keyExtractor={(item, index) => index}
+					 keyExtractor={(item, index) => index.toString()}
 				/>
 
 				<TouchableOpacity
