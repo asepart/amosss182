@@ -42,19 +42,22 @@ export default class TicketProcessing extends Component {
 			method: 'POST',
 			headers: auth,
 			body:	JSON.stringify({outcome: this.state.outcome, quantity: this.state.quantity})
-		})
+		}).then( (response) => {
+			console.log(response.status);
+		});
 
 		setUpdateBoolean(true);
-		const { navigate } = this.props.navigation;
-		navigate("Fourth", { name: "ProjectInfo" })
+		
 		//on submit pressed return back to ticket overview
+		const { navigate } = this.props.navigation;
+		navigate("Sixth", { name: "TicketView" })
 	 }
 
 	render() {
 		return (
 			<View style={styles.container}>
 				<Picker
-					style = {{width: 200, color: '#FFF', borderColor: 'gray', borderWidth: 1,}}
+					style = {styles.input}
 					selectedValue = {this.state.outcome}
 					onValueChange = {(text) => this.setState({outcome: text})}
 				>
