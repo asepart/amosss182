@@ -86,8 +86,6 @@ export default class Messages extends Component {
 
 	async onLongPress(ctx, currentMessage) {
 	    
-		//TODO: for further long press actions add actionsheet with additional functions here
-		
 		//opens media in browser or in another app
 		if (currentMessage.image != undefined) {
 			let link = await getDownloadLink(currentMessage.text, ticket);
