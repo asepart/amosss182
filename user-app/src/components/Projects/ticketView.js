@@ -80,13 +80,6 @@ export default class TicketView extends Component {
 		this.getTicketInfo();
 	}
 
-
-
-	componentWillUnmount() {
-		const { navigate } = this.props.navigation;
-        navigate("Fourth", { name: "ProjectInfo" })
-	}
-
 	render() {
 		var { params } = this.props.navigation.state;
 		if (this.state.isLoading) {

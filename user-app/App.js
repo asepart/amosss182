@@ -34,7 +34,6 @@ const AppNavigation = createStackNavigator({
   Ninth: {screen: Camera },
   Tenth: {screen:ProjectList},
   Eleventh: {screen: CameraRollPicker},
-  Twelveth: {screen: UserInfo},
   Twelfth: {screen: ProjectListTicketList,
     navigationOptions: ({navigation}) => ({
       entryKey: navigation.state.params.entrykey,
@@ -44,7 +43,8 @@ const AppNavigation = createStackNavigator({
       headerTitleStyle: {
           color:'#FFF'
       }
-    })}
+    })},
+  Thirteenth: {screen: UserInfo}
 }); 
 export default AppNavigation;
 

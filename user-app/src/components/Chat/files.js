@@ -1,3 +1,4 @@
+import {Platform} from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
@@ -19,6 +20,9 @@ export function uploadFile (uri, ticket) {
 	}
 	if(type == 'Videos') {
 		ext = '.mp4';
+		if (Platform.OS === 'ios') {
+			ext = '.MOV';
+		}
 	}
 
 	var filename = (btoa(moment()) + ext);
@@ -70,20 +74,19 @@ export async function getDownloadLink (filename, ticket) {
 				method: 'GET',
 				headers: getAuth()
 	}).then(
-				response => {
-					response.json();
-					link = '';
-					if (response.status == '200') {
-						link = response.url;
-					} else if (response.status == '404') {
-						alert("File does not exist.");
-					}
-				}
-		).catch(
-			error => {
-				console.log('downloadImage error:', error);
-				alert("File download failed.");
-			}
-		);
-	return link;
+		    response => {
+		    	link = '';
+		    	if (response.status == '200') {
+		    		link = response.url;
+		    	} else if (response.status == '404') {
+		    		alert("File does not exist.");
+		    	}
+		    }
+	  ).catch(
+	    error => {
+	    	console.log('downloadImage error:', error);
+	    	alert("File download failed.");
+	    }
+	  );
+	return link;	
 }
