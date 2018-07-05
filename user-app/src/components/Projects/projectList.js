@@ -78,9 +78,7 @@ componentDidUpdate() {
  _renderProjects({item}) {
     if (item.finished === 'false') {
         projectstatus = 'Project is open';
-    } else {
-        projectstatus = 'Project is finished';
-    }
+
      return (
         <TouchableOpacity
       onPress={()=> this.props.navigation.navigate("Twelfth", {entryKey:item.entryKey}) }
@@ -93,6 +91,7 @@ componentDidUpdate() {
                     </Text>
                       </TouchableOpacity>
      );
+    }
  }      
  
 updateUser() {
