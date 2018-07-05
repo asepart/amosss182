@@ -28,7 +28,8 @@ static navigationOptions= {
 		this.state = {
       userProjects: [],
       entryKey: "",
-			error: ""
+			info: "",
+			infoType: {}
 		};
 	}
 
@@ -50,15 +51,16 @@ componentDidUpdate() {
   
      if(await isValid()){
         setState({isValid: true});
-  
-      
-        //navigate to different site
-       const { navigate } = this.props.navigation;
-        navigate("Fourth", { name: "ProjectInfo" })
+
+        this.setState({info: "Project added", infoType: styles.success});
+        
+        //enable for immediate navigation after pressing join
+//        const { navigate } = this.props.navigation;
+//        navigate("Fourth", { name: "ProjectInfo" });
   
      } else {
-        this.setState({error: "something went wrong"});
-      }
+        this.setState({info: "Project not found", infoType: styles.error});
+     }
       
     }
        
@@ -113,9 +115,10 @@ render() {
               <Text style={styles.buttonText}>Join Project</Text>
         
           </TouchableOpacity>
-          <Text style={styles.error}>
-          {this.state.error}
+          <Text style={this.state.infoType}>
+          {this.state.info}
 				</Text>
+				<Text/>
           <FlatList
 					style={styles.textLarge}
 					data={this.state.userProjects}
