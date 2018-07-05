@@ -61,8 +61,6 @@ async function authenticate() {
 }
 
 export async function isAuth() {
-	if (auth)
-		return true;
 	if (username === '' || psw === '')
 		return false;
 	return await authenticate();
