@@ -56,7 +56,7 @@ export default class ProjectListTicketList extends Component {
 		fetch(URL + '/leave', {
 			method: 'POST',
 			headers: getAuth(),
-			body:	entryKey
+			body:	projectKey
 		})
 		const { navigate } = this.props.navigation;
 		navigate("Tenth", { name: "ProjectList" })
