@@ -24,23 +24,28 @@ var response = await fetch(URL + '/join', {
 	switch (response.status) {
 		case 200:
 			val=true;
+			return true;
         case 204:
         	val=true;
+        	return true;
         // username or password is invalid    
         case 401:
             val=false;
+            return false;
         // user had already joined 
         case 400:
             val=true;
+            return true;
         // user is not part of the project    
         case 403:
             val=false;
+            return false;
         // key is invalid    
         case 404:
             val=false;
+            return false;
 		default:			
 	}
-	return val;
 }
 
 export async function isValid() {
