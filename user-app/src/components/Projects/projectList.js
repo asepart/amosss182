@@ -103,12 +103,14 @@ updateUser() {
 }
       
 render() {
+	var buttonEnabled = (this.state.entryKey !== '');
     return (
       <View style={styles.container}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
         placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.inputLong}/>
           <TouchableOpacity 
+          disabled={!buttonEnabled}
          onPress={this.onAddProject.bind(this)} 
           style={styles.buttonLargeContainer}>
           
@@ -120,10 +122,9 @@ render() {
 				</Text>
 				<Text/>
           <FlatList
-					style={styles.textLarge}
 					data={this.state.userProjects}
                     renderItem={this._renderProjects.bind(this)}
-					 keyExtractor={(item, index) => index}
+					 keyExtractor={(item, index) => index.toString()}
           />   
           <TouchableOpacity
 			onPress={this.updateUser.bind(this)}

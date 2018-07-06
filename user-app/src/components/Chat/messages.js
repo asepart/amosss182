@@ -43,7 +43,7 @@ export default class Messages extends Component {
 	}
 
 	async makeApiCall() {
-		return fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
+		return await fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Picker} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Picker, Platform} from 'react-native';
 import styles from '../Login/Design';
 import { StackNavigator } from 'react-navigation';
 import {URL} from '../Login/const';
@@ -19,7 +19,7 @@ export default class TicketProcessing extends Component {
 	static navigationOptions = {
 		title: 'Ticket Processing',
 		headerStyle: {
-			backgroundColor: '#8eacbb'
+			backgroundColor: '#5daedb'
 		},
 		headerTitleStyle: {
 			color: '#FFF'
@@ -29,7 +29,7 @@ export default class TicketProcessing extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			outcome: '',
+			outcome: pickerPlaceholder,
 			quantity: '',
 		}
 	}
@@ -54,14 +54,20 @@ export default class TicketProcessing extends Component {
 	 }
 
 	render() {
+		var buttonEnabled = (this.state.outcome !== pickerPlaceholder && this.state.quantity !== '');
+		var pickerStyle = styles.inputPicker;
+		if (Platform.OS === 'ios') {
+			pickerStyle = styles.inputPickerIOS;
+		}
 		return (
-			<View style={styles.container}>
+			<View style={styles.containerPicker}>
 				<Picker
-					style = {styles.input}
-					selectedValue = {this.state.outcome}
+					style = {pickerStyle}
+				itemStyle={{color: '#FFF'}}	
+				selectedValue = {this.state.outcome}
 					onValueChange = {(text) => this.setState({outcome: text})}
 				>
-					<Picker.Item label = { pickerPlaceholder} value = { pickerPlaceholder} />
+					<Picker.Item label = { pickerPlaceholder} value = { pickerPlaceholder}/>
 					<Picker.Item label = "POSITIVE" value = "positive" />
 					<Picker.Item label = "NEGATIVE" value = "negative" />
 				</Picker>
@@ -74,6 +80,7 @@ export default class TicketProcessing extends Component {
 					value = {this.state.quantity}
 				/>
 				<TouchableOpacity
+					disabled={!buttonEnabled}
 					onPress={this.onSubmitPressed.bind(this)}
 					style={styles.buttonContainer}
 				>

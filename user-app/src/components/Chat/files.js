@@ -12,7 +12,7 @@ export function setType(asset) {
 	type = asset;
 }
 
-export function uploadFile (uri, ticket) {
+export async function uploadFile (uri, ticket) {
 
 	var ext = '';
 	if(type == 'Photos') {
@@ -44,13 +44,13 @@ export function uploadFile (uri, ticket) {
 	imgBody.append('file', image);
 
 	//send file to backend
-	fetch(URL + '/files/' + ticket, {
+	const res = await fetch(URL + '/files/' + ticket, {
 				method: 'POST',
 				headers: getAuthForMediaPost(),
 				body: imgBody
 	}).then(
 				response => {
-					response.json();
+					
 					//console.log(JSON.stringify(response));
 					if (response.status == '409') {
 						alert("File upload failed. Filename already exists.");
