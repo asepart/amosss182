@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList, Button} from 'react-native';
 import styles from '../Login/Design';
 import { StackNavigator, } from 'react-navigation';
 import {getAuth,username,psw} from '../Login/auth';
@@ -20,7 +20,8 @@ export default class ProjectListTicketList extends Component {
 	}
 
 	componentDidMount() {
-			this.fetchTicketDetails();
+		this.props.navigation.setParams({ update: this.updateUser });
+		this.fetchTicketDetails();
 	}
 
 	componentDidUpdate() {
@@ -62,15 +63,24 @@ export default class ProjectListTicketList extends Component {
 		navigate("Tenth", { name: "ProjectList" })
 	}
 
-	static navigationOptions= {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Tickets',
 		headerStyle: {
 			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
+		},
+		headerRight: <Button title={username} onPress={ () => params.update() } />
 		}
 	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	_renderItem({item}) {
 		return (this._getTicketStatus({item}));

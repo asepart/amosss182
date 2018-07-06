@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Platform, ActivityIndicator, View, Linking } from 'react-native';
+import { Platform, ActivityIndicator, View, Linking, Button } from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, username} from '../Login/auth';
 import styles from '../Login/Design';
@@ -12,13 +12,17 @@ import {getDownloadLink} from './files';
 
 export default class Messages extends Component {
 
-	static navigationOptions= {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Chat',
 		headerStyle: {
 			backgroundColor:'#5daedb'
 		},
 		headerTitleStyle: {
 			color:'#FFF'
+		},
+		headerRight: <Button title={username} onPress={ () => params.update() } />
 		}
 	}
 
@@ -33,6 +37,7 @@ export default class Messages extends Component {
 	}
 
 	componentDidMount(){
+		this.props.navigation.setParams({ update: this.updateUser });
 		this.makeApiCall();
 		//TODO: following line causes bug, please fix
 		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
@@ -41,6 +46,11 @@ export default class Messages extends Component {
 	componentWillUnmount() {
 		clearInterval(this.interval);
 	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	async makeApiCall() {
 		return await fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
