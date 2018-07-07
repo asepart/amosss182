@@ -62,7 +62,7 @@ export default styles=StyleSheet.create({
     // Text input box span over whole horizontal
     inputLong: {
       height: 40,
-      width:350,
+      width: 350,
       color: '#FFF',
       backgroundColor: '#14639e',
       marginBottom: 10,
@@ -91,7 +91,7 @@ export default styles=StyleSheet.create({
       backgroundColor: '#009fca',
       paddingVertical: 15,
       marginBottom:15,
-      width: 200,
+      width: 200
 
     },
     //button spanning whole horizontal
@@ -142,8 +142,7 @@ export default styles=StyleSheet.create({
        justifyContent:'center',
        width:60,
        height:60,
-       backgroundColor:'#009fca',
-       borderRadius:60,
+       backgroundColor:'#009fca'
 
     },
 

@@ -20,7 +20,7 @@ export default class ProjectList extends Component {
   title: 'Projects',
   headerStyle: {
     backgroundColor:'#5daedb',
-    paddingRight: 15
+    paddingRight: 15,
   },
   headerTitleStyle: {
     color:'#FFF'
@@ -110,7 +110,7 @@ export default class ProjectList extends Component {
 render() {
 	var buttonEnabled = (this.state.entryKey !== '');
     return (
-      <View style={styles.container}>
+      <View style={styles.containerAlign}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
         placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.inputLong}/>
