@@ -90,6 +90,7 @@ export default styles=StyleSheet.create({
     buttonContainer: {
       backgroundColor: '#009fca',
       paddingVertical: 15,
+      marginBottom:15,
       width: 200,
 
     },
