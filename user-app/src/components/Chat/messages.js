@@ -9,6 +9,7 @@ import {ticket} from './sendMessages';
 import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
 import {getDownloadLink} from './files';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class Messages extends Component {
 
@@ -17,12 +18,13 @@ export default class Messages extends Component {
 		return {
 		title: 'Chat',
 		headerStyle: {
-			backgroundColor:'#5daedb'
+			backgroundColor:'#5daedb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color:'#FFF'
 		},
-		headerRight: <Button title={username} onPress={ () => params.update() } />
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
 

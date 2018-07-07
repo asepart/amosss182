@@ -7,6 +7,7 @@ import {ticket, setTicketID} from '../Chat/sendMessages';
 import {key} from '../Projects/keyValid';
 import {getAuthForPost, username} from '../Login/auth';
 import {setUpdateBoolean} from '../Login/state';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 var pickerPlaceholder = "Outcome";
 export var tickID = "";
@@ -21,12 +22,13 @@ export default class TicketProcessing extends Component {
 		return {
 		title: 'Ticket Processing',
 		headerStyle: {
-			backgroundColor: '#5daedb'
+			backgroundColor: '#5daedb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color: '#FFF'
 		},
-		headerRight: <Button title={username} onPress={ () => params.update() } />
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
 

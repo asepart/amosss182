@@ -11,6 +11,7 @@ import { setTicketId } from '../Tickets/ticketProcessed';
 import { StackNavigator } from 'react-navigation'
 import {status} from '../Projects/projectListTicketList';
 import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class TicketView extends Component {
 
@@ -19,12 +20,13 @@ export default class TicketView extends Component {
 		return {
 		title: 'Ticket Details',
 		headerStyle: {
-			backgroundColor: '#8eacbb'
+			backgroundColor: '#8eacbb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color: '#FFF'
 		},
-		headerRight: <Button title={username} onPress={ () => params.update() } />
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
 

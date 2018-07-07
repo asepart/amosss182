@@ -23,7 +23,8 @@ const AppNavigation = createStackNavigator({
      navigationOptions: ({navigation}) => ({
     id: navigation.state.params.id,
     headerStyle: {
-      backgroundColor:'#5daedb'
+      backgroundColor:'#5daedb',
+      paddingRight: 15
   },
 	headerTitleStyle: {
 		color:'#FFF'
@@ -38,7 +39,8 @@ const AppNavigation = createStackNavigator({
     navigationOptions: ({navigation}) => ({
       entryKey: navigation.state.params.entrykey,
       headerStyle: {
-        backgroundColor:'#5daedb'
+        backgroundColor:'#5daedb',
+        paddingRight: 15
     },
       headerTitleStyle: {
           color:'#FFF'
