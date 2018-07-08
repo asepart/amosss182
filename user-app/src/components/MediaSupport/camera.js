@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 // import styles from '../Login/Design';
 import { RNCamera } from 'react-native-camera';
-import uploadFile from '../Chat/files';
+import { uploadFile } from '../Chat/files';
 import { ticket } from '../Chat/sendMessages';
 
 export var uri = '';
@@ -52,14 +52,11 @@ export default class CameraAccess extends Component {
     console.log(" ========================== takePicture =================================");
     if (this.camera) {
       const options = { quality: 0.5 };
-      this.camera.takePictureAsync(options).then(data => {
-        console.log(data.uri);
-        console.log(ticket);
-        uploadFile(data.uri, ticket);
-      });
+      data = await this.camera.takePictureAsync(options);
+      uploadFile(data.uri, ticket);
+      };
     }
   };
-}
 
 const styles = StyleSheet.create({
   container: {
