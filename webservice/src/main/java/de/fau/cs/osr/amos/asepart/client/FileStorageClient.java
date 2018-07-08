@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 
-import io.minio.ErrorCode;
 import io.minio.MinioClient;
-import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 

@@ -3,9 +3,7 @@ package de.fau.cs.osr.amos.asepart.service;
 import de.fau.cs.osr.amos.asepart.client.*;
 import de.fau.cs.osr.amos.asepart.ext.*;
 
-import java.io.File;
 import java.io.InputStream;
-import java.nio.file.FileAlreadyExistsException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;

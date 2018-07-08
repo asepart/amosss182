@@ -351,6 +351,15 @@ public class WebServiceTest
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
             assertEquals("pizza", projects.get(0).get("entryKey"));
         }
+
+        try (Response response = getUserClient().path("/projects").request().get())
+        {
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> projects = response.readEntity(type);
+
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals("pizza", projects.get(0).get("entryKey"));
+        }
     }
 
     @Test
