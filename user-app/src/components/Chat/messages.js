@@ -10,6 +10,8 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
 import {getDownloadLink} from './files';
 
+var limit = 30;
+
 export default class Messages extends Component {
 
 	static navigationOptions= {
@@ -44,6 +46,22 @@ export default class Messages extends Component {
 
 	async makeApiCall() {
 		return await fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				isLoading: false,
+				dataSource: responseJson,
+			}, function(){});
+		})
+		.catch((error) =>{
+			console.error(error);
+		});
+	}
+
+	async onLoadEarlierPressed() {
+		var newLimit = limit * 2;
+		limit = newLimit;
+		return await fetch(URL + '/messages/' + ticket + '?limit=' + newLimit, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -138,6 +156,8 @@ export default class Messages extends Component {
 		return(
 			<GiftedChat
 				messages={messages}
+				loadEarlier={true}
+				onLoadEarlier={this.onLoadEarlierPressed.bind(this)}
 				onInputTextChanged={(text) => this.setState({message: text})}
 				onSend={this.onSendPressed.bind(this)}
 				showAvatarForEveryMessage={true}
