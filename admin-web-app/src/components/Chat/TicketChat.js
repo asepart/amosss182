@@ -81,7 +81,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket + '?limit=' + this.state.numChatMsgs, {method:'GET', headers: getAuth(), timeout: 0})
+		fetch(URL + '/messages/' + this.state.idTicket + '?limit=' + this.state.numChatMsgs, {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			let maxID = Math.max.apply(Math, responseJson.map(o => {return Number(o.id)}));
@@ -102,6 +102,7 @@ export default class TicketChat extends Component {
 			console.log("Zzzzz…")
 		}
 		while (true){
+			/*
 			try {
 				var response = await fetch(URL + '/listen/' + this.state.idTicket + '?since=' + this.state.newestMsgId, {
 					method: 'GET',
@@ -127,6 +128,9 @@ export default class TicketChat extends Component {
 			} catch (e) {
 				console.error(e);
 			}
+			*/
+			this.fetchMessages();
+			await sleep(10000);
 			if (window.location.pathname.indexOf('chat') === -1)
 				return;
 		}
@@ -140,6 +144,8 @@ export default class TicketChat extends Component {
 		this.textInput.clear();
 		this.state.message = "";
 		this.textInput.focus();
+		await sleep(100);
+		this.fetchMessages();
 	}
 
 	handleFile(selectorFiles: FileList) {
