@@ -51,8 +51,13 @@ export default class Login extends Component {
 		setUsername(this.state.email);
 		setPSW(this.state.password);
 
+		//enables blinking feedback message
+      	this.setState({info: "", infoType: styles.success});
+
 		if(await isAuth()){
 			setState({isAuth: true});
+
+		
 
 		this.setState({info: "Valid credentials", infoType: styles.success});
 
@@ -82,7 +87,8 @@ export default class Login extends Component {
 				<Text style={styles.buttonText}>LOGIN</Text>
 
 			</TouchableOpacity>
-
+			
+			<Text/>
 			<Text style={this.state.infoType}>
 					{this.state.info}
 				</Text>

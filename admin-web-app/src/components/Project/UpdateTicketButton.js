@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, Button, TextInput, Picker } from 'react-native';
+import { View, Text, Button, TextInput, Picker } from 'react-native';
 import Popup from "reactjs-popup";
-import {getAuthForPost} from '../shared/auth';
-import {URL} from '../shared/const';
+import {getAuth, getAuthForPost, getAuthForMediaPost} from '../shared/auth';
+import {URL, FileSelector} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
 import { Link } from 'react-router-dom';
+import { File } from './File';
 
 var pickerPlaceholder = "Category";
 
@@ -21,6 +22,8 @@ export default class UpdateTicketButton extends Component {
 			category: '',
 			requiredObservations: '',
 			id: '',
+			newFile: null,
+			files: null
 		};
 	}
 	openPopup = () => {
@@ -40,7 +43,8 @@ export default class UpdateTicketButton extends Component {
 			category: this.props.tick.row.category,
 			requiredObservations: this.props.tick.row.requiredObservations,
 			id: this.props.tick.row.id
-		})
+		});
+		this.getFiles ();
 	}
 
 	createTicket() {
@@ -63,6 +67,70 @@ export default class UpdateTicketButton extends Component {
 		this.setState({
 		  open: false
 		})
+	}
+
+	getFiles () {
+		fetch(URL + '/tickets/' + this.props.tick.row.id + '/attachments', {
+			method: 'GET',
+			headers: getAuth(),
+		})
+		.then(response => response.json())
+		.then(response => this.setState({files: response}))
+		.catch(e => console.error(e));
+	}
+
+	async handleFile(selectorFiles: FileList) {
+		var files = selectorFiles;
+		const formData = new FormData();
+		formData.append('file', files[0]);
+		var fileID = -1;
+
+		fetch(URL + '/files/' + this.state.id, {
+			method:'POST',
+			headers: getAuthForMediaPost(),
+			body: formData,
+		})
+		.then(response => {
+			return response.text();
+		})
+		.then(responseJson => {
+			fileID=responseJson;
+			fetch(URL + '/tickets/' + this.state.id + '/attachments', {
+				method:'POST',
+				headers: getAuth(),
+				body: fileID,
+			})
+			.then(x => {this.closePopup()})
+			.catch((error) => {
+				console.log(error);
+			});
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+	}
+
+	deleteFile(name) {
+		return; //do nothing
+
+		var files = this.state.files;
+		var index = files.indexOf(name);
+		if (index > -1) {
+		  files.splice(index, 1);
+		}
+		this.setState({files: files});
+
+		//TODO: one could delete the file from the server
+	}
+
+	listFiles () {
+		return this.state.files.map(file => {
+			return (
+				<View>
+					<File name={file} del='true'/>
+				</View>
+			);
+		});
 	}
 
 	render() {
@@ -113,6 +181,14 @@ export default class UpdateTicketButton extends Component {
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {`${this.state.requiredObservations}`}
+					/>
+					{
+						this.state.files === null ?
+							<Text>No files uploaded</Text> :
+							this.listFiles()
+					}
+					<FileSelector
+						onLoadFile = {(files:FileList) => this.handleFile(files)}
 					/>
 					<Button onPress = { this.createTicket.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
 					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />

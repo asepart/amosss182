@@ -1,6 +1,5 @@
 import {URL} from '../Login/const';
 import {getAuth} from '../Login/auth';
-import {ProjectInfo} from '../Projects/projectInfo';
 
 export var ticket = "";
 export var msg = "";

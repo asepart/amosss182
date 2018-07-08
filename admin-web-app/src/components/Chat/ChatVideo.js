@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import CPopup from '../shared/CPopup';
-import { View } from 'react-native';
 
 export default class ChatVideo extends Component {
 	render() {

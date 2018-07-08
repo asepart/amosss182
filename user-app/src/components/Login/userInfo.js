@@ -84,7 +84,7 @@ export default class UserInfo extends Component {
     	var buttonEnabled = (this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phoneNumber !== '');
     	
     	return (
-    		   <View style={styles.container}>
+    		   <View style={styles.containerAlign}>
     		   		<TextInput
     		   			onChangeText={(text) => this.setState({firstName: text})}
     		   			value={this.state.firstName}
