@@ -26,7 +26,10 @@ export default styles=StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#0c3868',
-
+        //alignItems moves items to upper center
+        alignItems: 'center',
+        //justifyContent moves items to center of page
+        justifyContent: 'center'
       },
 
     containerAlign: {
@@ -56,7 +59,7 @@ export default styles=StyleSheet.create({
       width: 200,
       color: '#FFF',
       backgroundColor: '#14639e',
-      marginBottom: 10,
+      marginTop: 10,
       paddingHorizontal: 10
     },
     // Text input box span over whole horizontal
@@ -90,17 +93,24 @@ export default styles=StyleSheet.create({
     buttonContainer: {
       backgroundColor: '#009fca',
       paddingVertical: 15,
-      marginBottom:15,
+      marginTop: 15,
       width: 200
 
     },
     //button spanning whole horizontal
-    buttonLargeContainer: {
+    buttonMediumContainer: {
       backgroundColor: '#009fca',
       paddingVertical: 15,
-      width: 350,
+      width: 320,
       marginBottom: 15
     },
+    
+    buttonLargeContainer: {
+        backgroundColor: '#009fca',
+        paddingVertical: 15,
+        width: 350,
+        marginBottom: 15
+      },
 
     buttonText: {
       textAlign: 'center',

@@ -95,7 +95,7 @@ export default class ProjectList extends Component {
      return (
         <TouchableOpacity
       onPress={()=> this.props.navigation.navigate("Twelfth", {entryKey:item.entryKey}) }
-                     style={styles.buttonLargeContainer}>
+                     style={styles.buttonMediumContainer}>
                      <Text style={styles.buttonText}>
                     Project Name: {item.name} 
                     </Text>
