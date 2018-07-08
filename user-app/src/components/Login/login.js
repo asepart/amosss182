@@ -78,7 +78,7 @@ export default class Login extends Component {
 
 	render() {
 	var buttonEnabled = (this.state.email !== '' && this.state.password !== '');
-		return (<KeyboardAvoidingView style={styles.containerAlign} behavior="padding" enabled><View>
+		return (<KeyboardAvoidingView style={styles.containerAlign} behavior="padding" enabled>
 			<Image source={require('../images/icon.png')} style={styles.icon} />
 			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.input} onSubmitEditing={buttonEnabled ? this.onLoginPressed.bind(this) : null}/>
 			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input} onSubmitEditing={buttonEnabled ? this.onLoginPressed.bind(this) : null}/>
@@ -92,7 +92,6 @@ export default class Login extends Component {
 			<Text style={this.state.infoType}>
 					{this.state.info}
 				</Text>
-				</View>
 		</KeyboardAvoidingView>);
 	}
 }
