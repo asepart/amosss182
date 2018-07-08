@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button,FlatList } from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button,FlatList,Image, Linking } from 'react-native';
 import { ticket } from '../Chat/sendMessages';
 import { key } from './keyValid';
 import { URL } from '../Login/const';
@@ -12,6 +12,9 @@ import { StackNavigator } from 'react-navigation'
 import {status} from '../Projects/projectListTicketList';
 import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+export var attachmentID = '';
+export var attachmentName = '';
 
 export default class TicketView extends Component {
 
@@ -91,7 +94,7 @@ export default class TicketView extends Component {
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.setState({isAccepted: status})
 		this.getTicketInfo();
-//		this.fetchTicketMedia();
+		this.fetchTicketMedia();
 	}
 
 	async fetchTicketMedia() {
@@ -108,18 +111,23 @@ export default class TicketView extends Component {
 					});
 	}
 
-	//_renderMedia({item}) {
-	//	return (<Image>
-	//		</Image>
-	//		);
-	//}
-
-	//<FlatList
-	//				style={styles.textLarge}
-	//				data={this.state.ticketMedia}
-	//				renderItem={this._renderMedia.bind(this)}
-	//				 keyExtractor={(item, index) => index}
-	//			/>
+	_renderMedia({item}){
+		attachmentID = item.attachmentId;
+		attachmentName = item.originalName;
+		try { 
+			return (
+				<TouchableOpacity style={{width:100, height:100}} onPress={ ()=>{ Linking.openURL(URL + '/files/' + attachmentID + '?thumbnail=false')}}>
+				<Image  style={{width: 50, height: 50}} source={{uri:URL + '/files/' + attachmentID + '?thumbnail=true'}} />
+				<Text style={styles.buttonText}>
+				{attachmentName}
+				</Text>
+				</TouchableOpacity>
+				
+			)
+		} catch(error)  {
+			console.error(error);
+		}
+  }	
 
 	render() {
 		var { params } = this.props.navigation.state;
@@ -130,15 +138,30 @@ export default class TicketView extends Component {
 				</View>
 			)
 		}
-
 		return (
 			<View style={styles.container}>
-			<ScrollView style={styles.containerScroll}>
+			<View style={styles.containerButtonRow}>
+				{this.state.isAccepted === 'open' ? (
 				<TouchableOpacity
+				onPress={this.onAcceptPressed.bind(this)}
+				style={styles.buttonRowContainer}>
+				<Text style={styles.buttonText}>Accept</Text>
+				</TouchableOpacity>
+				) : (
+				<TouchableOpacity
+				onPress={this.onProcessTicketPressed.bind(this)}
+				style={styles.buttonRowContainer}>
+				<Text style={styles.buttonText}>Process Ticket</Text>
+				</TouchableOpacity>
+				)}
+					<TouchableOpacity
 					onPress={this.onChatPressed.bind(this)}
-					style={styles.buttonLargeContainer}>
+					style={styles.buttonRowContainer}>
 					<Text style={styles.buttonText}>Chat</Text>
 				</TouchableOpacity>
+			</View>	
+			<ScrollView style={styles.containerScroll}>
+			
 				<Text style={styles.text}>
 					ID: {this.state.ticketDetail.id}
 				</Text>
@@ -172,30 +195,22 @@ export default class TicketView extends Component {
 				</Text>
 				<Text>
 				</Text>
-					<Text style={styles.text}>
+					<Text style={styles.textBold}>
 						Description:
 					</Text>
 					<Text style={styles.text} >
 						{this.state.ticketDetail.description}
 					</Text>
-						
+					<Text>
+				</Text>
+					<FlatList
+					style={styles.textLarge}
+					data={this.state.ticketMedia}
+					renderItem={this._renderMedia.bind(this)}
+					keyExtractor={(item, index) => {return index.toString()}}
+					/>	
 				</ScrollView>
 				
-				<View style={styles.bottomView}>
-				{this.state.isAccepted === 'open' ? (
-				<TouchableOpacity
-				onPress={this.onAcceptPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Accept</Text>
-				</TouchableOpacity>
-				) : (
-				<TouchableOpacity
-				onPress={this.onProcessTicketPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Process Ticket</Text>
-				</TouchableOpacity>
-				)}
-				</View>
 			</View>
 		);
 	}
