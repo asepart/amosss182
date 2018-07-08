@@ -1,5 +1,5 @@
 import {URL} from '../shared/const';
-import {getAuth, getAuthForPost} from '../shared/auth';
+import {getAuth} from '../shared/auth';
 
 export var ticket = "";
 export var msg = "";
