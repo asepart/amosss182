@@ -1430,40 +1430,6 @@ public class DatabaseClient implements AutoCloseable
     }
 
     /**
-     * List file metadata entries related to ticket.
-     *
-     * @param ticketId Unique ticket id.
-     * @throws SQLException on database error.
-     */
-
-    public List<Map<String, String>> listFiles(int ticketId) throws SQLException
-    {
-        try (PreparedStatement stmt = cn.prepareStatement(
-                "select id, internal_name, thumbnail_name, original_name from fileinfo where ticket_id = ?;"))
-        {
-            stmt.setInt(1, ticketId);
-
-            try (ResultSet rs = stmt.executeQuery())
-            {
-                List<Map<String, String>> result = new LinkedList<>();
-
-                while (rs.next())
-                {
-                    Map<String, String> row = new HashMap<>(4);
-                    row.put("id", String.valueOf(rs.getInt(1)));
-                    row.put("internalName", rs.getString(2));
-                    row.put("thumbnailName", rs.getString(3));
-                    row.put("originalName", rs.getString(4));
-
-                    result.add(row);
-                }
-
-                return result;
-            }
-        }
-    }
-
-    /**
      * List file metadata entries related to no ticket.
      *
      * @throws SQLException on database error.
