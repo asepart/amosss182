@@ -36,13 +36,13 @@ export default class ChatMessage extends Component {
 			return(
 				<View>
 					{
-						isImage(this.props.msg.attachment)?
-							<ChatImage src={URL + '/files/' + this.props.ticket + '/' + this.props.msg.attachment}/>
+						isImage(this.props.msg.originalName)?
+							<ChatImage src={URL + '/files/' + this.props.msg.attachment}/>
 						: <View></View>
 					}
 					{
-						isVideo(this.props.msg.attachment)?
-							<ChatVideo src={URL + '/files/' + this.props.ticket + '/' + this.props.msg.attachment}/>
+						isVideo(this.props.msg.originalName)?
+							<ChatVideo src={URL + '/files/' + this.props.msg.attachment}/>
 						: <View></View>
 					}
 					<a href={this.props.msg.content}>{this.props.msg.content}</a>

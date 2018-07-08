@@ -159,17 +159,22 @@ export default class TicketChat extends Component {
 			headers: getAuthForMediaPost(),
 			body: formData,
 		})
+		.then((response) => {
+			return response.text()
+		})
+		.then((responseText) => {
+
+			setMsg(URL + '/files/' + responseText);
+			setAttachment(responseText)
+			setTicketID(this.state.idTicket);
+			sendAttachment();
+
+			this.fetchMessages();
+			setUpdateBoolean(true);
+		})
 		.catch((error) => {
 			console.log(error);
 		});
-
-		setMsg(URL + '/files/' + this.state.idTicket + '/' + files[0].name);
-		setAttachment(files[0].name)
-		setTicketID(this.state.idTicket);
-		sendAttachment();
-
-		this.fetchMessages();
-		setUpdateBoolean(true);
 	}
 
 	renderChat(ticket) {
