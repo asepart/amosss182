@@ -79,7 +79,7 @@ export default class UpdateProjectButton extends Component {
 						value = { this.state.entryKey }
 						editable = { false }
 					/>
-					<View style={{ flexDirection: 'row' }}>
+					<View style={{ flexDirection: 'row', justifyContent: 'center', borderColor: 'gray', borderWidth: 1 }}>
 						<CheckBox
 							value={this.state.finished}
 							onValueChange={

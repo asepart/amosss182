@@ -83,9 +83,11 @@ export default class TicketList extends Component {
 			}, {
 				Header: 'Summary',
 				accessor: 'summary',
+				show: false,
 			}, {
 				Header: 'Description',
-				accessor: 'description'
+				accessor: 'description',
+				show: false,
 			}, {
 				Header: 'Category',
 				accessor: 'category',
