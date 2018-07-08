@@ -276,7 +276,7 @@ The following REST operations are available:
 
   HTTP operation: POST
   Path:           /messages/{ticket}?attachment={attachment}
-  Notice:         "attachment" must be a file name previously uploaded using the /files/... api.
+  Notice:         "attachment" must be a metadata file id previously uploaded using the /files/... api.
   Roles:          Admin, User
   Request Body:   The chat message as ASCII text.
   Status code:    [204 No Content]   in case of success.

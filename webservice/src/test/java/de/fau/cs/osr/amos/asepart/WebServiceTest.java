@@ -976,11 +976,11 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
-
+/*
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
-        }
+        }*/
     }
 
     @Test
@@ -996,22 +996,18 @@ public class WebServiceTest
         }
 
         final FileDataBodyPart filePart = new FileDataBodyPart("file", new File(fileName));
+        String fileMetaDataId;
 
         try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
              Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
         {
-            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
-             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
-        {
-            assertEquals(Response.Status.CONFLICT, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            fileMetaDataId = response.readEntity(String.class);
         }
 
         Files.delete(filePath);
 
-        try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().get())
+        try (Response response = getAdminClient().path("/files/").path(fileMetaDataId).request().get())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
 
@@ -1024,7 +1020,7 @@ public class WebServiceTest
 
         Files.delete(filePath);
 
-        try (Response response = getAdminClient().path("/files/1").path("asepart-test-file.txt").request().delete())
+        try (Response response = getAdminClient().path("/files/").path(fileMetaDataId).request().delete())
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
@@ -1043,22 +1039,18 @@ public class WebServiceTest
         }
 
         final FileDataBodyPart filePart = new FileDataBodyPart("file", new File(fileName));
+        String fileMetaDataId;
 
         try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
-             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+             Response response = getAdminClient().path("/files/1/").request().post(Entity.entity(multipart, multipart.getMediaType())))
         {
-            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
-        }
-
-        try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
-             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
-        {
-            assertEquals(Response.Status.CONFLICT, Response.Status.fromStatusCode(response.getStatus()));
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+            fileMetaDataId = response.readEntity(String.class);
         }
 
         Files.delete(filePath);
 
-        try (Response response = getAdminClient().path("/files/1").path("wikipedia.png").request().delete())
+        try (Response response = getAdminClient().path("/files/").path(fileMetaDataId).request().delete())
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }

@@ -2,10 +2,11 @@ package de.fau.cs.osr.amos.asepart.client;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -1113,7 +1114,7 @@ public class DatabaseClient implements AutoCloseable
      *
      * @param sender Name of sender (user or admin)
      * @param content Message text.
-     * @param attachment File name, must be present on external file server already.
+     * @param attachment Metadata id of attachment file.
      * @param ticketId Unique ticket id.
      * @throws SQLException on database error.
      */
@@ -1124,9 +1125,15 @@ public class DatabaseClient implements AutoCloseable
         {
             stmt.setString(1, sender);
             stmt.setString(2, content);
-            stmt.setString(3, attachment);
-            stmt.setInt(4, ticketId);
 
+            if (attachment != null)
+            {
+                stmt.setInt(3, Integer.parseInt(attachment));
+            }
+
+            else stmt.setNull(3, Types.INTEGER);
+
+            stmt.setInt(4, ticketId);
             stmt.executeUpdate();
         }
 
@@ -1260,7 +1267,7 @@ public class DatabaseClient implements AutoCloseable
 
     public int registerFile(String internalName, String thumbnailName, String originalName, int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("insert into fileinfo values(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS))
+        try (PreparedStatement stmt = cn.prepareStatement("insert into fileinfo(internal_name, thumbnail_name, original_name, ticket_id) values(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS))
         {
             stmt.setString(1, internalName);
             stmt.setString(2, thumbnailName);
@@ -1316,6 +1323,8 @@ public class DatabaseClient implements AutoCloseable
 
             try (ResultSet rs = stmt.executeQuery())
             {
+                rs.next();
+
                 Map<String, String> result = new HashMap<>(4);
                 result.put("internalName", rs.getString(1));
                 result.put("thumbnailName", rs.getString(2));
