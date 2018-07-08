@@ -2,10 +2,11 @@ package de.fau.cs.osr.amos.asepart.client;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -875,6 +876,73 @@ public class DatabaseClient implements AutoCloseable
     }
 
     /**
+     * Add attachment to ticket.
+     *
+     * @param ticketId Unique ticket id.
+     * @param fileMetadataId Metadata entry id of file.
+     * @throws SQLException on database error.
+     */
+
+    public void addAttachment(int ticketId, int fileMetadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("insert into attachment values (?, ?);"))
+        {
+            stmt.setInt(1, ticketId);
+            stmt.setInt(2, fileMetadataId);
+            stmt.executeUpdate();
+        }
+    }
+    /**
+     * Remove attachment from ticket.
+     *
+     * @param ticketId Unique ticket id.
+     * @param fileMetadataId Metadata entry id of file.
+     * @throws SQLException on database error.
+     */
+
+    public void removeAttachment(int ticketId, int fileMetadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("delete from attachment where ticket_id = ? and attachment_id = ?;"))
+        {
+            stmt.setInt(1, ticketId);
+            stmt.setInt(2, fileMetadataId);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * List attachments of ticket.
+     *
+     * @param ticketId Unique ticket id.
+     *
+     * @return List of maps containing each attachment's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listAttachments(int ticketId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select a.ticket_id, a.attachment_id, f.original_name from attachment a join fileinfo f on a.attachment_id = f.id where a.ticket_id = ?;"))
+        {
+            List<Map<String, String>> result = new LinkedList<>();
+
+            stmt.setInt(1, ticketId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next())
+            {
+                Map<String, String> row = new HashMap<>(3);
+                row.put("ticketId", String.valueOf(rs.getInt(1)));
+                row.put("attachmentId", String.valueOf(rs.getInt(2)));
+                row.put("originalName", rs.getString(3));
+
+                result.add(row);
+            }
+
+            return result;
+        }
+    }
+
+    /**
      * Deletes a ticket.
      *
      * @param id Unique ticket id.
@@ -1113,7 +1181,7 @@ public class DatabaseClient implements AutoCloseable
      *
      * @param sender Name of sender (user or admin)
      * @param content Message text.
-     * @param attachment File name, must be present on external file server already.
+     * @param attachment Metadata id of attachment file.
      * @param ticketId Unique ticket id.
      * @throws SQLException on database error.
      */
@@ -1124,9 +1192,15 @@ public class DatabaseClient implements AutoCloseable
         {
             stmt.setString(1, sender);
             stmt.setString(2, content);
-            stmt.setString(3, attachment);
-            stmt.setInt(4, ticketId);
 
+            if (attachment == null || attachment.isEmpty())
+            {
+                stmt.setNull(3, Types.INTEGER);
+            }
+
+            else stmt.setInt(3, Integer.parseInt(attachment));
+
+            stmt.setInt(4, ticketId);
             stmt.executeUpdate();
         }
 
@@ -1232,12 +1306,151 @@ public class DatabaseClient implements AutoCloseable
 
                 while (rs.next())
                 {
-                    Map<String, String> row = new HashMap<>(4);
+                    Map<String, String> row = new HashMap<>(5);
                     row.put("id", String.valueOf(rs.getInt(1)));
                     row.put("sender", rs.getString(2));
                     row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
                     row.put("content", rs.getString(4));
                     row.put("attachment", rs.getString(5));
+                    result.add(row);
+                }
+
+                return result;
+            }
+        }
+    }
+
+    /**
+     * Insert a file metadata entry.
+     *
+     * @param internalName Hashed filename to uniquely identify a file.
+     * @param thumbnailName Hashed filename of thumbnail.
+     * @param originalName Original filename given by user.
+     * @param ticketId Unique ticket id.
+     *
+     * @return Metadata id of file.
+     * @throws SQLException on database error.
+     */
+
+    public int registerFile(String internalName, String thumbnailName, String originalName, int ticketId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("insert into fileinfo(internal_name, thumbnail_name, original_name, ticket_id) values(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS))
+        {
+            stmt.setString(1, internalName);
+            stmt.setString(2, thumbnailName);
+            stmt.setString(3, originalName);
+            stmt.setInt(4, ticketId);
+
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys())
+            {
+                if (generatedKeys.next())
+                {
+                    return generatedKeys.getInt(1);
+                }
+
+                else
+                {
+                    throw new SQLException("Registering file failed, no ID obtained.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove file metadata entry.
+     *
+     * @param metadataId Metadata entry id of file.
+     * @throws SQLException on database error.
+     */
+
+    public void unregisterFile(int metadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("delete from fileinfo where id = ?;"))
+        {
+            stmt.setInt(1, metadataId);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Get metadata of file.
+     *
+     * @param metadataId Metadata entry id of file.
+     * @return Metadata entry.
+     * @throws SQLException on database error.
+     */
+
+    public Map<String, String> getFile(int metadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select internal_name, thumbnail_name, original_name, ticket_id from fileinfo where id = ?;"))
+        {
+            stmt.setInt(1, metadataId);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                rs.next();
+
+                Map<String, String> result = new HashMap<>(4);
+                result.put("internalName", rs.getString(1));
+                result.put("thumbnailName", rs.getString(2));
+                result.put("originalName", rs.getString(3));
+                result.put("ticketId", String.valueOf(rs.getInt(4)));
+
+                return result;
+            }
+        }
+    }
+
+    /**
+     * Checks if file exists in metadata catalog.
+     *
+     * @param metadataId Metadata entry id of file.
+     * @return true if file exists, else if not.
+     * @throws SQLException on database error.
+     */
+
+    public boolean isFile(int metadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select count(id) from fileinfo where id = ?;");)
+        {
+            stmt.setInt(1, metadataId);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                rs.next();
+                int count = rs.getInt(1);
+
+                if (count == 1) return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * List file metadata entries related to no ticket.
+     *
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listOrphans() throws SQLException
+    {
+        try (Statement stmt = cn.createStatement())
+        {
+            try (ResultSet rs = stmt.executeQuery("select id, internal_name, thumbnail_name, original_name from fileinfo where ticket_id is null;"))
+            {
+                List<Map<String, String>> result = new LinkedList<>();
+
+                while (rs.next())
+                {
+                    Map<String, String> row = new HashMap<>(4);
+                    row.put("id", String.valueOf(rs.getInt(1)));
+                    row.put("internalName", rs.getString(2));
+                    row.put("thumbnailName", rs.getString(3));
+                    row.put("originalName", rs.getString(4));
+
                     result.add(row);
                 }
 

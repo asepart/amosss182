@@ -3,17 +3,15 @@ package de.fau.cs.osr.amos.asepart.client;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.util.LinkedList;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import javax.imageio.ImageIO;
 
-import io.minio.ErrorCode;
 import io.minio.MinioClient;
-import io.minio.Result;
-import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
-import io.minio.messages.Item;
 
 import net.coobird.thumbnailator.Thumbnails;
 import org.jcodec.api.FrameGrab;
@@ -25,19 +23,20 @@ import org.jcodec.scale.AWTUtil;
  * open source implementation of the Amazon S3 protocol.
  */
 
-public class FileStorageClient
+public class FileStorageClient implements AutoCloseable
 {
-    private MinioClient client;
+    private MinioClient minioClient;
+    private DatabaseClient dbClient;
 
     private final String fileBucket;
     private final String thumbnailBucket;
 
     public FileStorageClient() throws Exception
     {
-        final String minioUrl = System.getenv("ASEPART_MINIO_URL");
         final String minioAccessKey = System.getenv("MINIO_ACCESS_KEY");
         final String minioSecretKey = System.getenv("MINIO_SECRET_KEY");
 
+        final String minioUrl = System.getenv("ASEPART_MINIO_URL");
         fileBucket = System.getenv("ASEPART_MINIO_BUCKET");
 
         if (minioUrl == null || minioAccessKey == null || minioSecretKey == null || fileBucket == null)
@@ -47,7 +46,7 @@ public class FileStorageClient
 
         try
         {
-            client = new MinioClient(minioUrl, minioAccessKey, minioSecretKey);
+            minioClient = new MinioClient(minioUrl, minioAccessKey, minioSecretKey);
         }
 
         catch (InvalidEndpointException e)
@@ -60,55 +59,73 @@ public class FileStorageClient
             throw new IllegalArgumentException("Minio port is invalid.");
         }
 
-        if (!client.bucketExists(fileBucket))
-            client.makeBucket(fileBucket);
+        if (!minioClient.bucketExists(fileBucket))
+            minioClient.makeBucket(fileBucket);
 
-        if (!client.bucketExists(thumbnailBucket))
-            client.makeBucket(thumbnailBucket);
+        if (!minioClient.bucketExists(thumbnailBucket))
+            minioClient.makeBucket(thumbnailBucket);
+
+        dbClient = new DatabaseClient();
     }
 
-    private static String internalName(int ticketId, String fileName)
+    @Override
+    public void close() throws Exception
     {
-        return "ticket:" + String.valueOf(ticketId) + ":" + fileName;
+        dbClient.close();
     }
 
-    private static boolean isImageFile(String fileName)
+    private static String internalName(String extension)
     {
-        return fileName.endsWith(".jpg") || fileName.endsWith(".png") || fileName.endsWith(".bmp");
+        final UUID uuid = UUID.randomUUID();
+        return uuid + "." + extension;
     }
 
-    private static boolean isVideoFile(String fileName)
+    private static boolean isImageFile(String originalName)
     {
-        return fileName.endsWith(".mp4") || fileName.endsWith(".mkv") || fileName.endsWith(".mov");
+        originalName = originalName.toLowerCase();
+        return originalName.endsWith(".jpg") || originalName.endsWith(".png") || originalName.endsWith(".bmp");
+    }
+
+    private static boolean isVideoFile(String originalName)
+    {
+        originalName = originalName.toLowerCase();
+        return originalName.endsWith(".mp4") || originalName.endsWith(".mov");
+    }
+
+    private static String getContentType(String originalName)
+    {
+        switch (getExtension(originalName))
+        {
+            case "jpg": return "image/jpg";
+            case "png": return "image/png";
+            case "bmp": return "image/bmp";
+            case "mp4": return "video/mp4";
+            case "mov": return "video/quicktime";
+            default: throw new UnsupportedOperationException("File extension not supported.");
+        }
     }
 
     private static String getExtension(String fileName)
     {
-        return fileName.substring(fileName.lastIndexOf('.') + 1);
+        return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
     }
 
-    private static String getVideoThumbnailName(String fileName)
+    private String download(String bucket, String file) throws Exception
     {
-        return fileName + ".png";
-    }
-
-    private String download(int ticketId, String fileName, String bucket) throws Exception
-    {
-        final String fileId = internalName(ticketId, fileName);
-        return client.presignedGetObject(bucket, fileId, 86400);
+        return minioClient.presignedGetObject(bucket, file, 86400);
     }
 
     /**
      * Returns an url where the file can be found.
      *
-     * @param ticketId Unique id of ticket.
-     * @param fileName The name of the file.
+     * @param metadataId Metadata id of file.
      * @return URL which can be used to GET the file.
      */
 
-    public String download(int ticketId, String fileName) throws Exception
+    public String download(int metadataId) throws Exception
     {
-        return download(ticketId, fileName, fileBucket);
+        Map<String, String> fileInfo = dbClient.getFile(metadataId);
+        return download(fileBucket, fileInfo.get("internalName"));
     }
 
     /**
@@ -117,45 +134,54 @@ public class FileStorageClient
      * @param ticketId Unique id of ticket.
      * @param fileName The name of the file.
      * @param fileStream Stream containing the file's contents.
+     *
+     * @return Metadata id of file.
      */
 
-    public void upload(int ticketId, String fileName, InputStream fileStream) throws Exception
+    public int upload(int ticketId, String fileName, InputStream fileStream) throws Exception
     {
-        final String fileId = internalName(ticketId, fileName);
+        final String fileId = internalName(getExtension(fileName));
+        String contentType;
 
-        if (!exists(ticketId, fileName))
+        try
         {
-            String contentType;
-
-            if (isImageFile(fileName))
-            {
-                contentType = "image/" + getExtension(fileName);
-            }
-
-            else if (isVideoFile(fileName))
-            {
-                contentType = "video/" + getExtension(fileName);
-            }
-
-            else contentType = "application/octet-stream";
-
-            client.putObject(fileBucket, fileId, fileStream, contentType);
+            contentType = getContentType(fileName);
         }
 
-        else throw new FileAlreadyExistsException("File with same name already exists for this ticket.");
+        catch (UnsupportedOperationException e)
+        {
+            contentType = "application/octet-stream";
+        }
+
+        minioClient.putObject(fileBucket, fileId, fileStream, contentType);
+
+        String thumbnailName = null;
 
         if (isImageFile(fileName) || isVideoFile(fileName))
-            generateThumbnail(fileId);
+            thumbnailName = generateThumbnail(fileId);
+
+        try
+        {
+            return dbClient.registerFile(fileId, thumbnailName, fileName, ticketId);
+        }
+
+        catch (SQLException sqlex)
+        {
+            minioClient.removeObject(fileBucket, fileId);
+            if (thumbnailName != null) minioClient.removeObject(thumbnailName, thumbnailName);
+
+            throw sqlex;
+        }
     }
 
-    private void generateThumbnail(String fileId) throws Exception
+    private String generateThumbnail(String fileId) throws Exception
     {
         final String extension = getExtension(fileId);
 
         File cacheFile = File.createTempFile("asepart-", "-cache." + extension);
         cacheFile.deleteOnExit();
 
-        client.getObject(fileBucket, fileId, cacheFile.getAbsolutePath());
+        minioClient.getObject(fileBucket, fileId, cacheFile.getAbsolutePath());
 
         if (isImageFile(fileId))
         {
@@ -163,7 +189,9 @@ public class FileStorageClient
             thumbFile.deleteOnExit();
 
             Thumbnails.of(cacheFile).size(256, 256).toFile(thumbFile.getAbsoluteFile());
-            client.putObject(thumbnailBucket, fileId, thumbFile.getAbsolutePath());
+            minioClient.putObject(thumbnailBucket, fileId, thumbFile.getAbsolutePath());
+
+            return fileId;
         }
 
         else if (isVideoFile(fileId))
@@ -175,8 +203,10 @@ public class FileStorageClient
             BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
             ImageIO.write(bufferedImage, "png", thumbFile);
 
-            String thumbnailId = getVideoThumbnailName(fileId);
-            client.putObject(thumbnailBucket, thumbnailId, thumbFile.getAbsolutePath());
+            String thumbnailId = internalName("png");
+            minioClient.putObject(thumbnailBucket, thumbnailId, thumbFile.getAbsolutePath());
+
+            return thumbnailId;
         }
 
         else throw new IllegalArgumentException("File is neither an image nor a video!");
@@ -185,115 +215,68 @@ public class FileStorageClient
     /**
      * Checks if a file has a thumbnail available.
      *
-     * @param ticketId Unique id of ticket.
-     * @param fileName The name of the file.
+     * @param metadataId Metadata id of file.
      * @return true if thumbnail exists, false if not.
      */
 
-    public boolean hasThumbnail(int ticketId, String fileName) throws Exception
+    public boolean hasThumbnail(int metadataId) throws Exception
     {
-        final String fileId = internalName(ticketId, fileName);
-
-        if (isImageFile(fileId))
-            return exists(fileId, thumbnailBucket);
-        else if (isVideoFile(fileId))
-            return exists(getVideoThumbnailName(fileId), thumbnailBucket);
-        else return false;
+        Map<String, String> fileInfo = dbClient.getFile(metadataId);
+        return fileInfo.get("thumbnailName") != null;
     }
 
     /**
      * Returns an url where the thumbnail of the file can be found.
      *
-     * @param ticketId Unique id of ticket.
-     * @param fileName The name of the file.
+     * @param metadataId Metadata id of file.
      * @return URL which can be used to GET the thumbnail.
      */
 
-    public String getThumbnail(int ticketId, String fileName) throws Exception
+    public String getThumbnail(int metadataId) throws Exception
     {
-        if (isImageFile(fileName))
-            return download(ticketId, fileName, thumbnailBucket);
-        else if (isVideoFile(fileName))
-            return download(ticketId, getVideoThumbnailName(fileName), thumbnailBucket);
-        else throw new IllegalArgumentException("File is neither an image nor a video!");
+        if (!hasThumbnail(metadataId))
+            throw new IllegalArgumentException("File is neither an image nor a video!");
+
+        Map<String, String> fileInfo = dbClient.getFile(metadataId);
+        return download(thumbnailBucket, fileInfo.get("thumbnailName"));
     }
 
-    /**
-     * Checks if a file exists.
-     *
-     * @param ticketId Unique id of ticket.
-     * @param fileName The name of the file.
-     * @return true if file exists, false if not.
-     */
-
-    public boolean exists(int ticketId, String fileName) throws Exception
+    public boolean exists(int metadataId) throws Exception
     {
-        final String fileId = internalName(ticketId, fileName);
-        return exists(fileId, fileBucket);
-    }
-
-    private boolean exists(String fileId, String bucket) throws Exception
-    {
-        boolean fileExists = true;
-
-        try
-        {
-            client.statObject(bucket, fileId);
-        }
-
-        catch (ErrorResponseException e)
-        {
-            if (e.errorResponse().errorCode().code().equals(ErrorCode.NO_SUCH_KEY.code()))
-                fileExists = false;
-        }
-
-        return fileExists;
+        return dbClient.isFile(metadataId);
     }
 
     /**
      * Delete a file.
      *
-     * @param ticketId Unique id of ticket.
-     * @param fileName The name of the file.
+     * @param metadataId Metadata id of file.
      */
 
-    public void remove(int ticketId, String fileName) throws Exception
+    public void remove(int metadataId) throws Exception
     {
-        final String fileId = internalName(ticketId, fileName);
-        client.removeObject(fileBucket, fileId);
+        Map<String, String> fileInfo = dbClient.getFile(metadataId);
+        minioClient.removeObject(fileBucket, fileInfo.get("internalName"));
 
-        if (hasThumbnail(ticketId, fileName))
-        {
-            if (isImageFile(fileName))
-                client.removeObject(thumbnailBucket, fileId);
-            if (isVideoFile(fileName))
-                client.removeObject(thumbnailBucket, getVideoThumbnailName(fileId));
-        }
+        final String thumbnailName = fileInfo.get("thumbnailName");
+
+        if (thumbnailName != null)
+            minioClient.removeObject(thumbnailBucket, thumbnailName);
+
+        dbClient.unregisterFile(metadataId);
     }
 
     /**
-     * Delete all files related to a ticket.
-     *
-     * @param ticketId Unique id of ticket.
+     * Delete all files that are not related to a ticket.
      */
 
-    public void cascade(int ticketId) throws Exception
+    public void killOrphans() throws Exception
     {
-        cascadeBucket(ticketId, fileBucket);
-        cascadeBucket(ticketId, thumbnailBucket);
-    }
+        List<Map<String, String>> fileList = dbClient.listOrphans();
 
-    private void cascadeBucket(int ticketId, String bucket) throws Exception
-    {
-        Iterable<Result<Item>> results = client.listObjects(bucket, "ticket:" + String.valueOf(ticketId) + ":");
-        LinkedList<String> trash = new LinkedList<>();
-
-        for (Result<Item> result : results)
+        for (Map<String, String> fileInfo : fileList)
         {
-            Item item = result.get();
-            trash.add(item.objectName());
+            int metadataId = Integer.parseInt(fileInfo.get("id"));
+            remove(metadataId);
         }
-
-        client.removeObject(bucket, trash);
     }
 }
