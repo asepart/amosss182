@@ -469,6 +469,69 @@ public class WebService
         }
     }
 
+    @Path("/tickets/{id}/attachments")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"Admin"})
+    public Response addAttachment(@Context SecurityContext sc, @PathParam("id") int ticketId, int metadataId) throws Exception
+    {
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            db.addAttachment(ticketId, metadataId);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @Path("/tickets/{id}/attachments/{file}")
+    @DELETE
+    @RolesAllowed({"Admin"})
+    public Response removeAttachment(@Context SecurityContext sc, @PathParam("id") int ticketId, @PathParam("file") int metadataId) throws Exception
+    {
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            db.removeAttachment(ticketId, metadataId);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @Path("/tickets/{id}/attachments")
+    @GET
+    @Consumes(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"Admin"})
+    public Response listAttachments(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
+    {
+        try (DatabaseClient db = new DatabaseClient())
+        {
+            if (!db.isTicket(ticketId))
+                return Response.status(Response.Status.NOT_FOUND).build();
+
+            Map<String, String> ticket = db.getTicket(ticketId);
+
+            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+
+            return Response.ok(db.listAttachments(ticketId)).build();
+        }
+    }
+
     @Path("/tickets/{id}")
     @DELETE
     @RolesAllowed({"Admin"})

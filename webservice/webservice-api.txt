@@ -184,7 +184,38 @@ The following REST operations are available:
   Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
-                  [404 Not Found]    if project or ticket did not exist before request.
+                  [404 Not Found]    if ticket did not exist before request.
+
+- Add attachment to ticket.
+
+  HTTP operation: POST
+  Path:           /tickets/{id}/attachments
+  Roles:          Admin
+  Request-Body:   Metadata file id as ASCII string.
+  Status code:    [204 No Content]   in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not Found]    if ticket does not exist.
+
+- Remove attachment from ticket.
+
+  HTTP operation: POST
+  Path:           /tickets/{id}/attachments/{file}
+  Roles:          Admin
+  Status code:    [204 No Content]   in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not Found]    if ticket does not exist.
+
+- List attachments of ticket.
+
+  HTTP operation: GET
+  Path:           /tickets/{id}/attachments
+  Roles:          Admin
+  Status code:    [204 No Content]   in case of success.
+                  [401 Unauthorized] if the provided username or password is invalid.
+                  [403 Forbidden]    if the permissions are not sufficient.
+                  [404 Not Found]    if ticket does not exist.
 
 - Accept ticket.
 

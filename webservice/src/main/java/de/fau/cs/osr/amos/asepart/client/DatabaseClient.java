@@ -876,6 +876,72 @@ public class DatabaseClient implements AutoCloseable
     }
 
     /**
+     * Add attachment to ticket.
+     *
+     * @param ticketId Unique ticket id.
+     * @param fileMetadataId Metadata entry id of file.
+     * @throws SQLException on database error.
+     */
+
+    public void addAttachment(int ticketId, int fileMetadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("insert into attachment values (?, ?);"))
+        {
+            stmt.setInt(1, ticketId);
+            stmt.setInt(2, fileMetadataId);
+            stmt.executeUpdate();
+        }
+    }
+    /**
+     * Remove attachment from ticket.
+     *
+     * @param ticketId Unique ticket id.
+     * @param fileMetadataId Metadata entry id of file.
+     * @throws SQLException on database error.
+     */
+
+    public void removeAttachment(int ticketId, int fileMetadataId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("delete from attachment where ticket_id = ? and attachment_id = ?;"))
+        {
+            stmt.setInt(1, ticketId);
+            stmt.setInt(2, fileMetadataId);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * List attachments of ticket.
+     *
+     * @param ticketId Unique ticket id.
+     *
+     * @return List of maps containing each attachment's details.
+     * @throws SQLException on database error.
+     */
+
+    public List<Map<String, String>> listAttachments(int ticketId) throws SQLException
+    {
+        try (PreparedStatement stmt = cn.prepareStatement("select ticket_id, attachment_id from attachment where ticket_id = ?;"))
+        {
+            List<Map<String, String>> result = new LinkedList<>();
+
+            stmt.setInt(1, ticketId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next())
+            {
+                Map<String, String> row = new HashMap<>(2);
+                row.put("ticket_id", String.valueOf(rs.getInt(1)));
+                row.put("attachment_id", String.valueOf(rs.getInt(2)));
+
+                result.add(row);
+            }
+
+            return result;
+        }
+    }
+
+    /**
      * Deletes a ticket.
      *
      * @param id Unique ticket id.
