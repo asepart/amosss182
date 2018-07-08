@@ -11,6 +11,7 @@ import 'react-table/react-table.css';
 import '../../index.css';
 import {Link} from 'react-router-dom'
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
+import ProjectStatus from './ProjectStatus';
 
 export default class ProjectList extends Component {
 
@@ -64,8 +65,13 @@ export default class ProjectList extends Component {
 				Header: 'Entry Code',
 				accessor: 'entryKey' // String-based value accessors!
 			}, {
-				Header: '',
+				Header: 'Status',
 				accessor: 'finished',
+				maxWidth: 95,
+				Cell: props => <ProjectStatus state={props}/>
+			}, {
+				Header: '',
+				accessor: '',
 				maxWidth: 35,
 				Cell: props => <UpdateProjectButton proj={props} callToParent={this.fetchProjects.bind(this)} />
 			}, {
