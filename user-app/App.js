@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, AppRegistry} from 'react-native';
-import ProjectInfo from './src/components/Projects/projectInfo';
 import Login from './src/components/Login/login';
 import GetMessages from './src/components/Chat/messages';
 import TicketView from '../user-app/src/components/Projects/ticketView';
@@ -18,7 +17,6 @@ import ProjectList from './src/components/Projects/projectList';
 
 const AppNavigation = createStackNavigator({
   First: { screen: Login },
-  Fourth: {screen: ProjectInfo},
   Sixth: {screen: TicketView, 
      navigationOptions: ({navigation}) => ({
     id: navigation.state.params.id,
