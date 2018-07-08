@@ -5,6 +5,7 @@ import { StackNavigator, } from 'react-navigation';
 import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
 import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 window.btoa = require('Base64').btoa;
 export var status = '';
@@ -68,12 +69,13 @@ export default class ProjectListTicketList extends Component {
 		return {
 		title: 'Tickets',
 		headerStyle: {
-			backgroundColor:'#5daedb'
+			backgroundColor:'#5daedb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color:'#FFF'
 		},
-		headerRight: <Button title={username} onPress={ () => params.update() } />
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
 	

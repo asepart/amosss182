@@ -6,6 +6,7 @@ import {URL} from '../Login/const';
 import {getAuth, username} from '../Login/auth';
 import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
 import {setKey, isValid} from '../Projects/keyValid';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export var projectname = '';
 export var projectstatus = '';
@@ -18,12 +19,13 @@ export default class ProjectList extends Component {
 		return {
   title: 'Projects',
   headerStyle: {
-    backgroundColor:'#5daedb'
+    backgroundColor:'#5daedb',
+    paddingRight: 15,
   },
   headerTitleStyle: {
     color:'#FFF'
   },
-  headerRight: <Button title={username} onPress={ () => params.update() } />
+  headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 } }
     constructor(props) {
 		super(props);
@@ -108,7 +110,7 @@ export default class ProjectList extends Component {
 render() {
 	var buttonEnabled = (this.state.entryKey !== '');
     return (
-      <View style={styles.container}>
+      <View style={styles.containerAlign}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
         placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.inputLong}/>
