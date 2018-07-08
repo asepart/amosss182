@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 import ChatImage from './ChatImage';
 import ChatVideo from './ChatVideo';
-import {getAuth} from '../shared/auth';
 import {URL} from '../shared/const';
 
 function isImage (str) {
