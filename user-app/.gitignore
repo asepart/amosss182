@@ -30,6 +30,7 @@ build/
 local.properties
 *.iml
 keystore/
+assets/
 app/*
 !build.gradle
 .buckconfig
