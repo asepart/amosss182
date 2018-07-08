@@ -116,7 +116,7 @@ render() {
       <View style={styles.containerAlign}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
-        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.inputLong}/>
+        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.inputLong} onSubmitEditing={buttonEnabled ? this.onAddProject.bind(this) : null}/>
           <TouchableOpacity 
           disabled={!buttonEnabled}
          onPress={this.onAddProject.bind(this)} 
