@@ -42,18 +42,18 @@ export default class Messages extends Component {
 	componentDidMount(){
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.makeApiCall();
-		//TODO: following line causes bug, please fix
-		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
 	}
 	
+
 	updateUser = () => {
-    	const { navigate } = this.props.navigation;
-    	navigate("Thirteenth", { name: "UserInfo" });
-    }
+			const { navigate } = this.props.navigation;
+			navigate("Thirteenth", { name: "UserInfo" });
+	}
 
 	async makeApiCall() {
 		return await fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
@@ -85,18 +85,18 @@ export default class Messages extends Component {
 		});
 	}
 
+	sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
 	async listenForNewMessages() {
-		return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				dataSource: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+		while (true){
+			this.makeApiCall();
+			await this.sleep(10000);
+			//stop after leaving chat
+			if (this.props.navigation.state.params.name !== 'GetMessages')
+				return;
+		}
 	}
 
 	async onSendPressed() {
