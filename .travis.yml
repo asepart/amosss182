@@ -30,7 +30,8 @@ matrix:
       script: 
         - openssl aes-256-cbc -K 12345678 -iv 12345678 -in my-release-key.keystore.enc -out my-release-key.keystore -d
         # - expect npm_run_eject.exp
-        - cd android && ./gradlew assembleRelease
+        - cd android && chmod +x ./gradlew
+        -  ./gradlew assembleRelease
         - cd app/build/outputs/apk/
         - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $TRAVIS_BUILD_DIR/user-app/my-release-key.keystore -storepass 12345678 -keypass 12345678 app-release-unsigned.apk my-key-alias
         - jarsigner -verify app-release-unsigned.apk
