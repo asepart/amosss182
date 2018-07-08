@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import styles from './Design';
 import {setState} from './state';
 import {URL} from './const';
@@ -84,6 +84,7 @@ export default class UserInfo extends Component {
     	var buttonEnabled = (this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phoneNumber !== '');
     	
     	return (
+    			<KeyboardAvoidingView style={styles.containerAlign} behavior="padding" enabled>
     		   <View style={styles.containerAlign}>
     		   		<TextInput
     		   			onChangeText={(text) => this.setState({firstName: text})}
@@ -126,6 +127,7 @@ export default class UserInfo extends Component {
 		   				placeholder="Current Password * " placeholderTextColor="#FFF"
 		   				underlineColorAndroid="transparent" style={styles.input}
     		   			secureTextEntry={true}
+    		   			onSubmitEditing={buttonEnabled ? this.onPressUpdate.bind(this) : null}
     		   		/>
     		   		<TouchableOpacity
     		   			onPress={this.onPressUpdate.bind(this)}
@@ -134,6 +136,7 @@ export default class UserInfo extends Component {
     		   			<Text style={styles.buttonText}>Update</Text>
     		   		</TouchableOpacity>
     		   	</View>
+    		   	</KeyboardAvoidingView>
    	   );
     }
 }
