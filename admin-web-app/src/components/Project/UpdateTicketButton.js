@@ -127,7 +127,7 @@ export default class UpdateTicketButton extends Component {
 		return this.state.files.map(file => {
 			return (
 				<View>
-					<File name={file}/>
+					<File name={file} del='true'/>
 				</View>
 			);
 		});
