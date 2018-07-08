@@ -20,8 +20,15 @@ export default class CameraAccess extends Component {
     super(props);
     this.state = {
       path: null,
+      type: 'back'
     };
   }
+
+  toggleFacing() {
+    this.setState({
+      type: this.state.type === 'back' ? 'front' : 'back',
+    });
+}
 
   render() {
     return (
@@ -31,17 +38,20 @@ export default class CameraAccess extends Component {
               this.camera = ref;
             }}
             style = {styles.preview}
-            type={RNCamera.Constants.Type.back}
+            type={this.state.type}
             flashMode={RNCamera.Constants.FlashMode.auto}
             permissionDialogTitle={'Permission to use camera'}
             permissionDialogMessage={'We need your permission to use your camera phone'}
         />
-        <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center',}}>
+        <View style={{flex: 0, flexDirection: 'row', justifyContent: 'space-around',}}>
+        <TouchableOpacity style={styles.flipButton} onPress={this.toggleFacing.bind(this)}>
+            <Text style={styles.flipText}> FLIP </Text>
+        </TouchableOpacity>
         <TouchableOpacity
             onPress={this.takePicture.bind(this)}
-            style = {styles.capture}
+            style = {[styles.capture, styles.picButton, { flex: 0.3, alignSelf: 'flex-end' }]} 
         >
-            <Text style={{fontSize: 14}}> SNAP </Text>
+            <Text style={styles.flipText}> SNAP </Text>
         </TouchableOpacity>
         </View>
       </View>
