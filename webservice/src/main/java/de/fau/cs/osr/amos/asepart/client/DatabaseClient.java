@@ -921,7 +921,7 @@ public class DatabaseClient implements AutoCloseable
 
     public List<Map<String, String>> listAttachments(int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("select a.ticket_id, a.attachment_id, f.original_name from attachment a join fileinfo f on a.attachment_id = f.id where ticket_id = ?;"))
+        try (PreparedStatement stmt = cn.prepareStatement("select a.ticket_id, a.attachment_id, f.original_name from attachment a join fileinfo f on a.attachment_id = f.id where a.ticket_id = ?;"))
         {
             List<Map<String, String>> result = new LinkedList<>();
 

@@ -52,7 +52,7 @@ create table fileinfo(
   internal_name text not null,
   thumbnail_name text default null,
   original_name text not null,
-  ticket_id serial references ticket(id) on delete set null
+  ticket_id integer references ticket(id) on delete set null
 );
 
 create table attachment(

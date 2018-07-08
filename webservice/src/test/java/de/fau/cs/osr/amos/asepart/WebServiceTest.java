@@ -1079,16 +1079,27 @@ public class WebServiceTest
 
         }
 
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(ticketId)).path("attachments").request().get())
+        {
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> attachments = response.readEntity(type);
+            String attachmentId = attachments.get(attachments.size() - 1).get("attachmentId");
+
+            assertEquals(fileMetaDataId, attachmentId);
+        }
+
         try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-/*
+
         try (Response response = getAdminClient().path("/files/").path(fileMetaDataId).request().delete())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
-        }*/
+        }
     }
 
     @Test

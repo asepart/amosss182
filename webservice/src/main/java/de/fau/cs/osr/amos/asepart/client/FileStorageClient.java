@@ -243,33 +243,6 @@ public class FileStorageClient implements AutoCloseable
         return download(thumbnailBucket, fileInfo.get("thumbnailName"));
     }
 
-    /**
-     * Checks if a file exists.
-     *
-     * @param bucket The bucket to check.
-     * @param file The internal name of the file.
-     * @return true if file exists, false if not.
-     */
-
-    @Deprecated
-    public boolean exists(String bucket, String file) throws Exception
-    {
-        boolean fileExists = true;
-
-        try
-        {
-            minioClient.statObject(bucket, file);
-        }
-
-        catch (ErrorResponseException e)
-        {
-            if (e.errorResponse().errorCode().code().equals(ErrorCode.NO_SUCH_KEY.code()))
-                fileExists = false;
-        }
-
-        return fileExists;
-    }
-
     public boolean exists(int metadataId) throws Exception
     {
         return dbClient.isFile(metadataId);
