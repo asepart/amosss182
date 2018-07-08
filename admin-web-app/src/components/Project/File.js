@@ -15,7 +15,7 @@ export class File extends Component {
 			method:'DELETE',
 			headers: getAuth()
 		})
-		.then(window.location.reload())
+		.then(/*window.location.reload()*/)
 		.catch((error) => {console.error(error);});
 	}
 
@@ -23,7 +23,7 @@ export class File extends Component {
 		return (
 			<View style={{flexDireaction:'row'}}>
 				<Text>
-					<Link to={"/files/" + this.props.name.attachmentId }>
+					<Link to={URL + "/files/" + this.props.name.attachmentId }>
 						Name:{this.props.name.originalName}
 					</Link>
 					<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/>
