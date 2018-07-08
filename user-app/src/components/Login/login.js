@@ -74,7 +74,7 @@ export default class Login extends Component {
 	var buttonEnabled = (this.state.email !== '' && this.state.password !== '');
 		return (<View style={styles.containerAlign}>
 			<Image source={require('../images/icon.png')} style={styles.icon} />
-			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.input}/>
+			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.input}/>
 			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input}/>
 			<TouchableOpacity disabled={!buttonEnabled} onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 			
