@@ -35,7 +35,7 @@ export default class CustomActions extends React.Component {
         	setType('Photos');
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
-        case 1:
+        case 2:
         	setType('Videos');
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
