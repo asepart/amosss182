@@ -146,6 +146,15 @@ export default styles=StyleSheet.create({
 
     },
 
+    //for items fixed at bottom
+    bottomView:{
+      flex: 1,
+      padding: 20,
+      backgroundColor: '#0c3868', 
+      position: 'absolute',
+      bottom: 0
+    },
+
     error: {
       color: 'red'
     },
@@ -163,6 +172,12 @@ export default styles=StyleSheet.create({
     text: {
       color: '#FFF',
       fontSize: 15
+    },
+
+    textBold: {
+      color: '#FFF',
+      fontSize: 15,
+      fontWeight: 'bold'
     },
 
     testText: {

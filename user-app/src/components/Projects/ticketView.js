@@ -91,7 +91,7 @@ export default class TicketView extends Component {
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.setState({isAccepted: status})
 		this.getTicketInfo();
-		this.fetchTicketMedia();
+//		this.fetchTicketMedia();
 	}
 
 	async fetchTicketMedia() {
@@ -108,11 +108,18 @@ export default class TicketView extends Component {
 					});
 	}
 
-	_renderMedia({item}) {
-		return (<Image>
-			</Image>
-			);
-	}
+	//_renderMedia({item}) {
+	//	return (<Image>
+	//		</Image>
+	//		);
+	//}
+
+	//<FlatList
+	//				style={styles.textLarge}
+	//				data={this.state.ticketMedia}
+	//				renderItem={this._renderMedia.bind(this)}
+	//				 keyExtractor={(item, index) => index}
+	//			/>
 
 	render() {
 		var { params } = this.props.navigation.state;
@@ -126,63 +133,69 @@ export default class TicketView extends Component {
 
 		return (
 			<View style={styles.container}>
+			<ScrollView style={styles.containerScroll}>
 				<TouchableOpacity
 					onPress={this.onChatPressed.bind(this)}
-					style={styles.buttonContainer}>
+					style={styles.buttonLargeContainer}>
 					<Text style={styles.buttonText}>Chat</Text>
 				</TouchableOpacity>
-
-				<View>
-				{this.state.isAccepted === 'open' ? (
-			<TouchableOpacity
-				onPress={this.onAcceptPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Accept</Text>
-			</TouchableOpacity>
-		) : (
-			<TouchableOpacity
-				onPress={this.onProcessTicketPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Process Ticket</Text>
-			</TouchableOpacity>
-		)}
-				</View>
-
 				<Text style={styles.text}>
-					Id: {this.state.ticketDetail.id}
+					ID: {this.state.ticketDetail.id}
 				</Text>
+				<Text>
+				</Text>	
 				<Text style={styles.text}>
 					Key: {this.state.ticketDetail.projectKey}
 				</Text>
-				<Text style={styles.text}>
-					Required Observations: {this.state.ticketDetail.requiredObservations}
-				</Text>
-				<Text style={styles.text}>
-					Category: {this.state.ticketDetail.category}
+				<Text>
 				</Text>
 				<Text style={styles.text}>
 					Ticket Name: {this.state.ticketDetail.name}
 				</Text>
 				<Text style={styles.text}>
-					Ticket Status: {this.state.ticketDetail.status}
-				</Text>
-				<Text style={styles.text}>
 					Summary: {this.state.ticketDetail.summary}
 				</Text>
-				<ScrollView style={styles.containerScroll}>
-					<Text style={styles.textLarge}>
+				<Text>
+				</Text>
+				<Text style={styles.text}>
+					Required Observations: {this.state.ticketDetail.requiredObservations}
+				</Text>
+				<Text>
+				</Text>
+				<Text style={styles.text}>
+					Category: {this.state.ticketDetail.category}
+				</Text>
+				<Text>
+				</Text>
+				<Text style={styles.text}>
+					Ticket Status: {this.state.ticketDetail.status}
+				</Text>
+				<Text>
+				</Text>
+					<Text style={styles.text}>
 						Description:
 					</Text>
 					<Text style={styles.text} >
 						{this.state.ticketDetail.description}
 					</Text>
+						
 				</ScrollView>
-				<FlatList
-					style={styles.textLarge}
-					data={this.state.ticketMedia}
-					renderItem={this._renderMedia.bind(this)}
-					 keyExtractor={(item, index) => index}
-				/>
+				
+				<View style={styles.bottomView}>
+				{this.state.isAccepted === 'open' ? (
+				<TouchableOpacity
+				onPress={this.onAcceptPressed.bind(this)}
+				style={styles.buttonContainer}>
+				<Text style={styles.buttonText}>Accept</Text>
+				</TouchableOpacity>
+				) : (
+				<TouchableOpacity
+				onPress={this.onProcessTicketPressed.bind(this)}
+				style={styles.buttonContainer}>
+				<Text style={styles.buttonText}>Process Ticket</Text>
+				</TouchableOpacity>
+				)}
+				</View>
 			</View>
 		);
 	}
