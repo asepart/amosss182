@@ -1228,7 +1228,7 @@ public class DatabaseClient implements AutoCloseable
                                               "where ticket_id = ?\n" +
                                               "order by timestamp desc\n" +
                                               "limit ?)\n" +
-                             "select * from last_messages order by timestamp asc;"))
+                             "select lm.id, lm.sender, lm.timestamp, lm.content, lm.attachment, fi.original_name from last_messages lm left outer join fileinfo fi on lm.attachment = fi.id order by timestamp asc;"))
         {
             stmt.setInt(1, ticketId);
             stmt.setInt(2, limit);
@@ -1239,12 +1239,13 @@ public class DatabaseClient implements AutoCloseable
 
                 while (rs.next())
                 {
-                    Map<String, String> row = new HashMap<>(4);
+                    Map<String, String> row = new HashMap<>(6);
                     row.put("id", String.valueOf(rs.getInt(1)));
                     row.put("sender", rs.getString(2));
                     row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
                     row.put("content", rs.getString(4));
                     row.put("attachment", rs.getString(5));
+                    row.put("originalName", rs.getString(6));
                     result.add(row);
                 }
 
@@ -1292,8 +1293,10 @@ public class DatabaseClient implements AutoCloseable
         }
 
         try (PreparedStatement stmt = cn.prepareStatement(
-                "select id, sender, timestamp, content, attachment, ticket_id\n" +
-                   "from message\n" +
+                "select m.id, m.sender, m.timestamp, m.content, m.attachment, f.original_name\n" +
+                   "from message m\n" +
+                   "left outer join fileinfo f\n" +
+                   "on m.attachment = f.id\n" +
                    "where ticket_id = ? and id >= ?\n" +
                    "order by timestamp asc;"))
         {
@@ -1306,12 +1309,13 @@ public class DatabaseClient implements AutoCloseable
 
                 while (rs.next())
                 {
-                    Map<String, String> row = new HashMap<>(5);
+                    Map<String, String> row = new HashMap<>(6);
                     row.put("id", String.valueOf(rs.getInt(1)));
                     row.put("sender", rs.getString(2));
                     row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
                     row.put("content", rs.getString(4));
                     row.put("attachment", rs.getString(5));
+                    row.put("originalName", rs.getString(6));
                     result.add(row);
                 }
 
