@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions} from 'react-native';
 import {URL, FileSelector} from '../shared/const';
-import {getAuth, getAuthForPost, getAuthForMediaPost, username} from '../shared/auth';
+import {getAuth, getAuthForMediaPost} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
 import ChatMessage from './ChatMessage';
@@ -145,11 +145,11 @@ export default class TicketChat extends Component {
 
 		return this.state.chatHistory.map(function(news, id) {
 			if(id !== 0) {
-				tmp_date = new Date(parseInt(tmp_chat[id-1].timestamp)).toDateString();
-				date = new Date(parseInt(tmp_chat[id].timestamp));
+				tmp_date = new Date(parseInt(tmp_chat[id-1].timestamp, 10)).toDateString();
+				date = new Date(parseInt(tmp_chat[id].timestamp, 10));
 			} else {
 				tmp_date = new Date(1993, 3, 20);
-				date = new Date(parseInt(tmp_chat[id].timestamp));
+				date = new Date(parseInt(tmp_chat[id].timestamp, 10));
 			}
 			return (
 				<View key={id}>

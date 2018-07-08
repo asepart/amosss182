@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import CPopup from '../shared/CPopup';
-import { URL } from '../shared/const';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 
 export default class ChatImage extends Component {
 
@@ -11,7 +10,7 @@ export default class ChatImage extends Component {
 		}
 		return (
 			<CPopup toggle={this.props.src + '?thumbnail=true'}>
-				<img src={this.props.src} alt="image"/>
+				<img src={this.props.src} alt="Preview"/>
 			</CPopup>
 		);
 
