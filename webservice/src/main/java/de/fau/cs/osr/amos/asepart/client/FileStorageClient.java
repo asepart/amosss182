@@ -3,8 +3,6 @@ package de.fau.cs.osr.amos.asepart.client;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +15,6 @@ import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 
-import jdk.internal.util.xml.impl.Input;
 import net.coobird.thumbnailator.Thumbnails;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.common.model.Picture;
@@ -158,10 +155,7 @@ public class FileStorageClient implements AutoCloseable
             contentType = "application/octet-stream";
         }
 
-        if (isImageFile(fileName))
-            minioClient.putObject(fileBucket, fileId, resizeImage(fileStream), contentType);
-
-        else minioClient.putObject(fileBucket, fileId, fileStream, contentType);
+        minioClient.putObject(fileBucket, fileId, fileStream, contentType);
 
         String thumbnailName = null;
 
@@ -180,16 +174,6 @@ public class FileStorageClient implements AutoCloseable
 
             throw sqlex;
         }
-    }
-
-    private InputStream resizeImage(InputStream img) throws Exception
-    {
-        PipedInputStream istream = new PipedInputStream();
-        PipedOutputStream ostream = new PipedOutputStream(istream);
-
-        Thumbnails.of(img).size(1000, 1000).toOutputStream(ostream);
-
-        return istream;
     }
 
     private String generateThumbnail(String fileId) throws Exception
