@@ -23,10 +23,12 @@ export class File extends Component {
 		return (
 			<View style={{flexDireaction:'row'}}>
 				<Text>
-					<Link to={URL + "/files/" + this.props.name.attachmentId }>
-						Name:{this.props.name.originalName}
+					<Link to={URL + "/files/" + this.props.name.attachmentId } target="_blank">
+						{this.props.name.originalName}
 					</Link>
-					<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/>
+					{this.props.del === 'true' ?
+						<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/>
+					:<View></View>}
 				</Text>
 			</View>
 		);
