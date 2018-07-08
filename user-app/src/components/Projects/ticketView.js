@@ -91,6 +91,13 @@ export default class TicketView extends Component {
 		this.setState({isAccepted: status})
 		this.getTicketInfo();
 	}
+	
+	componentDidUpdate() {
+    	if(getUpdateBoolean() === true) {
+    		this.getTicketInfo();
+    		setUpdateBoolean(false);
+    	}
+    }
 
 	render() {
 		var { params } = this.props.navigation.state;

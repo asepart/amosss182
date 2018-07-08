@@ -92,6 +92,7 @@ export default class ProjectList extends Component {
        }       
 
  _renderProjects({item}) {
+	 setUpdateBoolean(true);
     if (item.finished === 'false') {
         projectstatus = 'Project is open';
 
