@@ -485,6 +485,10 @@ public class WebService
             if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
+            Map<String, String> fileInfo = db.getFile(metadataId);
+            if (!fileInfo.get("ticketId").equals(String.valueOf(ticketId)))
+                return Response.status(Response.Status.BAD_REQUEST).build();
+
             db.addAttachment(ticketId, metadataId);
         }
 
@@ -769,6 +773,15 @@ public class WebService
 
             if (sc.isUserInRole("User") && (finished || !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey"))))
                 return Response.status(Response.Status.FORBIDDEN).build();
+
+            try
+            {
+                Map<String, String> fileInfo = db.getFile(Integer.parseInt(attachment));
+                if (!fileInfo.get("ticketId").equals(String.valueOf(ticketId)))
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+
+            catch (NumberFormatException ignored) {}
 
             db.sendMessage(principal.getName(), message, attachment, ticketId);
         }

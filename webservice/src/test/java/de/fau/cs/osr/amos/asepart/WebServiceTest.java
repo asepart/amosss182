@@ -986,6 +986,41 @@ public class WebServiceTest
     @Test
     void testFiles() throws IOException
     {
+
+        Map<String, String> project = new HashMap<>(3);
+        project.put("entryKey", "junit_test");
+        project.put("owner", "admin");
+        project.put("name", "JUnit Test Project");
+
+        try (Response response = getAdminClient().path("/projects").request().post(Entity.json(project)))
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        Map<String, String> ticket = new HashMap<>(6);
+        ticket.put("projectKey", "junit_test");
+        ticket.put("name", "Test Ticket");
+        ticket.put("summary", "Test Ticket Summary");
+        ticket.put("description", "Description of Test Ticket");
+        ticket.put("category", "trace");
+        ticket.put("requiredObservations", "42");
+
+        try (Response response = getAdminClient().path("/tickets").request().post(Entity.json(ticket)))
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
+        int ticketId;
+
+        try (Response response = getAdminClient().path("/projects/junit_test/tickets").request().get())
+        {
+            GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
+            List<Map<String, String>> tickets = response.readEntity(type);
+            ticketId = Integer.parseInt(tickets.get(tickets.size() - 1).get("id"));
+
+            assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
+        }
+
         final String fileName = "/tmp/asepart-test-file.txt";
         final Path filePath = Paths.get(fileName);
         final String fileContent = "This is a test file for JUnit.";
@@ -999,7 +1034,7 @@ public class WebServiceTest
         String fileMetaDataId;
 
         try (FormDataMultiPart multipart = (FormDataMultiPart)  new FormDataMultiPart().bodyPart(filePart);
-             Response response = getAdminClient().path("/files/1").request().post(Entity.entity(multipart, multipart.getMediaType())))
+             Response response = getAdminClient().path("/files/").path(String.valueOf(ticketId)).request().post(Entity.entity(multipart, multipart.getMediaType())))
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
             fileMetaDataId = response.readEntity(String.class);
@@ -1020,10 +1055,40 @@ public class WebServiceTest
 
         Files.delete(filePath);
 
-        try (Response response = getAdminClient().path("/files/").path(fileMetaDataId).request().delete())
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(ticketId)).path("attachments").request().post(Entity.text(fileMetaDataId)))
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+
+        }
+
+        try (Response response = getAdminClient().path("/tickets").path("1").path("attachments").request().post(Entity.text(fileMetaDataId)))
+        {
+            assertEquals(Response.Status.BAD_REQUEST, Response.Status.fromStatusCode(response.getStatus()));
+
+        }
+
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(ticketId)).path("attachments").path(fileMetaDataId).request().delete())
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+
+        }
+
+        try (Response response = getAdminClient().path("/tickets").path(String.valueOf(ticketId)).path("attachments").request().post(Entity.text(fileMetaDataId)))
+        {
+            assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
+
+        }
+
+        try (Response response = getAdminClient().path("/projects").path("junit_test").request().delete())
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
+
+/*
+        try (Response response = getAdminClient().path("/files/").path(fileMetaDataId).request().delete())
+        {
+            assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
+        }*/
     }
 
     @Test

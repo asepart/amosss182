@@ -921,7 +921,7 @@ public class DatabaseClient implements AutoCloseable
 
     public List<Map<String, String>> listAttachments(int ticketId) throws SQLException
     {
-        try (PreparedStatement stmt = cn.prepareStatement("select ticket_id, attachment_id from attachment where ticket_id = ?;"))
+        try (PreparedStatement stmt = cn.prepareStatement("select a.ticket_id, a.attachment_id, f.original_name from attachment a join fileinfo f on a.attachment_id = f.id where ticket_id = ?;"))
         {
             List<Map<String, String>> result = new LinkedList<>();
 
@@ -930,9 +930,10 @@ public class DatabaseClient implements AutoCloseable
 
             while (rs.next())
             {
-                Map<String, String> row = new HashMap<>(2);
-                row.put("ticket_id", String.valueOf(rs.getInt(1)));
-                row.put("attachment_id", String.valueOf(rs.getInt(2)));
+                Map<String, String> row = new HashMap<>(3);
+                row.put("ticketId", String.valueOf(rs.getInt(1)));
+                row.put("attachmentId", String.valueOf(rs.getInt(2)));
+                row.put("originalName", rs.getString(3));
 
                 result.add(row);
             }
@@ -1472,7 +1473,7 @@ public class DatabaseClient implements AutoCloseable
     {
         try (Statement stmt = cn.createStatement())
         {
-            try (ResultSet rs = stmt.executeQuery("select id, internal_name, thumbnail_name, original_name from fileinfo where ticket_id = null;"))
+            try (ResultSet rs = stmt.executeQuery("select id, internal_name, thumbnail_name, original_name from fileinfo where ticket_id is null;"))
             {
                 List<Map<String, String>> result = new LinkedList<>();
 
