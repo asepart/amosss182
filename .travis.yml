@@ -21,9 +21,11 @@ matrix:
 
     - language: android
       if: tag =~ ^release
+      android:
+        components:
+          - build-tools-26.0.2
       before_install:
         - nvm install 8
-        - yes | sdkmanager "platforms;android-26"
       install:
         - cd user-app
         - npm install
@@ -35,7 +37,7 @@ matrix:
         - cd app/build/outputs/apk/release
         - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $TRAVIS_BUILD_DIR/user-app/my-release-key.keystore -storepass 12345678 -keypass 12345678 app-release-unsigned.apk my-key-alias
         - jarsigner -verify app-release-unsigned.apk
-        - "${ANDROID_HOME}build-tools/26.0.1/zipalign -v 4 app-release-unsigned.apk Asepart.apk"
+        - "${ANDROID_HOME}build-tools/26.0.2/zipalign -v 4 app-release-unsigned.apk Asepart.apk"
 
 
 before_deploy:
