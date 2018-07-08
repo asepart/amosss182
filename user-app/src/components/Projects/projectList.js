@@ -59,6 +59,9 @@ export default class ProjectList extends Component {
 
       setUpdateBoolean(true);
       setKey(this.state.entryKey);
+      
+      //enables blinking feedback message
+      this.setState({info: "", infoType: styles.success});
   
      if(await isValid()){
         setState({isValid: true});
