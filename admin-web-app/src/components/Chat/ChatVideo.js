@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import CPopup from '../shared/CPopup';
 
-export default class ChatVideo extends Component {
+export class ChatVideo extends Component {
 	render() {
 		return (
 			<CPopup toggle={this.props.src + '?thumbnail=true'}>

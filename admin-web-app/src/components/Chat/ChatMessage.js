@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
-import ChatImage from './ChatImage';
-import ChatVideo from './ChatVideo';
+import {ChatImage} from './ChatImage';
+import {ChatVideo} from './ChatVideo';
 import {URL} from '../shared/const';
 
-function isImage (str) {
+export function isImage (str) {
 	if (typeof str === "string"){
 		if(str.length < 5) // .jpg, .png, .bmp is always >= 5 chars
 			return false;
@@ -16,7 +16,7 @@ function isImage (str) {
 	return false;
 }
 
-function isVideo (str) {
+export function isVideo (str) {
 	if (typeof str === "string"){
 		if(str.length < 5) // .jpg, .png, .bmp is always >= 5 chars
 			return false;
