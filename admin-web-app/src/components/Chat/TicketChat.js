@@ -4,6 +4,7 @@ import {URL, FileSelector} from '../shared/const';
 import {getAuth, getAuthForPost, getAuthForMediaPost, username} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
 import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
+import {sleep} from '../shared/functions';
 import ChatMessage from './ChatMessage';
 
 export default class TicketChat extends Component {
@@ -16,13 +17,21 @@ export default class TicketChat extends Component {
 			idTicket: this.props.match.params.id,
 			chatHistory: [],
 			numChatMsgs: 20,
-			newestMsgId: 1
+			newestMsgId: -1
 		}
 	}
 
 	loadMoreMessages (){
 		this.setState({numChatMsgs: (2*this.state.numChatMsgs)});
 		this.fetchMessages();
+		setUpdateBoolean(true);
+	}
+
+	addNewestMessages(response){
+		let messages = this.state.chatHistory;
+		//add new all messages and remove old ones to stabilize the array length
+		response.forEach(msg => {messages.push(msg), messages.shift()});
+		return messages;
 	}
 
 	componentDidMount() {
@@ -40,10 +49,6 @@ export default class TicketChat extends Component {
 	}
 
 	componentDidUpdate() {
-		if(getUpdateBoolean() === true) {
-			this.fetchMessages();
-			setUpdateBoolean(false);
-		}
 		this.textInput.focus();
 	}
 
@@ -79,9 +84,11 @@ export default class TicketChat extends Component {
 		fetch(URL + '/messages/' + this.state.idTicket + '?limit=' + this.state.numChatMsgs, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
+			let maxID = Math.max.apply(Math, responseJson.map(o => {return Number(o.id)}));
 			this.setState({
 				isLoading: false,
 				chatHistory: responseJson,
+				newestMsgId: maxID
 			}, function(){});
 		})
 		.catch((error) =>{
@@ -90,22 +97,35 @@ export default class TicketChat extends Component {
 	}
 
 	async listenForNewMessages() {
+		while(this.state.newestMsgId < 0){
+			await sleep(1000);
+			console.log("Zzzzz…")
+		}
 		while (true){
-			console.log("fetch " + (new Date()).toISOString());
-			var response = await fetch(URL + '/listen/' + this.state.idTicket, {
-				method: 'GET',
-				headers: getAuth()
-			})
-			switch (response.status) {
-				case 200:
-					this.setState({
-						isLoading: false,
-						chatHistory: response,
-					});
-					break;
-				default:
-					console.error("Error:" + response.status);
-					console.error(response.text);
+			try {
+				var response = await fetch(URL + '/listen/' + this.state.idTicket + '?since=' + this.state.newestMsgId, {
+					method: 'GET',
+					headers: getAuth()
+				});
+				switch (response.status) {
+					case 200:
+						let maxID = Math.max.apply(Math, response.map(o => {return Number(o.id)}));
+						this.setState({
+							isLoading: false,
+							chatHistory: this.addNewestMessages(response),
+							newestMsgId: maxID
+						});
+						break;
+					case 503:
+						console.log("no msg within 30 sec")
+						break;
+					default:
+						console.error("Error:" + response.status);
+						console.error(response.text);
+				}
+
+			} catch (e) {
+				console.error(e);
 			}
 		}
 	}
@@ -114,11 +134,10 @@ export default class TicketChat extends Component {
 		setMsg(this.state.message);
 		setTicketID(this.state.idTicket);
 		sendMessage();
-		this.fetchMessages();
 
 		this.textInput.clear();
 		this.state.message = "";
-		setUpdateBoolean(true);
+		this.textInput.focus();
 	}
 
 	handleFile(selectorFiles: FileList) {
