@@ -15,7 +15,14 @@ export default class TicketChat extends Component {
 			message: "",
 			idTicket: this.props.match.params.id,
 			chatHistory: [],
+			numChatMsgs: 20,
+			newestMsgId: 1
 		}
+	}
+
+	loadMoreMessages (){
+		this.setState({numChatMsgs: (2*this.state.numChatMsgs)});
+		this.fetchMessages();
 	}
 
 	componentDidMount() {
@@ -69,7 +76,7 @@ export default class TicketChat extends Component {
 	}
 
 	fetchMessages() {
-		fetch(URL + '/messages/' + this.state.idTicket + '?limit=30', {method:'GET', headers: getAuth(), timeout: 0})
+		fetch(URL + '/messages/' + this.state.idTicket + '?limit=' + this.state.numChatMsgs, {method:'GET', headers: getAuth(), timeout: 0})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -217,7 +224,10 @@ export default class TicketChat extends Component {
 					disabled = {true}
 					title = {"Chat history of " + tmp_ticketName + " in " + tmp_projectName}
 				/>
-
+				<Button
+					onPress = { this.loadMoreMessages.bind(this) }
+					title = {"Show more Messages (" + (this.state.numChatMsgs * 2) + ')'}
+				/>
 				<ScrollView
 					ref = {ref => this.scrollView = ref}
 					onContentSizeChange = {(contentWidth, contentHeight) => {
