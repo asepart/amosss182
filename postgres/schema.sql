@@ -64,4 +64,12 @@ create table observation(
   login_name character varying (32) not null references user_account(login_name) on delete cascade,
   outcome observation_outcome not null,
   quantity integer not null check (quantity > 0)
-)
+);
+
+create table fileinfo(
+  id serial primary key,
+  internal_name text not null,
+  thumbnail_name text default null,
+  original_name text not null,
+  ticket_id serial references ticket(id) on delete set null
+);
