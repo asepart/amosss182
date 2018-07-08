@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button,FlatList } from 'react-native';
 import { ticket } from '../Chat/sendMessages';
 import { key } from './keyValid';
 import { URL } from '../Login/const';
@@ -36,7 +36,8 @@ export default class TicketView extends Component {
 			isLoading: true,
 			isAccepted:"", 
 			ticketDetail: "",
-			idTicket: ""
+			idTicket: "",
+			ticketMedia: [],
 		};
 	}
 	
@@ -90,6 +91,27 @@ export default class TicketView extends Component {
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.setState({isAccepted: status})
 		this.getTicketInfo();
+		this.fetchTicketMedia();
+	}
+
+	async fetchTicketMedia() {
+		let ticketID = this.props.navigation.state.params.id;
+		fetch(URL + '/tickets/' + ticketID + '/attachments', {method:'GET', headers: getAuth()})
+				.then((response) => response.json())
+					.then((responseJson) => {
+						this.setState({
+							isLoading: false,
+							ticketMedia: responseJson
+						}, function() {});
+					}).catch((error) => {
+						console.error(error);
+					});
+	}
+
+	_renderMedia({item}) {
+		return (<Image>
+			</Image>
+			);
 	}
 
 	render() {
@@ -155,6 +177,12 @@ export default class TicketView extends Component {
 						{this.state.ticketDetail.description}
 					</Text>
 				</ScrollView>
+				<FlatList
+					style={styles.textLarge}
+					data={this.state.ticketMedia}
+					renderItem={this._renderMedia.bind(this)}
+					 keyExtractor={(item, index) => index}
+				/>
 			</View>
 		);
 	}
