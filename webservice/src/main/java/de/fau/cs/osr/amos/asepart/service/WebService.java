@@ -515,9 +515,11 @@ public class WebService
     @Path("/tickets/{id}/attachments")
     @GET
     @Consumes(MediaType.TEXT_PLAIN)
-    @RolesAllowed({"Admin"})
+    @RolesAllowed({"Admin", "User"})
     public Response listAttachments(@Context SecurityContext sc, @PathParam("id") int ticketId) throws Exception
     {
+        Principal principal = sc.getUserPrincipal();
+
         try (DatabaseClient db = new DatabaseClient())
         {
             if (!db.isTicket(ticketId))
@@ -525,7 +527,9 @@ public class WebService
 
             Map<String, String> ticket = db.getTicket(ticketId);
 
-            if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
+            if (sc.isUserInRole("Admin") && !db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), ticket.get("projectKey")))
+                return Response.status(Response.Status.FORBIDDEN).build();
+            else if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(db.listAttachments(ticketId)).build();

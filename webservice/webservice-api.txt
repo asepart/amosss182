@@ -211,7 +211,7 @@ The following REST operations are available:
 
   HTTP operation: GET
   Path:           /tickets/{id}/attachments
-  Roles:          Admin
+  Roles:          Admin, User
   Status code:    [204 No Content]   in case of success.
                   [401 Unauthorized] if the provided username or password is invalid.
                   [403 Forbidden]    if the permissions are not sufficient.
