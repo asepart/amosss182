@@ -53,6 +53,25 @@ export default styles=StyleSheet.create({
 
     },
 
+    containerButtonRow: {
+      height: 100,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 20,
+      backgroundColor: '#0c3868',
+     
+    },
+
+    buttonRowContainer: {
+      backgroundColor: '#009fca',
+      paddingVertical: 15,
+      width: '40%',
+      height: 40,
+      marginBottom: 15,
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+
     //Text input boxes
     input: {
       height: 40,
@@ -156,6 +175,15 @@ export default styles=StyleSheet.create({
 
     },
 
+    //for items fixed at bottom
+    bottomView:{
+      flex: 1,
+      padding: 20,
+      backgroundColor: '#0c3868', 
+      position: 'absolute',
+      bottom: 0
+    },
+
     error: {
       color: 'red'
     },
@@ -173,6 +201,12 @@ export default styles=StyleSheet.create({
     text: {
       color: '#FFF',
       fontSize: 15
+    },
+
+    textBold: {
+      color: '#FFF',
+      fontSize: 15,
+      fontWeight: 'bold'
     },
 
     testText: {
