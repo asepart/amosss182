@@ -27,13 +27,6 @@ export async function uploadFile (uri, ticket) {
 
 	var filename = (btoa(moment()) + ext);
 
-	//send file url to chat
-	fetch(URL + '/messages/' + ticket + '?attachment=' + filename, {
-				method: 'POST',
-				headers: getAuth(),
-				body: URL + '/files/' + ticket + '/' + filename
-	})
-
 	//convert file into FormData
 	const image = {
 					uri: uri,
@@ -44,49 +37,30 @@ export async function uploadFile (uri, ticket) {
 	imgBody.append('file', image);
 
 	//send file to backend
-	const res = await fetch(URL + '/files/' + ticket, {
+	fetch(URL + '/files/' + ticket, {
 				method: 'POST',
 				headers: getAuthForMediaPost(),
 				body: imgBody
-	}).then(
-				response => {
-					
-					//console.log(JSON.stringify(response));
-					if (response.status == '409') {
-						alert("File upload failed. Filename already exists.");
-					}
-				}
-		).catch(
-			error => {
-				console.log('uploadImage error:', error);
-				alert("File upload failed.");
-			}
-		);
+	})
+	.then((response) => {
+		return response.text()
+	})
+	.then((responseText) => {
+		console.log(URL + '/files/' + ticket)
+		console.log("promise is: " + responseText)
+		//send file url to chat
+
+		fetch(URL + '/messages/' + ticket + '?attachment=' + responseText, {
+					method: 'POST',
+					headers: getAuth(),
+					body: URL + '/files/' + responseText
+		})
+	})
+	.catch((error) => {
+		console.log(error);
+		alert("File upload failed.");
+	});
 
 	console.log(ticket);
 	console.log(imgBody);
-}
-
-export async function getDownloadLink (filename, ticket) {
-
-	//get downloadlink from backend
-	const res = await fetch(URL + '/files/' + ticket + '/' + filename + '?thumbnail=false', {
-				method: 'GET',
-				headers: getAuth()
-	}).then(
-		    response => {
-		    	link = '';
-		    	if (response.status == '200') {
-		    		link = response.url;
-		    	} else if (response.status == '404') {
-		    		alert("File does not exist.");
-		    	}
-		    }
-	  ).catch(
-	    error => {
-	    	console.log('downloadImage error:', error);
-	    	alert("File download failed.");
-	    }
-	  );
-	return link;	
 }

@@ -59,6 +59,9 @@ export default class ProjectList extends Component {
 
       setUpdateBoolean(true);
       setKey(this.state.entryKey);
+      
+      //enables blinking feedback message
+      this.setState({info: "", infoType: styles.success});
   
      if(await isValid()){
         setState({isValid: true});
@@ -89,13 +92,14 @@ export default class ProjectList extends Component {
        }       
 
  _renderProjects({item}) {
+	 setUpdateBoolean(true);
     if (item.finished === 'false') {
         projectstatus = 'Project is open';
 
      return (
         <TouchableOpacity
       onPress={()=> this.props.navigation.navigate("Twelfth", {entryKey:item.entryKey}) }
-                     style={styles.buttonLargeContainer}>
+                     style={styles.buttonMediumContainer}>
                      <Text style={styles.buttonText}>
                     Project Name: {item.name} 
                     </Text>
@@ -113,7 +117,7 @@ render() {
       <View style={styles.containerAlign}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
-        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.inputLong}/>
+        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.inputLong} onSubmitEditing={buttonEnabled ? this.onAddProject.bind(this) : null}/>
           <TouchableOpacity 
           disabled={!buttonEnabled}
          onPress={this.onAddProject.bind(this)} 

@@ -89,6 +89,7 @@ export default class ProjectListTicketList extends Component {
 	}
 
 	_getTicketStatus({item}) {
+		setUpdateBoolean(true);
 		status = item.status;
 		switch (status){
 			case 'open':

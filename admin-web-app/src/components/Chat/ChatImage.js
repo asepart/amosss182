@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import CPopup from '../shared/CPopup';
 import { View } from 'react-native';
 
-export default class ChatImage extends Component {
+export class ChatImage extends Component {
 
 	render() {
 		if (this.props.src == null){

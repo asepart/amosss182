@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button,FlatList,Image, Linking } from 'react-native';
 import { ticket } from '../Chat/sendMessages';
 import { key } from './keyValid';
 import { URL } from '../Login/const';
@@ -12,6 +12,9 @@ import { StackNavigator } from 'react-navigation'
 import {status} from '../Projects/projectListTicketList';
 import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+export var attachmentID = '';
+export var attachmentName = '';
 
 export default class TicketView extends Component {
 
@@ -36,7 +39,8 @@ export default class TicketView extends Component {
 			isLoading: true,
 			isAccepted:"", 
 			ticketDetail: "",
-			idTicket: ""
+			idTicket: "",
+			ticketMedia: [],
 		};
 	}
 	
@@ -90,7 +94,47 @@ export default class TicketView extends Component {
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.setState({isAccepted: status})
 		this.getTicketInfo();
+		this.fetchTicketMedia();
 	}
+	
+	componentDidUpdate() {
+    	if(getUpdateBoolean() === true) {
+    		this.getTicketInfo();
+    		setUpdateBoolean(false);
+    	}
+    }
+
+	async fetchTicketMedia() {
+		let ticketID = this.props.navigation.state.params.id;
+		fetch(URL + '/tickets/' + ticketID + '/attachments', {method:'GET', headers: getAuth()})
+				.then((response) => response.json())
+					.then((responseJson) => {
+						this.setState({
+							isLoading: false,
+							ticketMedia: responseJson
+						}, function() {});
+					}).catch((error) => {
+						console.error(error);
+					});
+	}
+
+	_renderMedia({item}){
+		attachmentID = item.attachmentId;
+		attachmentName = item.originalName;
+		try { 
+			return (
+				<TouchableOpacity style={{width:100, height:100}} onPress={ ()=>{ Linking.openURL(URL + '/files/' + attachmentID + '?thumbnail=false')}}>
+				<Image  style={{width: 50, height: 50}} source={{uri:URL + '/files/' + attachmentID + '?thumbnail=true'}} />
+				<Text style={styles.buttonText}>
+				{attachmentName}
+				</Text>
+				</TouchableOpacity>
+				
+			)
+		} catch(error)  {
+			console.error(error);
+		}
+  }	
 
 	render() {
 		var { params } = this.props.navigation.state;
@@ -101,60 +145,79 @@ export default class TicketView extends Component {
 				</View>
 			)
 		}
-
 		return (
 			<View style={styles.container}>
+			<View style={styles.containerButtonRow}>
+				{this.state.isAccepted === 'open' ? (
 				<TouchableOpacity
+				onPress={this.onAcceptPressed.bind(this)}
+				style={styles.buttonRowContainer}>
+				<Text style={styles.buttonText}>Accept</Text>
+				</TouchableOpacity>
+				) : (
+				<TouchableOpacity
+				onPress={this.onProcessTicketPressed.bind(this)}
+				style={styles.buttonRowContainer}>
+				<Text style={styles.buttonText}>Process Ticket</Text>
+				</TouchableOpacity>
+				)}
+					<TouchableOpacity
 					onPress={this.onChatPressed.bind(this)}
-					style={styles.buttonContainer}>
+					style={styles.buttonRowContainer}>
 					<Text style={styles.buttonText}>Chat</Text>
 				</TouchableOpacity>
-
-				<View>
-				{this.state.isAccepted === 'open' ? (
-			<TouchableOpacity
-				onPress={this.onAcceptPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Accept</Text>
-			</TouchableOpacity>
-		) : (
-			<TouchableOpacity
-				onPress={this.onProcessTicketPressed.bind(this)}
-				style={styles.buttonContainer}>
-				<Text style={styles.buttonText}>Process Ticket</Text>
-			</TouchableOpacity>
-		)}
-				</View>
-
+			</View>	
+			<ScrollView style={styles.containerScroll}>
+			
 				<Text style={styles.text}>
-					Id: {this.state.ticketDetail.id}
+					ID: {this.state.ticketDetail.id}
 				</Text>
+				<Text>
+				</Text>	
 				<Text style={styles.text}>
 					Key: {this.state.ticketDetail.projectKey}
 				</Text>
-				<Text style={styles.text}>
-					Required Observations: {this.state.ticketDetail.requiredObservations}
-				</Text>
-				<Text style={styles.text}>
-					Category: {this.state.ticketDetail.category}
+				<Text>
 				</Text>
 				<Text style={styles.text}>
 					Ticket Name: {this.state.ticketDetail.name}
 				</Text>
 				<Text style={styles.text}>
-					Ticket Status: {this.state.ticketDetail.status}
-				</Text>
-				<Text style={styles.text}>
 					Summary: {this.state.ticketDetail.summary}
 				</Text>
-				<ScrollView style={styles.containerScroll}>
-					<Text style={styles.textLarge}>
+				<Text>
+				</Text>
+				<Text style={styles.text}>
+					Required Observations: {this.state.ticketDetail.requiredObservations}
+				</Text>
+				<Text>
+				</Text>
+				<Text style={styles.text}>
+					Category: {this.state.ticketDetail.category}
+				</Text>
+				<Text>
+				</Text>
+				<Text style={styles.text}>
+					Ticket Status: {this.state.ticketDetail.status}
+				</Text>
+				<Text>
+				</Text>
+					<Text style={styles.textBold}>
 						Description:
 					</Text>
 					<Text style={styles.text} >
 						{this.state.ticketDetail.description}
 					</Text>
+					<Text>
+				</Text>
+					<FlatList
+					style={styles.textLarge}
+					data={this.state.ticketMedia}
+					renderItem={this._renderMedia.bind(this)}
+					keyExtractor={(item, index) => {return index.toString()}}
+					/>	
 				</ScrollView>
+				
 			</View>
 		);
 	}

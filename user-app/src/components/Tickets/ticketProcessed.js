@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Picker, Platform, Button} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Picker, Platform, Button, KeyboardAvoidingView } from 'react-native';
 import styles from '../Login/Design';
 import { StackNavigator } from 'react-navigation';
 import {URL} from '../Login/const';
@@ -75,6 +75,7 @@ export default class TicketProcessing extends Component {
 			pickerStyle = styles.inputPickerIOS;
 		}
 		return (
+			<KeyboardAvoidingView style={styles.containerAlign} behavior="padding" enabled>
 			<View style={styles.containerPicker}>
 				<Picker
 					style = {pickerStyle}
@@ -93,6 +94,7 @@ export default class TicketProcessing extends Component {
 					style = {styles.input}
 					onChangeText = {(text) => this.setState({quantity: text})}
 					value = {this.state.quantity}
+					onSubmitEditing={buttonEnabled ? this.onSubmitPressed.bind(this) : null}
 				/>
 				<TouchableOpacity
 					disabled={!buttonEnabled}
@@ -104,6 +106,7 @@ export default class TicketProcessing extends Component {
 					</Text>
 				</TouchableOpacity>
 			</View>
+			</KeyboardAvoidingView>
 		);
 	}
 }

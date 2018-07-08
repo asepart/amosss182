@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
-import ChatImage from './ChatImage';
-import ChatVideo from './ChatVideo';
+import {ChatImage} from './ChatImage';
+import {ChatVideo} from './ChatVideo';
 import {URL} from '../shared/const';
 
-function isImage (str) {
+export function isImage (str) {
 	if (typeof str === "string"){
 		if(str.length < 5) // .jpg, .png, .bmp is always >= 5 chars
 			return false;
@@ -16,7 +16,7 @@ function isImage (str) {
 	return false;
 }
 
-function isVideo (str) {
+export function isVideo (str) {
 	if (typeof str === "string"){
 		if(str.length < 5) // .jpg, .png, .bmp is always >= 5 chars
 			return false;
@@ -36,13 +36,13 @@ export default class ChatMessage extends Component {
 			return(
 				<View>
 					{
-						isImage(this.props.msg.attachment)?
-							<ChatImage src={URL + '/files/' + this.props.ticket + '/' + this.props.msg.attachment}/>
+						isImage(this.props.msg.originalName)?
+							<ChatImage src={URL + '/files/' + this.props.msg.attachment}/>
 						: <View></View>
 					}
 					{
-						isVideo(this.props.msg.attachment)?
-							<ChatVideo src={URL + '/files/' + this.props.ticket + '/' + this.props.msg.attachment}/>
+						isVideo(this.props.msg.originalName)?
+							<ChatVideo src={URL + '/files/' + this.props.msg.attachment}/>
 						: <View></View>
 					}
 					<a href={this.props.msg.content}>{this.props.msg.content}</a>

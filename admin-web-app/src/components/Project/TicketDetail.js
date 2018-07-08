@@ -5,6 +5,7 @@ import {URL} from '../shared/const';
 import 'react-table/react-table.css';
 import '../../index.css';
 import { Link } from 'react-router-dom';
+import { File } from './File';
 
 var tmp_ticket;
 
@@ -17,6 +18,7 @@ export default class TicketDetail extends Component {
 				isStatisticsLoading: true,
 				keyProj: this.props.keyProj,
 				idTicket: this.props.idTicket,
+				files: null
 			}
 		} else {
 			this.state = {
@@ -24,6 +26,7 @@ export default class TicketDetail extends Component {
 				isStatisticsLoading: true,
 				keyProj: this.props.match.params.project,
 				idTicket: this.props.match.params.id,
+				files: null
 			}
 		}
 	}
@@ -68,6 +71,24 @@ export default class TicketDetail extends Component {
 		}).catch((error) => {
 			console.error(error);
 		});
+
+		fetch(URL + '/tickets/' + this.state.idTicket + '/attachments', {
+			method: 'GET',
+			headers: getAuth(),
+		})
+		.then(response => response.json())
+		.then(response => this.setState({files: response}))
+		.catch(e => console.error(e));
+	}
+
+	listFiles () {
+		return this.state.files.map(file => {
+			return (
+				<View>
+					<File name={file}/>
+				</View>
+			);
+		});
 	}
 
 	_renderChatButton() {
@@ -107,6 +128,12 @@ export default class TicketDetail extends Component {
 					<Text><b>ON:</b> {this.state.statistics[tmp_ticket].ON}</Text>
 					<Text><b>OP:</b> {this.state.statistics[tmp_ticket].OP}</Text>
 					<Text><br/><b>Status:</b> {this.state.data.status}</Text>
+					<Text><b>Attachments:</b></Text>
+					{
+						this.state.files === null ?
+							<Text>No files uploaded</Text> :
+							this.listFiles()
+					}
 					<Text><br/><b>Description:</b> {'\n' + this.state.data.description}</Text>
 				</View>
 				<View>

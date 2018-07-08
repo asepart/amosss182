@@ -5,7 +5,8 @@ import {
 	TextInput,
 	TouchableOpacity,
 	StyleSheet,
-	Image
+	Image,
+	KeyboardAvoidingView 
 } from 'react-native';
 
 //Navigation library 
@@ -50,8 +51,13 @@ export default class Login extends Component {
 		setUsername(this.state.email);
 		setPSW(this.state.password);
 
+		//enables blinking feedback message
+      	this.setState({info: "", infoType: styles.success});
+
 		if(await isAuth()){
 			setState({isAuth: true});
+
+		
 
 		this.setState({info: "Valid credentials", infoType: styles.success});
 
@@ -72,19 +78,21 @@ export default class Login extends Component {
 
 	render() {
 	var buttonEnabled = (this.state.email !== '' && this.state.password !== '');
-		return (<View style={styles.containerAlign}>
+		return (<KeyboardAvoidingView style={styles.containerAlign} behavior="padding" enabled><View>
 			<Image source={require('../images/icon.png')} style={styles.icon} />
-			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.input}/>
-			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input}/>
+			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.input} onSubmitEditing={buttonEnabled ? this.onLoginPressed.bind(this) : null}/>
+			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input} onSubmitEditing={buttonEnabled ? this.onLoginPressed.bind(this) : null}/>
 			<TouchableOpacity disabled={!buttonEnabled} onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 			
 				<Text style={styles.buttonText}>LOGIN</Text>
 
 			</TouchableOpacity>
-
+			
+			<Text/>
 			<Text style={this.state.infoType}>
 					{this.state.info}
 				</Text>
-		</View>);
+				</View>
+		</KeyboardAvoidingView>);
 	}
 }

@@ -8,7 +8,6 @@ import {setMsg, sendMessage, setTicketID} from './sendMessages'
 import {ticket} from './sendMessages';
 import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
-import {getDownloadLink} from './files';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 var limit = 30;
@@ -43,18 +42,18 @@ export default class Messages extends Component {
 	componentDidMount(){
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.makeApiCall();
-		//TODO: following line causes bug, please fix
-		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
+		this.listenForNewMessages();
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
 	}
 	
+
 	updateUser = () => {
-    	const { navigate } = this.props.navigation;
-    	navigate("Thirteenth", { name: "UserInfo" });
-    }
+			const { navigate } = this.props.navigation;
+			navigate("Thirteenth", { name: "UserInfo" });
+	}
 
 	async makeApiCall() {
 		return await fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
@@ -86,18 +85,18 @@ export default class Messages extends Component {
 		});
 	}
 
+	sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
 	async listenForNewMessages() {
-		return fetch(URL + '/listen/' + ticket , {method:'GET', headers: getAuth(), timeout: 0})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			this.setState({
-				isLoading: false,
-				dataSource: responseJson,
-			}, function(){});
-		})
-		.catch((error) =>{
-			console.error(error);
-		});
+		while (true){
+			this.makeApiCall();
+			await this.sleep(10000);
+			//stop after leaving chat
+			if (this.props.navigation.state.params.name !== 'GetMessages')
+				return;
+		}
 	}
 
 	async onSendPressed() {
@@ -112,21 +111,6 @@ export default class Messages extends Component {
 					{...props}
 				/>
 			);
-	}
-
-	async onLongPress(ctx, currentMessage) {
-	    
-		//opens media in browser or in another app
-		if (currentMessage.image != undefined) {
-			let link = await getDownloadLink(currentMessage.text, ticket);
-			if (link != '') {
-				Linking.openURL(link);
-			} else {
-				Linking.openURL(currentMessage.text);
-			}
-		} else {
-			//do something if it is only a text message
-		}
 	}
 
 	render() {
@@ -154,8 +138,7 @@ export default class Messages extends Component {
 						text: message.content,
 						user: Object.assign({_id: message.sender, name: message.sender}),
 						createdAt: new Date(parseInt(message.timestamp)),
-						//TODO: change with real thumbnail URL
-						image: URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=false',
+						image: URL + '/files/' + message.attachment + '?thumbnail=false',
 					};
 				}
 		});
@@ -169,6 +152,8 @@ export default class Messages extends Component {
 			<GiftedChat
 				messages={messages}
 				loadEarlier={true}
+				returnKeyType="send"
+				onSubmitEditing={this.onSendPressed.bind(this)}
 				onLoadEarlier={this.onLoadEarlierPressed.bind(this)}
 				onInputTextChanged={(text) => this.setState({message: text})}
 				onSend={this.onSendPressed.bind(this)}
@@ -178,7 +163,6 @@ export default class Messages extends Component {
 					_id: username,
 					name: username,
 				}}
-				onLongPress={(ctx, currentMessage) => this.onLongPress(ctx, currentMessage)}
 			/>
 		);
 	}
