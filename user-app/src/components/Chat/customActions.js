@@ -18,7 +18,7 @@ export default class CustomActions extends React.Component {
   }
 
   onActionsPress() {
-	const options = ['Camera', 'Photo Library', 'Video Library', 'Cancel'];
+	const options = ['Photo Library', 'Video Library', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
       options,
@@ -35,7 +35,7 @@ export default class CustomActions extends React.Component {
         	setType('Photos');
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
-        case 2:
+        case 1:
         	setType('Videos');
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;

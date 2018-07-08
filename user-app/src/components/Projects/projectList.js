@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, Button} from 'react-native';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {URL} from '../Login/const';
-import {StackNavigator,} from 'react-navigation';
-import {getAuth} from '../Login/auth';
+import {getAuth, username} from '../Login/auth';
 import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
 import {setKey, isValid} from '../Projects/keyValid';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export var projectname = '';
 export var projectstatus = '';
@@ -14,34 +14,46 @@ export var projectstatus = '';
 export default class ProjectList extends Component {
 
 //setting page title 
-static navigationOptions= {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
   title: 'Projects',
   headerStyle: {
-    backgroundColor:'#5daedb'
+    backgroundColor:'#5daedb',
+    paddingRight: 15,
   },
   headerTitleStyle: {
     color:'#FFF'
-  }
-} 
+  },
+  headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
+} }
     constructor(props) {
 		super(props);
 		this.state = {
       userProjects: [],
       entryKey: "",
-			error: ""
+			info: "",
+			infoType: {}
 		};
 	}
 
-    componentDidMount() {
-        this.fetchUserProjects();
-}
 
-componentDidUpdate() {
-    if(getUpdateBoolean() === true) {
-      this.fetchUserProjects();
-      setUpdateBoolean(false);
+    componentDidMount() {
+    	this.props.navigation.setParams({ update: this.updateUser })
+        this.fetchUserProjects();
     }
-  }
+    
+    updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
+
+    componentDidUpdate() {
+    	if(getUpdateBoolean() === true) {
+    		this.fetchUserProjects();
+    		setUpdateBoolean(false);
+    	}
+    }
 
     async onAddProject() {
 
@@ -50,15 +62,16 @@ componentDidUpdate() {
   
      if(await isValid()){
         setState({isValid: true});
-  
-      
-        //navigate to different site
-       const { navigate } = this.props.navigation;
-        navigate("Fourth", { name: "ProjectInfo" })
+
+        this.setState({info: "Project added", infoType: styles.success});
+        
+        //enable for immediate navigation after pressing join
+//        const { navigate } = this.props.navigation;
+//        navigate("Twelfth", {entryKey: this.state.entryKey});
   
      } else {
-        this.setState({error: "something went wrong"});
-      }
+        this.setState({info: "Project not found", infoType: styles.error});
+     }
       
     }
        
@@ -78,9 +91,7 @@ componentDidUpdate() {
  _renderProjects({item}) {
     if (item.finished === 'false') {
         projectstatus = 'Project is open';
-    } else {
-        projectstatus = 'Project is finished';
-    }
+
      return (
         <TouchableOpacity
       onPress={()=> this.props.navigation.navigate("Twelfth", {entryKey:item.entryKey}) }
@@ -93,31 +104,34 @@ componentDidUpdate() {
                     </Text>
                       </TouchableOpacity>
      );
+    }
  }      
       
 render() {
+	var buttonEnabled = (this.state.entryKey !== '');
     return (
-      <View style={styles.container}>
+      <View style={styles.containerAlign}>
       <TextInput 
          onChangeText={(text) => this.setState({entryKey: text})} 
-        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" style={styles.inputLong}/>
+        placeholder="Entry Key" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.inputLong}/>
           <TouchableOpacity 
+          disabled={!buttonEnabled}
          onPress={this.onAddProject.bind(this)} 
           style={styles.buttonLargeContainer}>
           
               <Text style={styles.buttonText}>Join Project</Text>
         
           </TouchableOpacity>
-          <Text style={styles.error}>
-          {this.state.error}
+          <Text style={this.state.infoType}>
+          {this.state.info}
 				</Text>
+				<Text/>
           <FlatList
-					style={styles.textLarge}
 					data={this.state.userProjects}
                     renderItem={this._renderProjects.bind(this)}
-					 keyExtractor={(item, index) => index}
-				/>   
-
+					 keyExtractor={(item, index) => index.toString()}
+          />   
+          
       </View>
     );
   }

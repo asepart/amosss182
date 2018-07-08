@@ -7,6 +7,7 @@ import TicketView from '../user-app/src/components/Projects/ticketView';
 import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
 import CameraAccess from '../user-app/src/components/MediaSupport/camera';
+import UserInfo from './src/components/Login/userInfo';
 import ProjectListTicketList from '../user-app/src/components/Projects/projectListTicketList';
 
 import {
@@ -22,7 +23,8 @@ const AppNavigation = createStackNavigator({
      navigationOptions: ({navigation}) => ({
     id: navigation.state.params.id,
     headerStyle: {
-      backgroundColor:'#5daedb'
+      backgroundColor:'#5daedb',
+      paddingRight: 15
   },
 	headerTitleStyle: {
 		color:'#FFF'
@@ -37,14 +39,14 @@ const AppNavigation = createStackNavigator({
     navigationOptions: ({navigation}) => ({
       entryKey: navigation.state.params.entrykey,
       headerStyle: {
-        backgroundColor:'#5daedb'
+        backgroundColor:'#5daedb',
+        paddingRight: 15
     },
       headerTitleStyle: {
           color:'#FFF'
       }
-    })}
-      
-
+    })},
+  Thirteenth: {screen: UserInfo}
 }); 
 export default AppNavigation;
 

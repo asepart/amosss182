@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList, Button} from 'react-native';
 import styles from '../Login/Design';
 import { StackNavigator, } from 'react-navigation';
 import {getAuth,username,psw} from '../Login/auth';
 import {URL} from '../Login/const';
 import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 window.btoa = require('Base64').btoa;
 export var status = '';
@@ -20,7 +21,8 @@ export default class ProjectListTicketList extends Component {
 	}
 
 	componentDidMount() {
-			this.fetchTicketDetails();
+		this.props.navigation.setParams({ update: this.updateUser });
+		this.fetchTicketDetails();
 	}
 
 	componentDidUpdate() {
@@ -56,21 +58,31 @@ export default class ProjectListTicketList extends Component {
 		fetch(URL + '/leave', {
 			method: 'POST',
 			headers: getAuth(),
-			body:	entryKey
+			body:	projectKey
 		})
 		const { navigate } = this.props.navigation;
 		navigate("Tenth", { name: "ProjectList" })
 	}
 
-	static navigationOptions= {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Tickets',
 		headerStyle: {
-			backgroundColor:'#5daedb'
+			backgroundColor:'#5daedb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color:'#FFF'
+		},
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	_renderItem({item}) {
 		return (this._getTicketStatus({item}));
@@ -216,10 +228,9 @@ export default class ProjectListTicketList extends Component {
 		return (
 			<View style={styles.container}>
 				<FlatList
-					style={styles.textLarge}
 					data={this.state.tickets}
 					renderItem={this._renderItem.bind(this)}
-					 keyExtractor={(item, index) => index}
+					 keyExtractor={(item, index) => index.toString()}
 				/>
 
 				<TouchableOpacity

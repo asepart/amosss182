@@ -21,6 +21,13 @@ export default styles=StyleSheet.create({
       backgroundColor: '#0c3868',
 
     },
+    
+    containerPicker: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#0c3868',
+
+      },
 
     containerAlign: {
       flex: 1,
@@ -55,18 +62,36 @@ export default styles=StyleSheet.create({
     // Text input box span over whole horizontal
     inputLong: {
       height: 40,
-      width:350,
+      width: 350,
       color: '#FFF',
       backgroundColor: '#14639e',
       marginBottom: 10,
       paddingVertical: 10,
       paddingHorizontal: 10
     },
+    
+  //Picker input boxes
+    inputPickerIOS: {
+      height: 200,
+      width: 200,
+      backgroundColor: '#14639e',
+      marginBottom: 10,
+      paddingHorizontal: 10
+    },
+  //Picker input boxes
+    inputPicker: {
+      height: 40,
+      width: 200,
+      backgroundColor: '#14639e',
+      marginBottom: 10,
+      paddingHorizontal: 10
+    },
     //normal button
     buttonContainer: {
       backgroundColor: '#009fca',
       paddingVertical: 15,
-      width: 200,
+      marginBottom:15,
+      width: 200
 
     },
     //button spanning whole horizontal
@@ -117,14 +142,17 @@ export default styles=StyleSheet.create({
        justifyContent:'center',
        width:60,
        height:60,
-       backgroundColor:'#009fca',
-       borderRadius:60,
+       backgroundColor:'#009fca'
 
     },
 
     error: {
       color: 'red'
     },
+    
+    success: {
+        color: 'green'
+      },
 
     textLarge: {
      // textAlign: 'center',

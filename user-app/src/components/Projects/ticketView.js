@@ -1,26 +1,32 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button } from 'react-native';
 import { ticket } from '../Chat/sendMessages';
 import { key } from './keyValid';
 import { URL } from '../Login/const';
-import { getAuth } from '../Login/auth';
+import { getAuth, username } from '../Login/auth';
 import styles from '../Login/Design';
 import { setState } from '../Login/state';
 import { setTicketID } from '../Chat/sendMessages';
 import { setTicketId } from '../Tickets/ticketProcessed';
 import { StackNavigator } from 'react-navigation'
-import {ticketstatus} from '../Projects/projectInfo';
+import {status} from '../Projects/projectListTicketList';
 import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class TicketView extends Component {
 
-	static navigationOptions = {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Ticket Details',
 		headerStyle: {
-			backgroundColor: '#8eacbb'
+			backgroundColor: '#8eacbb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color: '#FFF'
+		},
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
 
@@ -33,6 +39,11 @@ export default class TicketView extends Component {
 			idTicket: ""
 		};
 	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	onChatPressed() {
 		setTicketID(this.state.idTicket);
@@ -76,15 +87,9 @@ export default class TicketView extends Component {
 	}
 
 	componentDidMount() {
-		this.setState({isAccepted: ticketstatus})
+		this.props.navigation.setParams({ update: this.updateUser });
+		this.setState({isAccepted: status})
 		this.getTicketInfo();
-	}
-
-
-
-	componentWillUnmount() {
-		const { navigate } = this.props.navigation;
-        navigate("Fourth", { name: "ProjectInfo" })
 	}
 
 	render() {

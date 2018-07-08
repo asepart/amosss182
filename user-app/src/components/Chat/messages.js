@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Platform, ActivityIndicator, View, Linking } from 'react-native';
+import { Platform, ActivityIndicator, View, Linking, Button } from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, username} from '../Login/auth';
 import styles from '../Login/Design';
@@ -9,16 +9,22 @@ import {ticket} from './sendMessages';
 import { GiftedChat } from 'react-native-gifted-chat';
 import CustomActions from './customActions';
 import {getDownloadLink} from './files';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class Messages extends Component {
 
-	static navigationOptions= {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Chat',
 		headerStyle: {
-			backgroundColor:'#5daedb'
+			backgroundColor:'#5daedb',
+			paddingRight: 15
 		},
 		headerTitleStyle: {
 			color:'#FFF'
+		},
+		headerRight: <Icon name="user" size={30} color="#FFF"  onPress={ () => params.update() } />
 		}
 	}
 
@@ -33,6 +39,7 @@ export default class Messages extends Component {
 	}
 
 	componentDidMount(){
+		this.props.navigation.setParams({ update: this.updateUser });
 		this.makeApiCall();
 		//TODO: following line causes bug, please fix
 		//this.interval = setInterval(() => this.listenForNewMessages(), 500);
@@ -41,9 +48,14 @@ export default class Messages extends Component {
 	componentWillUnmount() {
 		clearInterval(this.interval);
 	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	async makeApiCall() {
-		return fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
+		return await fetch(URL + '/messages/' + ticket + '?limit=30', {method:'GET', headers: getAuth()})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			this.setState({
@@ -86,13 +98,13 @@ export default class Messages extends Component {
 
 	async onLongPress(ctx, currentMessage) {
 	    
-		//TODO: for further long press actions add actionsheet with additional functions here
-		
 		//opens media in browser or in another app
 		if (currentMessage.image != undefined) {
 			let link = await getDownloadLink(currentMessage.text, ticket);
 			if (link != '') {
 				Linking.openURL(link);
+			} else {
+				Linking.openURL(currentMessage.text);
 			}
 		} else {
 			//do something if it is only a text message
@@ -119,19 +131,13 @@ export default class Messages extends Component {
 					};
 				}
 				else {
-					/*TODO: get URL of thumbnail when file extension problem is solved
-					var tmp = fetch(URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=true', {method:'GET', headers: getAuth()})
-					.then((response) => response.text());
-					window.alert(JSON.stringify(tmp))
-					*/
-
 					return {
 						_id: message.id,
 						text: message.content,
 						user: Object.assign({_id: message.sender, name: message.sender}),
 						createdAt: new Date(parseInt(message.timestamp)),
 						//TODO: change with real thumbnail URL
-						image: 'https://reactjs.org/logo-og.png',
+						image: URL + '/files/' + ticket + '/' + message.attachment + '?thumbnail=false',
 					};
 				}
 		});
