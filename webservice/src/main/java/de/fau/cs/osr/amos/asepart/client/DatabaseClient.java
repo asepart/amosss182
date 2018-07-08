@@ -1192,12 +1192,12 @@ public class DatabaseClient implements AutoCloseable
             stmt.setString(1, sender);
             stmt.setString(2, content);
 
-            if (attachment != null)
+            if (attachment == null || attachment.isEmpty())
             {
-                stmt.setInt(3, Integer.parseInt(attachment));
+                stmt.setNull(3, Types.INTEGER);
             }
 
-            else stmt.setNull(3, Types.INTEGER);
+            else stmt.setInt(3, Integer.parseInt(attachment));
 
             stmt.setInt(4, ticketId);
             stmt.executeUpdate();
