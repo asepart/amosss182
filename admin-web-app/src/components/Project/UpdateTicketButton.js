@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Button, TextInput, Picker } from 'react-native';
 import Popup from "reactjs-popup";
-import {getAuthForPost, getAuthForMediaPost} from '../shared/auth';
+import {getAuth, getAuthForPost, getAuthForMediaPost} from '../shared/auth';
 import {URL, FileSelector} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
@@ -33,24 +33,6 @@ export default class UpdateTicketButton extends Component {
 	closePopup = () => {
 		this.setState({ open: false });
 	};
-
-	handleFile(selectorFiles: FileList) {
-		var files = selectorFiles;
-		const formData = new FormData();
-		formData.append('file', files[0]);
-
-		//if you use this and URL points to localhost, remember to set global minio environments (check slack dev channel)
-		fetch(URL + '/files/' + this.state.id, {
-			method:'POST',
-			headers: getAuthForMediaPost(),
-			body: formData,
-		})
-		.catch((error) => {
-			console.log(error);
-		});
-
-		this.setState({newFile: files[0].name})//Filename
-	}
 
 	//needed to get right row values after changes in parent component
 	getVars() {
@@ -84,6 +66,35 @@ export default class UpdateTicketButton extends Component {
 		this.setState({
 		  open: false
 		})
+	}
+
+	handleFile(selectorFiles: FileList) {
+		var files = selectorFiles;
+		const formData = new FormData();
+		formData.append('file', files[0]);
+		var fileID = '';
+
+		fetch(URL + '/files/' + this.state.id, {
+			method:'POST',
+			headers: getAuthForMediaPost(),
+			body: formData,
+		})
+		.then(response => {
+			fileID = response.json();
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+
+		fetch(URL + '/tickets/' + this.state.id + '/attachments', {
+			method:'POST',
+			headers: getAuth(),
+			body: fileID,
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+		this.closePopup();
 	}
 
 	deleteFile(name) {
