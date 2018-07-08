@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator, Text, View, TouchableOpacity, Button } from 'react-native';
 import { ticket } from '../Chat/sendMessages';
 import { key } from './keyValid';
 import { URL } from '../Login/const';
-import { getAuth } from '../Login/auth';
+import { getAuth, username } from '../Login/auth';
 import styles from '../Login/Design';
 import { setState } from '../Login/state';
 import { setTicketID } from '../Chat/sendMessages';
@@ -14,13 +14,17 @@ import {setUpdateBoolean, getUpdateBoolean} from '../Login/state';
 
 export default class TicketView extends Component {
 
-	static navigationOptions = {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Ticket Details',
 		headerStyle: {
 			backgroundColor: '#8eacbb'
 		},
 		headerTitleStyle: {
 			color: '#FFF'
+		},
+		headerRight: <Button title={username} onPress={ () => params.update() } />
 		}
 	}
 
@@ -33,6 +37,11 @@ export default class TicketView extends Component {
 			idTicket: ""
 		};
 	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	onChatPressed() {
 		setTicketID(this.state.idTicket);
@@ -76,6 +85,7 @@ export default class TicketView extends Component {
 	}
 
 	componentDidMount() {
+		this.props.navigation.setParams({ update: this.updateUser });
 		this.setState({isAccepted: status})
 		this.getTicketInfo();
 	}

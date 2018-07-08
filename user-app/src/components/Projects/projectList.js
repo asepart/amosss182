@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, Button} from 'react-native';
 import styles from '../Login/Design';
 import {setState} from '../Login/state';
 import {URL} from '../Login/const';
-import {StackNavigator,} from 'react-navigation';
-import {getAuth} from '../Login/auth';
+import {getAuth, username} from '../Login/auth';
 import {getUpdateBoolean, setUpdateBoolean} from '../Login/state';
 import {setKey, isValid} from '../Projects/keyValid';
 
@@ -14,15 +13,18 @@ export var projectstatus = '';
 export default class ProjectList extends Component {
 
 //setting page title 
-static navigationOptions= {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
   title: 'Projects',
   headerStyle: {
     backgroundColor:'#5daedb'
   },
   headerTitleStyle: {
     color:'#FFF'
-  }
-} 
+  },
+  headerRight: <Button title={username} onPress={ () => params.update() } />
+} }
     constructor(props) {
 		super(props);
 		this.state = {
@@ -33,16 +35,23 @@ static navigationOptions= {
 		};
 	}
 
-    componentDidMount() {
-        this.fetchUserProjects();
-}
 
-componentDidUpdate() {
-    if(getUpdateBoolean() === true) {
-      this.fetchUserProjects();
-      setUpdateBoolean(false);
+    componentDidMount() {
+    	this.props.navigation.setParams({ update: this.updateUser })
+        this.fetchUserProjects();
     }
-  }
+    
+    updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
+
+    componentDidUpdate() {
+    	if(getUpdateBoolean() === true) {
+    		this.fetchUserProjects();
+    		setUpdateBoolean(false);
+    	}
+    }
 
     async onAddProject() {
 
@@ -56,7 +65,7 @@ componentDidUpdate() {
         
         //enable for immediate navigation after pressing join
 //        const { navigate } = this.props.navigation;
-//        navigate("Fourth", { name: "ProjectInfo" });
+//        navigate("Twelfth", {entryKey: this.state.entryKey});
   
      } else {
         this.setState({info: "Project not found", infoType: styles.error});
@@ -95,11 +104,6 @@ componentDidUpdate() {
      );
     }
  }      
- 
-updateUser() {
-	var { navigate } = this.props.navigation;
-	navigate("Thirteenth", { name: "UserInfo" });
-}
       
 render() {
 	var buttonEnabled = (this.state.entryKey !== '');
@@ -125,11 +129,7 @@ render() {
                     renderItem={this._renderProjects.bind(this)}
 					 keyExtractor={(item, index) => index.toString()}
           />   
-          <TouchableOpacity
-			onPress={this.updateUser.bind(this)}
-			style={styles.buttonContainer}>
-			<Text style={styles.buttonText}>User Information</Text>
-		</TouchableOpacity>
+          
       </View>
     );
   }

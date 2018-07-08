@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Picker, Platform} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Picker, Platform, Button} from 'react-native';
 import styles from '../Login/Design';
 import { StackNavigator } from 'react-navigation';
 import {URL} from '../Login/const';
 import {ticket, setTicketID} from '../Chat/sendMessages';
 import {key} from '../Projects/keyValid';
-import {getAuthForPost} from '../Login/auth';
+import {getAuthForPost, username} from '../Login/auth';
 import {setUpdateBoolean} from '../Login/state';
 
 var pickerPlaceholder = "Outcome";
@@ -16,13 +16,17 @@ export function setTicketId(tid) {
 
 export default class TicketProcessing extends Component {
 
-	static navigationOptions = {
+	static navigationOptions = ({ navigation }) => {
+		const { params = {} } = navigation.state;
+		return {
 		title: 'Ticket Processing',
 		headerStyle: {
 			backgroundColor: '#5daedb'
 		},
 		headerTitleStyle: {
 			color: '#FFF'
+		},
+		headerRight: <Button title={username} onPress={ () => params.update() } />
 		}
 	}
 
@@ -33,6 +37,15 @@ export default class TicketProcessing extends Component {
 			quantity: '',
 		}
 	}
+	
+	componentDidMount() {
+		this.props.navigation.setParams({ update: this.updateUser });
+	}
+	
+	updateUser = () => {
+    	const { navigate } = this.props.navigation;
+    	navigate("Thirteenth", { name: "UserInfo" });
+    }
 
 	onSubmitPressed() {
 		console.log(tickID)
