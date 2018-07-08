@@ -127,6 +127,8 @@ export default class TicketChat extends Component {
 			} catch (e) {
 				console.error(e);
 			}
+			if (window.location.pathname.indexOf('chat') === -1)
+				return;
 		}
 	}
 
