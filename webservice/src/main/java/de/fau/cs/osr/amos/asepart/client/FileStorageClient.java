@@ -84,11 +84,13 @@ public class FileStorageClient implements AutoCloseable
 
     private static boolean isImageFile(String originalName)
     {
+        originalName = originalName.toLowerCase();
         return originalName.endsWith(".jpg") || originalName.endsWith(".png") || originalName.endsWith(".bmp");
     }
 
     private static boolean isVideoFile(String originalName)
     {
+        originalName = originalName.toLowerCase();
         return originalName.endsWith(".mp4") || originalName.endsWith(".mov");
     }
 
@@ -107,7 +109,7 @@ public class FileStorageClient implements AutoCloseable
 
     private static String getExtension(String fileName)
     {
-        return fileName.substring(fileName.lastIndexOf('.') + 1);
+        return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
     }
 
     private String download(String bucket, String file) throws Exception

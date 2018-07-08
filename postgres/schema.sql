@@ -48,7 +48,7 @@ create table message(
   sender character varying (32) not null,
   timestamp timestamp not null default current_timestamp,
   content text not null,
-  attachment integer references fileinfo(id),
+  attachment integer references fileinfo(id) on delete set null,
   ticket_id serial not null references ticket(id) on delete cascade
 );
 
