@@ -11,14 +11,23 @@ export class File extends Component {
 	}
 
 	deleteFile() {
-		alert(this.props.name);
+		fetch(URL + '/tickets/' + this.props.name.ticketId + '/attachments/' + this.props.name.attachmentId, {
+			method:'DELETE',
+			headers: getAuth()
+		})
+		.then(window.location.reload())
+		.catch((error) => {console.error(error);});
 	}
 
 	render() {
 		return (
 			<View style={{flexDireaction:'row'}}>
-				<Text>{this.props.name}
-				<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/></Text>
+				<Text>
+					<Link to={"/files/" + this.props.name.attachmentId }>
+						Name:{this.props.name.originalName}
+					</Link>
+					<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/>
+				</Text>
 			</View>
 		);
 	}

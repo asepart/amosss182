@@ -25,7 +25,6 @@ export default class UpdateTicketButton extends Component {
 			newFile: null,
 			files: null
 		};
-		this.getFiles ();
 	}
 	openPopup = () => {
 		this.setState({ open: true });
@@ -44,7 +43,8 @@ export default class UpdateTicketButton extends Component {
 			category: this.props.tick.row.category,
 			requiredObservations: this.props.tick.row.requiredObservations,
 			id: this.props.tick.row.id
-		})
+		});
+		this.getFiles ();
 	}
 
 	createTicket() {
@@ -69,8 +69,8 @@ export default class UpdateTicketButton extends Component {
 		})
 	}
 
-	async getFiles () {
-		fetch(URL + '/files/' + this.state.id, {
+	getFiles () {
+		fetch(URL + '/tickets/' + this.props.tick.row.id + '/attachments', {
 			method: 'GET',
 			headers: getAuth(),
 		})
@@ -111,7 +111,7 @@ export default class UpdateTicketButton extends Component {
 	}
 
 	deleteFile(name) {
-		alert(name); return;
+		return; //do nothing
 
 		var files = this.state.files;
 		var index = files.indexOf(name);
@@ -124,18 +124,13 @@ export default class UpdateTicketButton extends Component {
 	}
 
 	listFiles () {
-		if(this.state.files === null) {
-			return (<Text>No files uploaded</Text>);
-		} else {
-			return this.state.files.map(file => {
-				return (
-					<View>
-						<Text>{file}</Text>
-						<img src={require('../images/delete.png')} alt="delete" onClick={this.deleteFile(file).bind(this)}/>
-					</View>
-				);
-			});
-		}
+		return this.state.files.map(file => {
+			return (
+				<View>
+					<File name={file}/>
+				</View>
+			);
+		});
 	}
 
 	render() {
@@ -187,7 +182,11 @@ export default class UpdateTicketButton extends Component {
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {`${this.state.requiredObservations}`}
 					/>
-					{this.listFiles()}
+					{
+						this.state.files === null ?
+							<Text>No files uploaded</Text> :
+							this.listFiles()
+					}
 					<FileSelector
 						onLoadFile = {(files:FileList) => this.handleFile(files)}
 					/>
