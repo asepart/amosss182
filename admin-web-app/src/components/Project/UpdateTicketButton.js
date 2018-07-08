@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, Button, TextInput, Picker } from 'react-native';
+import { View, Text, Button, TextInput, Picker } from 'react-native';
 import Popup from "reactjs-popup";
-import {getAuthForPost} from '../shared/auth';
-import {URL} from '../shared/const';
+import {getAuthForPost, getAuthForMediaPost} from '../shared/auth';
+import {URL, FileSelector} from '../shared/const';
 import '../../index.css';
 import {setUpdateBoolean} from '../shared/GlobalState';
 import { Link } from 'react-router-dom';
+import { File } from './File';
 
 var pickerPlaceholder = "Category";
 
@@ -21,6 +22,8 @@ export default class UpdateTicketButton extends Component {
 			category: '',
 			requiredObservations: '',
 			id: '',
+			newFile: null,
+			files: null
 		};
 	}
 	openPopup = () => {
@@ -30,6 +33,24 @@ export default class UpdateTicketButton extends Component {
 	closePopup = () => {
 		this.setState({ open: false });
 	};
+
+	handleFile(selectorFiles: FileList) {
+		var files = selectorFiles;
+		const formData = new FormData();
+		formData.append('file', files[0]);
+
+		//if you use this and URL points to localhost, remember to set global minio environments (check slack dev channel)
+		fetch(URL + '/files/' + this.state.id, {
+			method:'POST',
+			headers: getAuthForMediaPost(),
+			body: formData,
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+
+		this.setState({newFile: files[0].name})//Filename
+	}
 
 	//needed to get right row values after changes in parent component
 	getVars() {
@@ -63,6 +84,35 @@ export default class UpdateTicketButton extends Component {
 		this.setState({
 		  open: false
 		})
+	}
+
+	deleteFile(name) {
+		alert(name); return;
+
+		var files = this.state.files;
+		var index = files.indexOf(name);
+		if (index > -1) {
+		  files.splice(index, 1);
+		}
+		this.setState({files: files});
+
+		//TODO: one could delete the file from the server
+	}
+
+	listFiles () {
+		if(this.state.files === null) {
+			//return (<Text>No files uploaded</Text>);
+			return(<View><File name="foo"/></View>)
+		} else {
+			return this.state.files.map(file => {
+				return (
+					<View>
+						<Text>{file}</Text>
+						<img src={require('../images/delete.png')} alt="delete" onClick={this.deleteFile(file).bind(this)}/>
+					</View>
+				);
+			});
+		}
 	}
 
 	render() {
@@ -113,6 +163,10 @@ export default class UpdateTicketButton extends Component {
 						style = {{height: 40, borderColor: 'gray',borderWidth: 1, textAlign: 'center'}}
 						onChangeText = {(text) => this.setState({requiredObservations: text})}
 						value = {`${this.state.requiredObservations}`}
+					/>
+					{this.listFiles()}
+					<FileSelector
+						onLoadFile = {(files:FileList) => this.handleFile(files)}
 					/>
 					<Button onPress = { this.createTicket.bind(this) } title = "Update" color = "#0c3868" disabled = {!buttonEnabled}/>
 					<Button onPress = { this.closePopup } title = "Cancel" color = "#0e4a80" />
