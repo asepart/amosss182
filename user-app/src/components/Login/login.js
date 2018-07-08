@@ -75,8 +75,8 @@ export default class Login extends Component {
 	var buttonEnabled = (this.state.email !== '' && this.state.password !== '');
 		return (<KeyboardAvoidingView style={styles.containerAlign} behavior="height" enabled>
 			<Image source={require('../images/icon.png')} style={styles.icon} />
-			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.input}/>
-			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input} onSubmitEditing={this.onLoginPressed.bind(this)}/>
+			<TextInput  onChangeText={(text) => this.setState({email: text})} placeholder="username" placeholderTextColor="#FFF" underlineColorAndroid="transparent" autoCapitalize="none" style={styles.input} onSubmitEditing={buttonEnabled ? this.onLoginPressed.bind(this) : null}/>
+			<TextInput onChangeText={(text) => this.setState({password: text})} placeholder="password" placeholderTextColor="#FFF" underlineColorAndroid="transparent"  secureTextEntry style={styles.input} onSubmitEditing={buttonEnabled ? this.onLoginPressed.bind(this) : null}/>
 			<TouchableOpacity disabled={!buttonEnabled} onPress={this.onLoginPressed.bind(this)} style={styles.buttonContainer}>
 			
 				<Text style={styles.buttonText}>LOGIN</Text>
