@@ -35,12 +35,20 @@ create table ticket(
   project_key character varying (32) not null references project(entry_key) on delete cascade
 );
 
+create table fileinfo(
+  id serial primary key,
+  internal_name text not null,
+  thumbnail_name text default null,
+  original_name text not null,
+  ticket_id serial references ticket(id) on delete set null
+);
+
 create table message(
   id serial primary key,
   sender character varying (32) not null,
   timestamp timestamp not null default current_timestamp,
   content text not null,
-  attachment character varying (255) default null,
+  attachment integer references fileinfo(id) on delete set null,
   ticket_id serial not null references ticket(id) on delete cascade
 );
 
@@ -64,4 +72,4 @@ create table observation(
   login_name character varying (32) not null references user_account(login_name) on delete cascade,
   outcome observation_outcome not null,
   quantity integer not null check (quantity > 0)
-)
+);

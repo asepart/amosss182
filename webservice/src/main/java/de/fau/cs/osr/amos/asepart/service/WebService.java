@@ -3,6 +3,7 @@ package de.fau.cs.osr.amos.asepart.service;
 import de.fau.cs.osr.amos.asepart.client.*;
 import de.fau.cs.osr.amos.asepart.ext.*;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.net.InetAddress;
@@ -222,30 +223,17 @@ public class WebService
             if (!db.isAdmin(admin))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            try
-            {
-                FileStorageClient fs = new FileStorageClient();
-
-                final List<Map<String, String>> projects = db.listProjects(admin);
-
-                for (Map<String, String> project : projects)
-                {
-                    final List<Map<String, String>> tickets = db.getTicketsOfProject(project.get("entryKey"));
-
-                    for (Map<String, String> ticket : tickets)
-                    {
-                        int ticketId = Integer.parseInt(ticket.get("id"));
-                        fs.cascade(ticketId);
-                    }
-                }
-            }
-
-            catch (UnsupportedOperationException e)
-            {
-                // ignore if file storage is not enabled
-            }
-
             db.deleteAccount(admin);
+        }
+
+        try (FileStorageClient fs = new FileStorageClient())
+        {
+            fs.killOrphans();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            // ignore if file storage is not enabled
         }
 
         return Response.noContent().build();
@@ -329,25 +317,17 @@ public class WebService
             if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
 
-            try
-            {
-                FileStorageClient fs = new FileStorageClient();
-                final List<Map<String, String>> tickets = db.getTicketsOfProject(entryKey);
-
-                for (Map<String, String> ticket : tickets)
-                {
-                    int ticketId = Integer.parseInt(ticket.get("id"));
-                    fs.cascade(ticketId);
-                }
-            }
-
-            catch (UnsupportedOperationException e)
-            {
-                // ignore if file storage is not enabled
-            }
-
-
             db.deleteProject(entryKey);
+        }
+
+        try (FileStorageClient fs = new FileStorageClient())
+        {
+            fs.killOrphans();
+        }
+
+        catch (UnsupportedOperationException e)
+        {
+            // ignore if file storage is not enabled
         }
 
         return Response.noContent().build();
@@ -510,7 +490,7 @@ public class WebService
         try
         {
             FileStorageClient fs = new FileStorageClient();
-            fs.cascade(ticketId);
+            fs.killOrphans();
         }
 
         catch (UnsupportedOperationException e)
@@ -797,6 +777,7 @@ public class WebService
 
     @Path("/files/{ticket}")
     @POST
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @RolesAllowed({"Admin", "User"})
     public Response uploadFile(@Context SecurityContext sc, @PathParam("ticket") int ticketId,
@@ -824,17 +805,10 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        try
+        try (FileStorageClient fs = new FileStorageClient())
         {
-            FileStorageClient fs = new FileStorageClient();
-            fs.upload(ticketId, fileDetail.getFileName(), stream);
-
-            return Response.noContent().build();
-        }
-
-        catch (FileAlreadyExistsException e)
-        {
-            return Response.status(Response.Status.CONFLICT).build();
+            int metadataId = fs.upload(ticketId, fileDetail.getFileName(), stream);
+            return Response.ok(metadataId).build();
         }
 
         catch (UnsupportedOperationException e)
@@ -843,31 +817,27 @@ public class WebService
         }
     }
 
-    @Path("/files/{ticket}/{file}")
+    @Path("/files/{id}")
     @GET
-    public Response downloadFile(@PathParam("ticket") int ticketId, @PathParam("file") String fileName,
+    public Response downloadFile(@PathParam("id") int metadataId,
                                  @DefaultValue("false") @QueryParam("thumbnail") boolean thumbnail) throws Exception
     {
-        try (DatabaseClient db = new DatabaseClient())
+        try (FileStorageClient fs = new FileStorageClient())
         {
-            if (!db.isTicket(ticketId))
+            if (!fs.exists(metadataId))
                 return Response.status(Response.Status.NOT_FOUND).build();
-        }
 
-        try
-        {
-            FileStorageClient fs = new FileStorageClient();
             String location;
 
             if (thumbnail)
             {
-                if (!fs.hasThumbnail(ticketId, fileName))
+                if (!fs.hasThumbnail(metadataId))
                     return Response.status(Response.Status.BAD_REQUEST).build();
 
-                location = fs.getThumbnail(ticketId, fileName);
+                location = fs.getThumbnail(metadataId);
             }
 
-            else location = fs.download(ticketId, fileName);
+            else location = fs.download(metadataId);
             return Response.temporaryRedirect(new URI(location)).build();
         }
 
@@ -884,29 +854,29 @@ public class WebService
         }
     }
 
-    @Path("/files/{ticket}/{file}")
+    @Path("/files/{id}")
     @DELETE
     @RolesAllowed({"Admin"})
     public Response removeFile(@Context SecurityContext sc,
-                               @PathParam("ticket") int ticketId, @PathParam("file") String fileName) throws Exception
+                               @PathParam("id") int metadataId) throws Exception
     {
+
         try (DatabaseClient db = new DatabaseClient())
         {
-            if (!db.isTicket(ticketId))
+            if (!db.isFile(metadataId))
                 return Response.status(Response.Status.NOT_FOUND).build();
 
-            Map<String, String> ticket = db.getTicket(ticketId);
+            Map<String, String> fileInfo = db.getFile(metadataId);
+            Map<String, String> ticket = db.getTicket(Integer.parseInt(fileInfo.get("ticketId")));
             Map<String, String> project = db.getProject(ticket.get("projectKey"));
 
             if (!project.get("owner").equals(sc.getUserPrincipal().getName()))
                 return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        try
+        try (FileStorageClient fs = new FileStorageClient();)
         {
-            FileStorageClient fs = new FileStorageClient();
-            fs.remove(ticketId, fileName);
-
+            fs.remove(metadataId);
             return Response.noContent().build();
         }
 

@@ -276,7 +276,7 @@ The following REST operations are available:
 
   HTTP operation: POST
   Path:           /messages/{ticket}?attachment={attachment}
-  Notice:         "attachment" must be a file name previously uploaded using the /files/... api.
+  Notice:         "attachment" must be a metadata file id previously uploaded using the /files/... api.
   Roles:          Admin, User
   Request Body:   The chat message as ASCII text.
   Status code:    [204 No Content]   in case of success.
@@ -314,32 +314,32 @@ The following REST operations are available:
   Path:           /files/{ticket}
   Roles:          Admin, User
   Request Body:   File as multipart/form-data.
-  Status code:    [204 No Content]      in case of success.
+  Returns:        Metadata ID of uploaded file.
+  Status code:    [200 OK]              in case of success.
                   [400 Bad Request]     if request is malformed.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
                   [404 Not Found]       if ticket does not exist.
-                  [409 Conflict]        a file with the same name already exists for this ticket.
-                  [501 Not Implemented] file upload feature is not enabled.
+                  [501 Not Implemented] if file upload feature is not enabled.
 
 - Download a file (set thumbnail=true to get a thumbnail of the file instead).
 
   HTTP operation: GET
-  Path:           /files/{ticket}/{file}?thumbnail={true|false}
+  Path:           /files/{id}?thumbnail={true|false}
   Roles:          Admin, User
   Returns:        URL to file location.
   Status code:    [307 Temporary Redirect] in case of success.
                   [400 Bad Request]        if thumbnail of file was requested that does not support thumbnails.
-                  [404 Not Found]          if ticket or file does not exist.
-                  [501 Not Implemented]    file upload feature is not enabled.
+                  [404 Not Found]          if file does not exist.
+                  [501 Not Implemented]    if file upload feature is not enabled.
 
 - Delete a file.
 
   HTTP operation: DELETE
-  Path:           /files/{ticket}/{file}
+  Path:           /files/{id}
   Roles:          Admin
-  Status code:    [204 No Content]              in case of success.
+  Status code:    [204 No Content]      in case of success.
                   [401 Unauthorized]    if the provided username or password is invalid.
                   [403 Forbidden]       if the authorized account is not a member of the associated project.
-                  [404 Not Found]       if ticket or file does not exist.
-                  [501 Not Implemented] file upload feature is not enabled.
+                  [404 Not Found]       if file does not exist.
+                  [501 Not Implemented] if file upload feature is not enabled.
