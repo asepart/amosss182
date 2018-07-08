@@ -25,6 +25,7 @@ export default class UpdateTicketButton extends Component {
 			newFile: null,
 			files: null
 		};
+		this.getFiles ();
 	}
 	openPopup = () => {
 		this.setState({ open: true });
@@ -68,11 +69,21 @@ export default class UpdateTicketButton extends Component {
 		})
 	}
 
-	handleFile(selectorFiles: FileList) {
+	async getFiles () {
+		fetch(URL + '/files/' + this.state.id, {
+			method: 'GET',
+			headers: getAuth(),
+		})
+		.then(response => response.json())
+		.then(response => this.setState({files: response}))
+		.catch(e => console.error(e));
+	}
+
+	async handleFile(selectorFiles: FileList) {
 		var files = selectorFiles;
 		const formData = new FormData();
 		formData.append('file', files[0]);
-		var fileID = '';
+		var fileID = -1;
 
 		fetch(URL + '/files/' + this.state.id, {
 			method:'POST',
@@ -80,21 +91,23 @@ export default class UpdateTicketButton extends Component {
 			body: formData,
 		})
 		.then(response => {
-			fileID = response.json();
+			return response.text();
+		})
+		.then(responseJson => {
+			fileID=responseJson;
+			fetch(URL + '/tickets/' + this.state.id + '/attachments', {
+				method:'POST',
+				headers: getAuth(),
+				body: fileID,
+			})
+			.then(x => {this.closePopup()})
+			.catch((error) => {
+				console.log(error);
+			});
 		})
 		.catch((error) => {
 			console.log(error);
 		});
-
-		fetch(URL + '/tickets/' + this.state.id + '/attachments', {
-			method:'POST',
-			headers: getAuth(),
-			body: fileID,
-		})
-		.catch((error) => {
-			console.log(error);
-		});
-		this.closePopup();
 	}
 
 	deleteFile(name) {
@@ -112,8 +125,7 @@ export default class UpdateTicketButton extends Component {
 
 	listFiles () {
 		if(this.state.files === null) {
-			//return (<Text>No files uploaded</Text>);
-			return(<View><File name="foo"/></View>)
+			return (<Text>No files uploaded</Text>);
 		} else {
 			return this.state.files.map(file => {
 				return (
