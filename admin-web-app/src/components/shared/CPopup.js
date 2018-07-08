@@ -8,8 +8,10 @@ export default class CPopup extends Component {
 		return(
 			<Popup
 				trigger={<img src={this.props.toggle} alt="Show Media" style={{width: 100, height: 100}}/>}
-				modal
 				closeOnDocumentClick
+				contentStyle= {{
+					position: 'sticky',
+				}}
 			>
 				{this.props.children}
 			</Popup>
