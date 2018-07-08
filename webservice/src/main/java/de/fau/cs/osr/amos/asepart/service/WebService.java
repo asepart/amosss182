@@ -316,6 +316,8 @@ public class WebService
                 return Response.status(Response.Status.NOT_FOUND).build();
             if (!db.isAdminOwnerOfProject(sc.getUserPrincipal().getName(), entryKey))
                 return Response.status(Response.Status.FORBIDDEN).build();
+
+            db.deleteProject(entryKey);
         }
 
         try (FileStorageClient fs = new FileStorageClient())

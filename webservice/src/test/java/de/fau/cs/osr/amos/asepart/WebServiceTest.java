@@ -976,11 +976,11 @@ public class WebServiceTest
         {
             assertEquals(Response.Status.NO_CONTENT, Response.Status.fromStatusCode(response.getStatus()));
         }
-/*
+
         try (Response response = getAdminClient().path("/messages").path(String.valueOf(ticketId)).request().get())
         {
             assertEquals(Response.Status.NOT_FOUND, Response.Status.fromStatusCode(response.getStatus()));
-        }*/
+        }
     }
 
     @Test
