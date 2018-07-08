@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.postgresql.PGConnection;
-import org.postgresql.PGNotification;
 import org.postgresql.ds.PGSimpleDataSource;
 
 /**
@@ -1232,76 +1230,6 @@ public class DatabaseClient implements AutoCloseable
         {
             stmt.setInt(1, ticketId);
             stmt.setInt(2, limit);
-
-            try (ResultSet rs = stmt.executeQuery())
-            {
-                List<Map<String, String>> result = new LinkedList<>();
-
-                while (rs.next())
-                {
-                    Map<String, String> row = new HashMap<>(6);
-                    row.put("id", String.valueOf(rs.getInt(1)));
-                    row.put("sender", rs.getString(2));
-                    row.put("timestamp", String.valueOf(rs.getTimestamp(3).getTime()));
-                    row.put("content", rs.getString(4));
-                    row.put("attachment", rs.getString(5));
-                    row.put("originalName", rs.getString(6));
-                    result.add(row);
-                }
-
-                return result;
-            }
-        }
-    }
-
-    /**
-     * Waits until new messages are available for ticket
-     * and then returns them.
-     *
-     * @param ticketId Unique ticket id.
-     * @param since ID of last message the client has already seen.
-
-     * @return List of maps containing each message's details.
-     * @throws SQLException on database error.
-     */
-
-    public List<Map<String, String>> listenChannel(int ticketId, int since) throws Exception
-    {
-        try (Statement stmt = cn.createStatement())
-        {
-            stmt.execute(String.format("listen ticket_%d", ticketId));
-        }
-
-        final PGConnection pgcn = cn.unwrap(PGConnection.class);
-        PGNotification[] notifications;
-
-        do
-        {
-            notifications = pgcn.getNotifications();
-            Thread.sleep(500);
-        }
-        while (notifications == null);
-
-        for (PGNotification notification : notifications)
-        {
-            System.err.println("Received chat notification for ticket channel: " + notification.getName());
-        }
-
-        try (Statement stmt = cn.createStatement())
-        {
-            stmt.execute(String.format("unlisten ticket_%d", ticketId));
-        }
-
-        try (PreparedStatement stmt = cn.prepareStatement(
-                "select m.id, m.sender, m.timestamp, m.content, m.attachment, f.original_name\n" +
-                   "from message m\n" +
-                   "left outer join fileinfo f\n" +
-                   "on m.attachment = f.id\n" +
-                   "where ticket_id = ? and id >= ?\n" +
-                   "order by timestamp asc;"))
-        {
-            stmt.setInt(1, ticketId);
-            stmt.setInt(2, since);
 
             try (ResultSet rs = stmt.executeQuery())
             {

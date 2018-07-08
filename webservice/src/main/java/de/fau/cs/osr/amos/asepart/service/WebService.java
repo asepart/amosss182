@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
-import java.sql.SQLException;
 
 import java.security.Principal;
 import javax.annotation.security.RolesAllowed;
@@ -23,8 +22,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,7 +32,6 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ManagedAsync;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import io.minio.ErrorCode;
@@ -811,45 +807,6 @@ public class WebService
                 return Response.status(Response.Status.FORBIDDEN).build();
 
             return Response.ok(db.listMessages(ticketId, limit)).build();
-        }
-    }
-
-    @Path("/listen/{ticket}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"Admin", "User"})
-    @ManagedAsync
-    public void listenChannel(@Suspended final AsyncResponse response, @Context SecurityContext sc,
-                              @PathParam("ticket") int ticketId,
-                              @DefaultValue("1") @QueryParam("since") int limit) throws Exception
-    {
-
-        Principal principal = sc.getUserPrincipal();
-
-        try (DatabaseClient db = new DatabaseClient())
-        {
-            if (!db.isTicket(ticketId))
-                response.resume(Response.status(Response.Status.NOT_FOUND).build());
-
-            Map<String, String> ticket = db.getTicket(ticketId);
-            Map<String, String> project = db.getProject(ticket.get("projectKey"));
-
-            if (sc.isUserInRole("Admin") && !project.get("owner").equals(principal.getName()))
-                response.resume(Response.status(Response.Status.FORBIDDEN).build());
-
-            if (sc.isUserInRole("User") && !db.isUserMemberOfProject(principal.getName(), ticket.get("projectKey")))
-                response.resume(Response.status(Response.Status.FORBIDDEN).build());
-
-            try
-            {
-                List<Map<String, String>> messages = db.listenChannel(ticketId, limit);
-                response.resume(Response.ok(messages).build());
-            }
-
-            catch (SQLException e)
-            {
-                response.resume(Response.serverError().build());
-            }
         }
     }
 
