@@ -169,6 +169,8 @@ export default class Messages extends Component {
 			<GiftedChat
 				messages={messages}
 				loadEarlier={true}
+				returnKeyType="send"
+				onSubmitEditing={this.onSendPressed.bind(this)}
 				onLoadEarlier={this.onLoadEarlierPressed.bind(this)}
 				onInputTextChanged={(text) => this.setState({message: text})}
 				onSend={this.onSendPressed.bind(this)}
