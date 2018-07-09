@@ -35,7 +35,7 @@ export function getAuthForPost() {
 
 export function getAuthForMediaPost() {
 	return {
-		//'Content-Type': 'multipart/form-data',
+		'Content-Type': 'multipart/form-data',
 		'X-ASEPART-Role': 'User',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
