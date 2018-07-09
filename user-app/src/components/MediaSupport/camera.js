@@ -14,7 +14,7 @@ import {
 import { RNCamera } from 'react-native-camera';
 import { uploadFile } from '../Chat/files';
 import { ticket } from '../Chat/sendMessages';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export var uri = '';
 
@@ -48,24 +48,23 @@ renderCamera() {
         permissionDialogMessage={'We need your permission to use your camera phone'}
     >
     <View
-          style={{
-            flex: 0.2,
-            backgroundColor: 'transparent',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            alignSelf: 'flex-end',
-          }}
+          style={styles.bottomContainer}
     >
-    <TouchableOpacity style={styles.flipButton} onPress={this.toggleFacing.bind(this)}>
-      <Icon name="user" size={30} color="#FFF"/>
-    </TouchableOpacity>
-    <TouchableHighlight
-      style={ styles.capture }
-      onPress={this.takePicture.bind(this)}
-      underlayColor="rgba(255, 255, 255, 0.5)"
-    >
-      <Icon name="camera" size={30} color="#FFF"/>
-    </TouchableHighlight>
+      <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+        <TouchableOpacity style={styles.flipButton} onPress={this.toggleFacing.bind(this)}>
+          <Icon name="switch-camera" size={30} color="#FFF"/>
+        </TouchableOpacity>
+      </View>
+      <View style={{flex:3, alignItems: 'center', justifyContent: 'center'}}>
+        <TouchableHighlight
+          style={ styles.capture }
+          onPress={this.takePicture.bind(this)}
+        >
+          <Icon name="camera" size={30} color="#FFF"/>
+        </TouchableHighlight>
+      </View>
+      <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+      </View>
     </View>
     </RNCamera>
   </View>
@@ -79,18 +78,23 @@ renderImage() {
         source={{ uri: this.state.path }}
         style={styles.preview}
       />
-      <Text
-        style={styles.cancel}
-        onPress={() => this.setState({ path: null })}
-      >Cancel
-      </Text>
-      <TouchableHighlight
-      style={ styles.capture }
-      onPress={this.sendImage.bind(this)}
-      underlayColor="rgba(255, 255, 255, 0.5)"
-    >
-      <Icon name="cloud-upload" size={30} color="#FFF"/>
-    </TouchableHighlight>
+      <View
+        style={styles.bottomContainer}
+      >
+        <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+        <Icon name="replay" size={30} color="#FFF"/>
+        </View>
+        <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+          <TouchableHighlight
+          style={ styles.capture }
+          onPress={this.sendImage.bind(this)}
+        >
+          <Icon name="cloud-upload" size={30} color="#FFF"/>
+          </TouchableHighlight>
+        </View>
+        <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+        </View>
+      </View>
     </View>
   );
 }
@@ -132,17 +136,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#000',
   },
+  bottomContainer: {
+    flex: 0.2,
+    flexDirection: 'row',
+    // alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   flipButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
-    borderWidth: 2,
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
     borderColor: '#FFF',
-    left: 10,
-    flex: 0.1,
-    alignSelf: 'flex-end'
   },
   preview: {
     flex: 1,
@@ -152,19 +159,18 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width
   },
   capture: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 35,
     borderWidth: 5,
     borderColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'flex-end'
     // marginBottom: 10,
   },
   send: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 35,
     borderWidth: 5,
     borderColor: '#FFF',
