@@ -56,12 +56,12 @@ renderCamera() {
         </TouchableOpacity>
       </View>
       <View style={{flex:3, alignItems: 'center', justifyContent: 'center'}}>
-        <TouchableHighlight
+        <TouchableOpacity
           style={ styles.capture }
           onPress={this.takePicture.bind(this)}
         >
           <Icon name="camera" size={30} color="#FFF"/>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
       <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
       </View>
@@ -82,15 +82,17 @@ renderImage() {
         style={styles.bottomContainer}
       >
         <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
-        <Icon name="replay" size={30} color="#FFF"/>
+          <TouchableOpacity style={styles.flipButton} onPress={this.toggleFacing.bind(this)}>
+            <Icon name="replay" size={30} color="#FFF"/>
+          </TouchableOpacity>          
         </View>
         <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
-          <TouchableHighlight
+          <TouchableOpacity
           style={ styles.capture }
           onPress={this.sendImage.bind(this)}
         >
           <Icon name="cloud-upload" size={30} color="#FFF"/>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </View>
         <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
         </View>
@@ -168,19 +170,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // marginBottom: 10,
   },
-  send: {
-    width: 60,
-    height: 60,
-    borderRadius: 35,
-    borderWidth: 5,
-    borderColor: '#FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
   cancel: {
     backgroundColor: 'transparent',
-    color: '#FFF',
     fontWeight: '600',
     fontSize: 17,
     marginBottom: 20,
