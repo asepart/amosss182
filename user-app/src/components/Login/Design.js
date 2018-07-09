@@ -66,7 +66,6 @@ export default styles=StyleSheet.create({
       backgroundColor: '#009fca',
       paddingVertical: 15,
       width: '40%',
-      height: 40,
       marginBottom: 15,
       alignItems: 'center',
       justifyContent: 'center'
