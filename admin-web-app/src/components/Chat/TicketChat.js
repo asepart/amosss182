@@ -258,7 +258,7 @@ export default class TicketChat extends Component {
 				/>
 				<Button
 					onPress = { this.loadMoreMessages.bind(this) }
-					title = {"Show more Messages (" + (this.state.numChatMsgs * 2) + ')'}
+					title = {'Show more Messages'}
 				/>
 				<ScrollView
 					ref = {ref => this.scrollView = ref}
