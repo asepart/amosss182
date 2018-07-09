@@ -30,7 +30,7 @@ export async function uploadFile (file, ticket) {
 	//convert file into FormData
 	const image = {
 					uri: file.uri,
-					//type: 'multipart/form-data',
+					type: 'multipart/form-data',
 					name: filename
 	}
 	const imgBody = new FormData();
