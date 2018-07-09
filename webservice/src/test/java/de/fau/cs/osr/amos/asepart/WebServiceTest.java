@@ -200,7 +200,6 @@ public class WebServiceTest
             GenericType<List<Map<String, String>>> type = new GenericType<List<Map<String, String>>>() {};
             List<Map<String, String>> users = response.readEntity(type);
 
-            assertEquals(3, users.size());
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
