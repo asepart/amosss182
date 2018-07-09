@@ -69,12 +69,12 @@ public class WebServiceTest
     @Test
     void testLogin()
     {
-        try (Response response = getAdminClient().path("/login").request().options())
+        try (Response response = getAdminClient().path("/login/admin").request().options())
         {
             assertEquals(Response.Status.OK, Response.Status.fromStatusCode(response.getStatus()));
         }
 
-        try (Response response = getAdminClient().path("/login").request().get())
+        try (Response response = getAdminClient().path("/login/admin").request().get())
         {
             String answer = response.readEntity(String.class);
 
@@ -82,7 +82,7 @@ public class WebServiceTest
             assertEquals("Your identification is valid: admin", answer);
         }
 
-        try (Response response = getUserClient().path("/login").request().get())
+        try (Response response = getUserClient().path("/login/user").request().get())
         {
             String answer = response.readEntity(String.class);
 
@@ -94,7 +94,7 @@ public class WebServiceTest
     @Test
     void testUnauthorized()
     {
-        try (Response response = getClient().path("/login").request().get())
+        try (Response response = getClient().path("/login/admin").request().get())
         {
             String answer = response.readEntity(String.class);
 
@@ -106,7 +106,7 @@ public class WebServiceTest
     @Test
     void testWrongPassword()
     {
-        try (Response response = getClient("invalid", "wrong").path("/login").request().get())
+        try (Response response = getClient("invalid", "wrong").path("/login/user").request().get())
         {
             assertEquals(Response.Status.UNAUTHORIZED, Response.Status.fromStatusCode(response.getStatus()));
         }

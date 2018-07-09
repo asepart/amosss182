@@ -14,7 +14,6 @@ export function setUsername(lUsername) {
 export function getAuth() {
 	return {
 		'Accept': 'application/json',
-		'X-ASEPART-Role': 'Admin',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }
@@ -23,20 +22,18 @@ export function getAuthForPost() {
 	return {
 		'Accept': 'text/plain',
 		'Content-Type': 'application/json; charset=utf-8',
-		'X-ASEPART-Role': 'Admin',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }
 
 export function getAuthForMediaPost() {
 	return {
-		'X-ASEPART-Role': 'Admin',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }
 
 async function authenticate() {
-	var response = await fetch(URL + '/login', {
+	var response = await fetch(URL + '/login/admin', {
 		method: 'GET',
 		headers: getAuth()
 	})

@@ -3,7 +3,6 @@ import { Text, View, Button } from 'react-native';
 import { getAuth } from '../shared/auth';
 import { URL } from '../shared/const';
 import { setUpdateBoolean } from '../shared/GlobalState';
-import { Link } from 'react-router-dom';
 import { isImage, isVideo } from '../Chat/ChatMessage';
 import { ChatImage } from '../Chat/ChatImage';
 import { ChatVideo } from '../Chat/ChatVideo';
@@ -45,9 +44,7 @@ export class File extends Component {
 		return (
 			<View style={{flexDireaction:'row'}}>
 				<Text>
-					<Link to={URL + "/files/" + this.props.name.attachmentId } target="_blank">
-						{this.props.name.originalName}
-					</Link>
+					<a href={URL + "/files/" + this.props.name.attachmentId}>{this.props.name.originalName}</a> 
 					{this.props.del === 'true' ?
 						<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/>
 					: <p>{this.getPreview()}</p>}

@@ -19,7 +19,6 @@ export function getAuth() {
 	return {
 		
 		'Accept': 'application/json',
-		'X-ASEPART-Role': 'User',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }
@@ -28,7 +27,6 @@ export function getAuthForPost() {
 	return {
 		'Accept': 'text/plain',
 		'Content-Type': 'application/json; charset=utf-8',
-		'X-ASEPART-Role': 'User',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }
@@ -36,13 +34,12 @@ export function getAuthForPost() {
 export function getAuthForMediaPost() {
 	return {
 		'Content-Type': 'multipart/form-data',
-		'X-ASEPART-Role': 'User',
 		'Authorization': 'Basic ' + btoa(username + ":" + psw)
 	};
 }
 
 async function authenticate() {
-	var response = await fetch(URL + '/login', {
+	var response = await fetch(URL + '/login/user', {
 		method: 'GET',
 		headers: getAuth()
 	})

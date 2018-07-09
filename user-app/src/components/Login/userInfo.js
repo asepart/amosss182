@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native';
 import styles from './Design';
 import {setState} from './state';
 import {URL} from './const';
@@ -84,6 +84,7 @@ export default class UserInfo extends Component {
     	var buttonEnabled = (this.state.password !== '' && this.state.firstName !== '' && this.state.lastName !== '' && this.state.phoneNumber !== '');
     	
     	return (
+    			<ScrollView style={styles.containerScroll}>
     			<KeyboardAvoidingView style={styles.containerAlign} behavior="padding" enabled>
     		   <View style={styles.containerAlign}>
     		   		<TextInput
@@ -137,6 +138,7 @@ export default class UserInfo extends Component {
     		   		</TouchableOpacity>
     		   	</View>
     		   	</KeyboardAvoidingView>
+    		   	</ScrollView>
    	   );
     }
 }

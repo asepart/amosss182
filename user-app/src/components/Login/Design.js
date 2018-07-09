@@ -54,10 +54,8 @@ export default styles=StyleSheet.create({
     },
 
     containerButtonRow: {
-      height: 100,
       flexDirection: 'row',
       justifyContent: 'space-between',
-      padding: 20,
       backgroundColor: '#0c3868',
      
     },
@@ -66,7 +64,6 @@ export default styles=StyleSheet.create({
       backgroundColor: '#009fca',
       paddingVertical: 15,
       width: '40%',
-      height: 40,
       marginBottom: 15,
       alignItems: 'center',
       justifyContent: 'center'
