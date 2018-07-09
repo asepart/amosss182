@@ -75,7 +75,7 @@ export default class ProjectList extends Component {
      } else {
         this.setState({info: "Project not found", infoType: styles.error});
      }
-      
+     setUpdateBoolean(true);
     }
        
      

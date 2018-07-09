@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 window.btoa = require('Base64').btoa;
 export var status = '';
+var leaving = false;
 
 export default class ProjectListTicketList extends Component {
 
@@ -21,6 +22,7 @@ export default class ProjectListTicketList extends Component {
 	}
 
 	componentDidMount() {
+		this.leaving = false;
 		this.props.navigation.setParams({ update: this.updateUser });
 		this.fetchTicketDetails();
 	}
@@ -30,12 +32,6 @@ export default class ProjectListTicketList extends Component {
 			this.fetchTicketDetails();
 			setUpdateBoolean(false);
 		}
-		}
-
-		componentWillUnmount() {
-		const { navigate } = this.props.navigation;
-		navigate("Tenth", { name: "ProjectList" })
-		setUpdateBoolean(true);
 	}
 
 
@@ -54,6 +50,7 @@ export default class ProjectListTicketList extends Component {
 	}
 
 	leaveProject() {
+		this.leaving = true;
         let projectKey = this.props.navigation.state.params.entryKey;
 		fetch(URL + '/leave', {
 			method: 'POST',
@@ -89,7 +86,9 @@ export default class ProjectListTicketList extends Component {
 	}
 
 	_getTicketStatus({item}) {
-		setUpdateBoolean(true);
+		if(!this.leaving) {
+			setUpdateBoolean(true);
+		}
 		status = item.status;
 		switch (status){
 			case 'open':
