@@ -211,7 +211,6 @@ export default class TicketView extends Component {
 					<Text>
 				</Text>
 					<FlatList
-					style={styles.textLarge}
 					data={this.state.ticketMedia}
 					renderItem={this._renderMedia.bind(this)}
 					keyExtractor={(item, index) => {return index.toString()}}
