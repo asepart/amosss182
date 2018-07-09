@@ -124,34 +124,23 @@ export default class Messages extends Component {
 
 		//remap dataSource to GiftedChat supported object array
 		const messages = this.state.dataSource.map((message) => {
-				if(message.attachment === null) {
-					return {
-						_id: message.id,
-						text: message.content,
-						user: Object.assign({_id: message.sender, name: message.sender}),
-						createdAt: new Date(parseInt(message.timestamp)),
-					};
-				}
-				else {
-					if(this.isImage(message.originalName) === true) {
-						return {
-							_id: message.id,
-							text: message.content,
-							user: Object.assign({_id: message.sender, name: message.sender}),
-							createdAt: new Date(parseInt(message.timestamp)),
-							image: URL + '/files/' + message.attachment + '?thumbnail=false',
-						};
-					}
-					else {
-						return {
-							_id: message.id,
-							text: message.content,
-							user: Object.assign({_id: message.sender, name: message.sender}),
-							createdAt: new Date(parseInt(message.timestamp)),
-							image: URL + '/files/' + message.attachment + '?thumbnail=true',
-						};
-					}
-				}
+			if(message.attachment === null) {
+				return {
+					_id: message.id,
+					text: message.content,
+					user: Object.assign({_id: message.sender, name: message.sender}),
+					createdAt: new Date(parseInt(message.timestamp)),
+				};
+			}
+			else {
+				return {
+					_id: message.id,
+					text: message.content,
+					user: Object.assign({_id: message.sender, name: message.sender}),
+					createdAt: new Date(parseInt(message.timestamp)),
+					image: URL + '/files/' + message.attachment + '?thumbnail=true',
+				};
+			}
 		});
 
 		//GiftedChat somehow shows the newest message at the top right now
