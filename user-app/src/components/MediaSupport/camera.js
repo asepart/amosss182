@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
+  ToastAndroid,
   View
 } from 'react-native';
 // import styles from '../Login/Design';
@@ -85,10 +86,10 @@ renderImage() {
       </Text>
       <TouchableHighlight
       style={ styles.capture }
-      onPress={uploadFile(this.state.path, ticket)}
+      onPress={this.sendImage.bind(this)}
       underlayColor="rgba(255, 255, 255, 0.5)"
     >
-      <Icon name="cloud-upload-alt" size={30} color="#FFF"/>
+      <Icon name="cloud-upload" size={30} color="#FFF"/>
     </TouchableHighlight>
     </View>
   );
@@ -109,11 +110,18 @@ render() {
         const options = { quality: 0.5 };
         data = await this.camera.takePictureAsync(options);
         this.setState({ path: data.uri });
-        // uploadFile(data.uri, ticket);
       };
     } catch (err) {
       console.log('err: ', err);
     }
+  };
+
+  sendImage () {
+    uploadFile(this.state.path, ticket).then(function(){
+      //navigate back to the camera
+      ToastAndroid.show('The photo was sent!', ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+    });
+    this.setState({ path: null });
   };
 };
 
