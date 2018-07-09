@@ -1,11 +1,5 @@
 import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Button
-} from 'react-native';
+import {AppRegistry, StyleSheet, Text, View, Button} from 'react-native';
 import {setTicketID, msg, ticket} from '../Chat/sendMessages';
 import {uploadFile, type} from '../Chat/files';
 import CameraRollPicker from 'react-native-camera-roll-picker';
@@ -14,7 +8,7 @@ var buttonEnabled = false;
 var library = '';
 
 export default class CameraRollPicer extends Component {
-	
+
 	static navigationOptions = ({ navigation }) => {
 		if (type == 'Photos') {
 			library = 'Photo Library';
@@ -34,56 +28,52 @@ export default class CameraRollPicer extends Component {
 		headerRight: <Button title={"Send"} onPress={ () => params.send() } disabled={!buttonEnabled} />
 		}
 	}
-	
+
 	constructor(props) {
 		super(props);
-		
+
 		this.state = {
 				num: 0,
 				selected: [],
 		};
-		
+
 		buttonEnabled = false;
 	}
-	
+
 	componentDidMount () {
-	    this.props.navigation.setParams({ send: this.sendFile })
-	  }
-	
-	sendFile = () => {
-		
-		//send file to backend
-		for(let i = 0; i < this.state.num; i++){
-			
-			setTimeout(() => {
-				 
-				uploadFile(this.state.selected[i].uri, ticket);
-			 
-			    }, i*1000);
+			this.props.navigation.setParams({ send: this.sendFile })
 		}
-		
+
+	sendFile = () => {
+		//send file to backend
+		for(let i = 0; i < this.state.num; i++) {
+			setTimeout(() => {
+				uploadFile(this.state.selected[i], ticket);
+			}, i*1000);
+		}
+
 		//navigate back to chat
 		const { navigate } = this.props.navigation;
 		navigate("Seventh", { name: "GetMessages" });
 	}
-	
+
 	getSelectedImages(images, current) {
 		var num = images.length;
-		
+
 		this.setState({
 			num: num,
 			selected: images,
 		});
-		
+
 		buttonEnabled = (num >= 1);
-		
+
 		const { navigate } = this.props.navigation;
 		navigate("Eleventh", { refresh: "CameraRollPicker" });
-		
+
 		console.log(current);
-		console.log(this.state.selected);
+		//console.log(this.state.selected);
 	}
-	
+
 	render() {
 		return (
 			<View style={styles.container}>
@@ -105,7 +95,8 @@ export default class CameraRollPicer extends Component {
 					assetType={type}
 					imagesPerRow={3}
 					imageMargin={5}
-					callback={this.getSelectedImages.bind(this)} />
+					callback={this.getSelectedImages.bind(this)}
+				/>
 			</View>
 		);
 	}
