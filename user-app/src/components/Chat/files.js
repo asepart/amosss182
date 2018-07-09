@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import {Platform, ToastAndroid} from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
@@ -46,6 +46,7 @@ export async function uploadFile (uri, ticket) {
 		return response.text()
 	})
 	.then((responseText) => {
+		ToastAndroid.show('Sent!', ToastAndroid.SHORT, ToastAndroid.BOTTOM);
 		console.log(URL + '/files/' + ticket)
 		console.log("promise is: " + responseText)
 		//send file url to chat
