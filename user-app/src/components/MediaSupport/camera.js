@@ -28,12 +28,6 @@ export default class CameraAccess extends Component {
     };
   }
 
-  toggleFacing() {
-    this.setState({
-      type: this.state.type === 'back' ? 'front' : 'back',
-    });
-}
-
 renderCamera() {
   return (
     <View style={styles.container}>
@@ -82,7 +76,7 @@ renderImage() {
         style={styles.bottomContainer}
       >
         <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
-          <TouchableOpacity style={styles.flipButton} onPress={this.toggleFacing.bind(this)}>
+          <TouchableOpacity style={styles.flipButton} onPress={this.switchCamera.bind(this)}>
             <Icon name="replay" size={30} color="#FFF"/>
           </TouchableOpacity>          
         </View>
@@ -109,9 +103,19 @@ render() {
   );
 }
 
+  toggleFacing() {
+    this.setState({
+      type: this.state.type === 'back' ? 'front' : 'back',
+    });
+  }
+
+  switchCamera() {
+    //navigate back to the camera
+    this.setState({ path: null});
+  };
+
   takePicture = async function() {
     try {
-      console.log(" ========================== takePicture =================================");
       if (this.camera) {
         const options = { quality: 0.5 };
         data = await this.camera.takePictureAsync(options);
@@ -123,11 +127,13 @@ render() {
   };
 
   sendImage () {
-    uploadFile(this.state.path, ticket).then(function(){
+    try{
+      uploadFile(this.state.path, ticket);
       //navigate back to the camera
-      ToastAndroid.show('The photo was sent!', ToastAndroid.SHORT, ToastAndroid.BOTTOM);
-    });
-    this.setState({ path: null });
+      this.setState({ path: null });  
+    } catch (err) {
+      console.log('err: ', err);
+    }
   };
 };
 
