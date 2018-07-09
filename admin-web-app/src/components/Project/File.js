@@ -3,7 +3,6 @@ import { Text, View, Button } from 'react-native';
 import { getAuth } from '../shared/auth';
 import { URL } from '../shared/const';
 import { setUpdateBoolean } from '../shared/GlobalState';
-import { Link } from 'react-router-dom';
 import { isImage, isVideo } from '../Chat/ChatMessage';
 import { ChatImage } from '../Chat/ChatImage';
 import { ChatVideo } from '../Chat/ChatVideo';
