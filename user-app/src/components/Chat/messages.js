@@ -133,13 +133,24 @@ export default class Messages extends Component {
 					};
 				}
 				else {
-					return {
-						_id: message.id,
-						text: message.content,
-						user: Object.assign({_id: message.sender, name: message.sender}),
-						createdAt: new Date(parseInt(message.timestamp)),
-						image: URL + '/files/' + message.attachment + '?thumbnail=false',
-					};
+					if(this.isImage(message.originalName) === true) {
+						return {
+							_id: message.id,
+							text: message.content,
+							user: Object.assign({_id: message.sender, name: message.sender}),
+							createdAt: new Date(parseInt(message.timestamp)),
+							image: URL + '/files/' + message.attachment + '?thumbnail=false',
+						};
+					}
+					else {
+						return {
+							_id: message.id,
+							text: message.content,
+							user: Object.assign({_id: message.sender, name: message.sender}),
+							createdAt: new Date(parseInt(message.timestamp)),
+							image: URL + '/files/' + message.attachment + '?thumbnail=true',
+						};
+					}
 				}
 		});
 
