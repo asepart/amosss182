@@ -3,7 +3,7 @@ import {Button, ActivityIndicator, Text, View, TextInput, ScrollView, Dimensions
 import {URL, FileSelector} from '../shared/const';
 import {getAuth, getAuthForMediaPost} from '../shared/auth';
 import {setMsg, sendMessage, setTicketID, setAttachment, sendAttachment} from './sendMessages';
-import {getUpdateBoolean, setUpdateBoolean} from '../shared/GlobalState';
+import {setUpdateBoolean} from '../shared/GlobalState';
 import {sleep} from '../shared/functions';
 import ChatMessage from './ChatMessage';
 
