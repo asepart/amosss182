@@ -42,6 +42,8 @@ To build the app you have to change the directory to `user-app` and run
 
 `$ npm install`
 
-`$ npm start`
+The command `$ npm start` fails at the moment, therefore it is not possible to run the app using Expo.
 
-The console outputs an QR code which can be scanned using the "Expo" app which must be installed from the Play Store.
+In order to test the app, one should have a running Android Emulator or a connected Android phone in the debugging mode.
+
+`$ npm run android`

@@ -5,7 +5,7 @@ import GetMessages from './src/components/Chat/messages';
 import TicketView from '../user-app/src/components/Projects/ticketView';
 import TicketProcessing from './src/components/Tickets/ticketProcessed';
 import CameraRollPicker from '../user-app/src/components/MediaSupport/cameraRollPicker';
-import Camera from '../user-app/src/components/MediaSupport/camera';
+import CameraAccess from '../user-app/src/components/MediaSupport/camera';
 import UserInfo from './src/components/Login/userInfo';
 import ProjectListTicketList from '../user-app/src/components/Projects/projectListTicketList';
 
@@ -30,7 +30,7 @@ const AppNavigation = createStackNavigator({
   })},
   Seventh: {screen: GetMessages},
   Eigth: {screen: TicketProcessing },
-  Ninth: {screen: Camera },
+  Ninth: {screen: CameraAccess },
   Tenth: {screen:ProjectList},
   Eleventh: {screen: CameraRollPicker},
   Twelfth: {screen: ProjectListTicketList,

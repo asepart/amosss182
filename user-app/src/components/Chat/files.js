@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import {Platform, ToastAndroid} from 'react-native';
 import {URL} from '../Login/const';
 import {getAuth, getAuthForMediaPost} from '../Login/auth';
 import {setMsg, sendMessage} from './sendMessages';
@@ -46,6 +46,8 @@ export async function uploadFile (file, ticket) {
 		return response.text()
 	})
 	.then((responseText) => {
+		ToastAndroid.show('Sent!', ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+		console.log(URL + '/files/' + ticket)
 		//TODO: why does this not work for mp4?
 		console.log("promise is: " + responseText)
 		

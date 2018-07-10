@@ -18,22 +18,25 @@ export default class CustomActions extends React.Component {
   }
 
   onActionsPress() {
-	const options = ['Photo Library', 'Video Library', 'Cancel'];
+	const options = ['Camera', 'Photo Library', 'Video Library', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
       options,
       cancelButtonIndex,
     },
     (buttonIndex) => {
+    var { navigate } = this.props.navigation;
       switch (buttonIndex) {
         case 0:
         	setType('Photos');
-        	var { navigate } = this.props.navigation;
+        	navigate("Ninth", { name: "CameraAccess" });
+        	break;
+        case 1:
+        	setType('Photos');
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
-        case 1:
+        case 2:
         	setType('Videos');
-        	var { navigate } = this.props.navigation;
 			navigate("Eleventh", { name: "CameraRollPicker" });
 			break;
         default:
