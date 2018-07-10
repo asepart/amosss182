@@ -65,7 +65,7 @@ export default class UpdateTicketButton extends Component {
 		this.props.callToParent();
 		setUpdateBoolean(true);
 		this.setState({
-		  open: false
+			open: false
 		})
 	}
 
@@ -113,12 +113,15 @@ export default class UpdateTicketButton extends Component {
 	deleteFile(name) {
 		return; //do nothing
 
+		//commented out unreachable code
+		/*
 		var files = this.state.files;
 		var index = files.indexOf(name);
 		if (index > -1) {
-		  files.splice(index, 1);
+			files.splice(index, 1);
 		}
 		this.setState({files: files});
+		*/
 
 		//TODO: one could delete the file from the server
 	}

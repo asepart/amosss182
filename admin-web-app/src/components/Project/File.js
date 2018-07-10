@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
-import { Text, View, Button } from 'react-native';
+import { Text, View } from 'react-native';
 import { getAuth } from '../shared/auth';
 import { URL } from '../shared/const';
-import { setUpdateBoolean } from '../shared/GlobalState';
 import { isImage, isVideo } from '../Chat/ChatMessage';
 import { ChatImage } from '../Chat/ChatImage';
 import { ChatVideo } from '../Chat/ChatVideo';
-import CPopup from '../shared/CPopup';
 
 export class File extends Component {
+	
+	//useless constructor warning
+	/*
 	constructor(props) {
 		super(props);
 	}
+	*/
 
 	deleteFile() {
 		fetch(URL + '/tickets/' + this.props.name.ticketId + '/attachments/' + this.props.name.attachmentId, {
@@ -44,7 +46,7 @@ export class File extends Component {
 		return (
 			<View style={{flexDireaction:'row'}}>
 				<Text>
-					<a href={URL + "/files/" + this.props.name.attachmentId}>{this.props.name.originalName}</a> 
+					<a href={URL + "/files/" + this.props.name.attachmentId}>{this.props.name.originalName}</a>
 					{this.props.del === 'true' ?
 						<img src={require('../images/delete.png')} onClick={this.deleteFile.bind(this)} style={{height: 15, width: 15, marginBottom: -5}} alt="delete"/>
 					: <p>{this.getPreview()}</p>}
