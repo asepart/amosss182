@@ -119,6 +119,7 @@ render() {
       if (this.camera) {
         const options = { quality: 0.5 };
         data = await this.camera.takePictureAsync(options);
+        this.setState({ file: data });
         this.setState({ path: data.uri });
       };
     } catch (err) {
@@ -128,7 +129,7 @@ render() {
 
   sendImage () {
     try{
-      uploadFile(this.state.path, ticket);
+      uploadFile(this.state.file, ticket);
       //navigate back to the camera
       this.setState({ path: null });  
     } catch (err) {
