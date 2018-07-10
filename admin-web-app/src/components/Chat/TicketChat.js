@@ -27,16 +27,6 @@ export default class TicketChat extends Component {
 		setUpdateBoolean(true);
 	}
 
-	addNewestMessages(response){
-		let messages = this.state.chatHistory;
-		//add new all messages and remove old ones to stabilize the array length
-		response.forEach(msg => {
-			messages.push(msg); 
-			messages.shift()
-		});
-		return messages;
-	}
-
 	componentDidMount() {
 		if(this.props.name === undefined || this.props.tName === undefined) {
 			this.fetchTicketName();
@@ -45,10 +35,6 @@ export default class TicketChat extends Component {
 
 		this.fetchMessages();
 		this.listenForNewMessages();
-	}
-
-	componentWillUnmount() {
-		//clearInterval(this.interval);
 	}
 
 	componentDidUpdate() {
@@ -105,33 +91,6 @@ export default class TicketChat extends Component {
 			console.log("Zzzzz…")
 		}
 		while (true){
-			/*
-			try {
-				var response = await fetch(URL + '/listen/' + this.state.idTicket + '?since=' + this.state.newestMsgId, {
-					method: 'GET',
-					headers: getAuth()
-				});
-				switch (response.status) {
-					case 200:
-						let maxID = Math.max.apply(Math, response.map(o => {return Number(o.id)}));
-						this.setState({
-							isLoading: false,
-							chatHistory: this.addNewestMessages(response),
-							newestMsgId: maxID
-						});
-						break;
-					case 503:
-						console.log("no msg within 30 sec")
-						break;
-					default:
-						console.error("Error:" + response.status);
-						console.error(response.text);
-				}
-
-			} catch (e) {
-				console.error(e);
-			}
-			*/
 			this.fetchMessages();
 			await sleep(10000);
 			if (window.location.pathname.indexOf('chat') === -1)
