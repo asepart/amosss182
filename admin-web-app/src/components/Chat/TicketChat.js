@@ -30,7 +30,10 @@ export default class TicketChat extends Component {
 	addNewestMessages(response){
 		let messages = this.state.chatHistory;
 		//add new all messages and remove old ones to stabilize the array length
-		response.forEach(msg => {messages.push(msg), messages.shift()});
+		response.forEach(msg => {
+			messages.push(msg); 
+			messages.shift()
+		});
 		return messages;
 	}
 
