@@ -1,1 +1,1 @@
-export const URL = "https://asepartback-dev.herokuapp.com";
+export const URL = "https://asepartback.herokuapp.com";
