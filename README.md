@@ -36,7 +36,7 @@ Your browser will be opened displaying the web app.
 
 ## User App
 
-### Android
+### Android/iOS (using Expo App)
 
 To build the app you have to change the directory to `user-app` and run
 
@@ -44,4 +44,8 @@ To build the app you have to change the directory to `user-app` and run
 
 `$ npm start`
 
-The console outputs an QR code which can be scanned using the "Expo" app which must be installed from the Play Store.
+The console outputs an QR code which can be scanned using the "Expo" app which must be installed from the Play Store/App Store.
+
+### APK file (Android only)
+
+Download the .apk file from the "Releases" section and copy it to your phone. You may need to allow the installation of unknown apps in your system settings.
