@@ -38,8 +38,7 @@ import io.minio.ErrorCode;
 import io.minio.errors.ErrorResponseException;
 
 /**
- * Implements the ASEPART REST API as described in
- * api file webservice-api.txt.
+ * Implements the ASEPART REST API - see wiki for description.
  */
 
 @Path("/")
